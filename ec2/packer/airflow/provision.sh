@@ -44,10 +44,9 @@ sudo python ./awslogs-agent-setup.py -n -r us-east-1 -c /home/ubuntu/awslogs.con
 echo "------------------- install aws logs -------------------"
 
 mkdir /home/ubuntu/airflow/dags
-mkdir /home/ubuntu/airflow/plugins
 echo "------------------- create dag and plugins directory complete -------------------"
 
-cp /home/ubuntu/snowflake_hook.py /home/ubuntu/airflow/plugins
+cp /home/ubuntu/snowflake_hook.py /home/ubuntu/venv/lib/python2.7/site-packages/airflow/contrib/hooks/snowflake_hook.py
 echo "------------------- copy snowflake complete -------------------"
 
 sudo service awslogs start
