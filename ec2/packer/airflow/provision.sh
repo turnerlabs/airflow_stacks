@@ -82,7 +82,7 @@ sudo cp /home/ubuntu/airflow.sysconfig /etc/profile.d/airflow.sh
 sudo cp /home/ubuntu/airflow.conf //usr/lib/tmpfiles.d
 
 sudo cp /home/ubuntu/airflow-webserver.service /lib/systemd/system/airflow-webserver.service
-sudo cp /home/ubuntu/airflow-scheduler.service /lib/systemd/system/airflow-scheuler.service
+sudo cp /home/ubuntu/airflow-scheduler.service /lib/systemd/system/airflow-scheduler.service
 sudo cp /home/ubuntu/airflow-worker.service /lib/systemd/system/airflow-worker.service
 
 sudo mkdir /run/airflow

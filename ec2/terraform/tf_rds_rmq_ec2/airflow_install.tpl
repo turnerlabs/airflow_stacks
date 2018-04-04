@@ -1,9 +1,11 @@
 #!/bin/bash -xe
 
-mysql --host=${rds_url} --user=${db_master_username} --password=${db_master_password} -e "CREATE DATABASE ${airflow_dbname} /*\!40100 DEFAULT CHARACTER SET ${airflow_db_charset} */;"
-mysql --host=${rds_url} --user=${db_master_username} --password=${db_master_password} -e "CREATE USER '${db_airflow_username}'@'%' IDENTIFIED BY '${db_airflow_password}';"
+mysql --host=${rds_url} --user=${db_master_username} --password=${db_master_password} -e "CREATE DATABASE IF NOT EXISTS ${airflow_dbname} /*\!40100 DEFAULT CHARACTER SET ${airflow_db_charset} */;"
+mysql --host=${rds_url} --user=${db_master_username} --password=${db_master_password} -e "CREATE USER IF NOT EXISTS '${db_airflow_username}'@'%' IDENTIFIED BY '${db_airflow_password}';"
 mysql --host=${rds_url} --user=${db_master_username} --password=${db_master_password} -e "GRANT ALL PRIVILEGES ON ${airflow_dbname}.* TO '${db_airflow_username}'@'%';"
 mysql --host=${rds_url} --user=${db_master_username} --password=${db_master_password} -e "FLUSH PRIVILEGES;"
+
+export AIRFLOW_HOME=/home/ubuntu/airflow
 
 cd /home/ubuntu/airflow
 
