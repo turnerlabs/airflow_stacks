@@ -1,7 +1,5 @@
 #!/bin/bash -xe
 
-su ubuntu
-
 mysql --host=${rds_url} --user=${db_master_username} --password=${db_master_password} -e "CREATE DATABASE ${airflow_dbname} /*\!40100 DEFAULT CHARACTER SET ${airflow_db_charset} */;"
 mysql --host=${rds_url} --user=${db_master_username} --password=${db_master_password} -e "CREATE USER '${db_airflow_username}'@'%' IDENTIFIED BY '${db_airflow_password}';"
 mysql --host=${rds_url} --user=${db_master_username} --password=${db_master_password} -e "GRANT ALL PRIVILEGES ON ${airflow_dbname}.* TO '${db_airflow_username}'@'%';"
@@ -22,12 +20,16 @@ auth_backend = airflow.contrib.auth.backends.password_auth" airflow.cfg
 sed -i -e "/\[core\]/a\\
 remote_base_log_folder = s3://${s3_log_bucket_name}" airflow.cfg
 
-source /home/ubuntu/venv/bin/activate
+/home/ubuntu/venv/bin/airflow initdb
 
-airflow initdb
+systemctl enable airflow-webserver
+systemctl enable airflow-scheduler
+systemctl enable airflow-worker
 
-python /home/ubuntu/adduser.py -u airflow -e airflow@turner.com -p airflowpassword
+systemctl daemon-reload
 
-nohup airflow webserver $* >> ~/airflow/logs/webserver.log &
-nohup airflow scheduler $* >> ~/airflow/logs/scheduler.log &
-nohup airflow worker $* >> ~/airflow/logs/worker.log &
+systemctl start airflow-webserver
+systemctl start airflow-scheduler
+systemctl start airflow-worker
+
+/home/ubuntu/venv/bin/python /home/ubuntu/adduser.py -u airflow -e airflow@turner.com -p airflowpassword
