@@ -18,7 +18,7 @@
         "source_ami": "ami-41e0b93b",
         "instance_type": "t2.medium",
         "ssh_username": "ubuntu",
-        "ami_name": "airflow {{timestamp}}",
+        "ami_name": "airflowpython3 {{timestamp}}",
         "vpc_id": "{{user `vpcid_to_build_in`}}",
         "subnet_id": "{{user `subnetid_to_build_in`}}",
         "run_tags": {

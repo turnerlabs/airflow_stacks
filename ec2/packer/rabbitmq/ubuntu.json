@@ -22,7 +22,7 @@
         "vpc_id": "{{user `vpcid_to_build_in`}}",
         "subnet_id": "{{user `subnetid_to_build_in`}}",
         "run_tags": {
-            "Name": "sftp packer ami builder",
+            "Name": "rabbitmq packer ami builder",
             "application": "{{user `tag_application`}}",
             "contact-email": "{{user `tag_contact_email`}}",
             "customer": "{{user `tag_customer`}}",
@@ -30,21 +30,20 @@
             "environment": "{{user `tag_environment`}}"
         }
     }],
-    "provisioners": [
-    {
-        "type": "file",
-        "source": "erlang",
-        "destination": "/home/ubuntu/erlang"
-    },
-    {
-        "type": "file",
-        "source": "limits.conf",
-        "destination": "/home/ubuntu/limits.conf"
-    },
-    {
-        "type": "shell",
-        "execute_command": "{{.Vars}} bash '{{.Path}}'",
-        "script": "provision.sh"
-    }
-  ]
+    "provisioners": [{
+            "type": "file",
+            "source": "erlang",
+            "destination": "/home/ubuntu/erlang"
+        },
+        {
+            "type": "file",
+            "source": "limits.conf",
+            "destination": "/home/ubuntu/limits.conf"
+        },
+        {
+            "type": "shell",
+            "execute_command": "{{.Vars}} bash '{{.Path}}'",
+            "script": "provision.sh"
+        }
+    ]
 }
