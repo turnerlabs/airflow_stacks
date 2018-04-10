@@ -21,9 +21,6 @@ def main(argv):
             emailaddress = arg
         elif opt in ("-p", "--password"):
             password = arg
-    print 'Output username is ', username
-    print 'Output emailaddress is ', emailaddress
-    print 'Output password is ', password
     user = PasswordUser(models.User())
     user.username = username
     user.email = emailaddress

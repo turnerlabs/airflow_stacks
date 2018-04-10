@@ -11,9 +11,9 @@ def main(argv):
     try:
         opts, args = getopt.getopt(argv,"u:e:p:",["username=","emailaddress=","password="])
     except getopt.GetoptError:
-        print 'adduser.py -u <username> -e <emailaddress> -p <password>'
+        print('adduser.py -u <username> -e <emailaddress> -p <password>')
         sys.exit(2)
-    print 'OPTIONS :', opts
+    print('OPTIONS :', opts)
     for opt, arg in opts:
         if opt in ("-u", "--username"):
             username = arg
@@ -21,9 +21,6 @@ def main(argv):
             emailaddress = arg
         elif opt in ("-p", "--password"):
             password = arg
-    print 'Output username is ', username
-    print 'Output emailaddress is ', emailaddress
-    print 'Output password is ', password
     user = PasswordUser(models.User())
     user.username = username
     user.email = emailaddress

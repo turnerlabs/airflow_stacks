@@ -99,3 +99,14 @@ echo "------------------- copy systemd components complete -------------------"
 sudo mkdir /run/airflow
 sudo chown ubuntu:ubuntu /run/airflow
 echo "------------------- modified pid directory complete -------------------"
+
+pip install --upgrade jsonpatch
+
+cd /home/ubuntu
+wget https://launchpad.net/cloud-init/trunk/18.2/+download/cloud-init-18.2.tar.gz
+tar -zxvf /home/ubuntu/cloud-init-18.2.tar.gz
+cd /home/ubuntu/cloud-init-18.2/
+python setup.py build
+python setup.py install --init-system systemd
+sudo cp /home/ubuntu/venv/bin/cloud-init /usr/bin/cloud-init
+echo "------------------- cloud init fix -------------------"
