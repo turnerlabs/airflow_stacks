@@ -9,6 +9,8 @@ export AIRFLOW_HOME=/home/ubuntu/airflow
 
 cd /home/ubuntu/airflow
 
+
+sed -i -e "s/expose_config = False/expose_config = True/g" airflow.cfg
 sed -i -e "s/executor = SequentialExecutor/executor = CeleryExecutor/g" airflow.cfg
 sed -i -e "s/remote_log_conn_id =/remote_log_conn_id = s3_logging_conn/g" airflow.cfg
 sed -i -e "s/load_examples = True/load_examples = False/g" airflow.cfg
