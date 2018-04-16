@@ -24,4 +24,6 @@ packer build
 -var 'tag_team=<>'
 -var 'tag_environment=<>'
 -var 'vpcid_to_build_in=<>'
--var 'subnetid_to_build_in=<>'  ubuntu.json
+-var 'subnetid_to_build_in=<>'
+ubuntu.json
+```

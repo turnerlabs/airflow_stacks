@@ -25,6 +25,10 @@ A Key Pair has already been created.
 Please check the variables.tf for a clear description of what each variable is that is passed to this terraform.
 
 ```bash
+terraform init
+```
+
+```bash
 terraform apply
 -var 'tag_name=<>'
 -var 'tag_application=<>'
@@ -37,9 +41,10 @@ terraform apply
 -var 'subnet_id2=<>'
 -var 'db_instance_class=<>'
 -var 'db_identifier=<>'
--var 'airflow_ami=<>'
--var 'airflow_instance_class=<>'
--var 'airflow_keypair_name=<>'
+-var 'db_master_username=<>'
+-var 'db_master_password=<>'
+-var 'db_airflow_username=<>'
+-var 'db_airflow_password=<>'
 -var 'rabbitmq_ami=<>'
 -var 'rabbitmq_instance_class=<>'
 -var 'rabbitmq_keypair_name=<>'
@@ -47,10 +52,9 @@ terraform apply
 -var 'rabbitmq_admin_password=<>'
 -var 'rabbitmq_airflow_username=<>'
 -var 'rabbitmq_airflow_password=<>'
--var 'db_master_username=<>'
--var 'db_master_password=<>'
--var 'db_airflow_username=<>'
--var 'db_airflow_password=<>'
+-var 'airflow_ami=<>'
+-var 'airflow_instance_class=<>'
+-var 'airflow_keypair_name=<>'
 -var 'airflow_username=<>'
 -var 'airflow_emailaddress=<>'
 -var 'airflow_password=<>'
