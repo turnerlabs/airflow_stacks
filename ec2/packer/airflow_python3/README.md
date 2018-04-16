@@ -31,6 +31,9 @@ snowflake-connector-python - https://github.com/aberdave/airflow-snowflake
 - All airflow specific logs(webserver, scheduler, worker) will go to cloudwatch logs
 - Airflow logs are rotated out every night using logrotate since they get very large quickly.
 
+Here's the command line needed to build the AMI.
+
+```bash
 packer build
 -var 'tag_application=<>'
 -var 'tag_contact_email=<>'
@@ -38,5 +41,4 @@ packer build
 -var 'tag_team=<>'
 -var 'tag_environment=<>'
 -var 'vpcid_to_build_in=<>'
--var 'subnetid_to_build_in=<>'
-ubuntu.json
+-var 'subnetid_to_build_in=<>'  ubuntu.json

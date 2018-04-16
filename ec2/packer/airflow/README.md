@@ -1,10 +1,10 @@
 # Description
 
-This is a packer builder and custom provisioner to create an AMI for airflow
+This is a packer builder and custom provisioner to create a Python 2.7 AMI for airflow
 
 ## Builder
 
-The builder phase uses a t2 medium in the east region as the instance type to run the provisioner on.  The instance size can be changed to something larger if you need to create the AMI faster.  This is just for building the AMI and has no bearing on the long running instance.  That is determined in the terraform script.
+The builder phase uses a t2 medium of the Ubuntu 16.04 AMI in the east region as the instance type to run the provisioner on.  The instance size can be changed to something larger if you need to create the AMI faster.  This is just for building the AMI and has no bearing on the long running instance.  That is determined in the terraform script.
 
 ## Provisioner
 
@@ -13,7 +13,7 @@ The provisioner phase installs all the airflow server components.  If you take a
 
 ## Process
 
-Once the provisioner has completed, an image will be created using the ami_name in the ubuntu.json file.
+Once the provisioner has completed, an AMI will be created using the ami_name in the ubuntu.json file.
 
 ## Airflow SubPackages that are installed:
 Default ones(from http://airflow.readthedocs.io/en/latest/installation.html)
@@ -26,11 +26,13 @@ snowflake-connector-python - https://github.com/aberdave/airflow-snowflake
 - Celery as the worker task executor
 - RabbitMQ is the queue used for Celery
 - RDS MySQL is the database used for both airflow and celery.
-- S3 will receive all the logs(in process).
-- Snowflake(in process)
+- Snowflake
 - All airflow specific logs(webserver, scheduler, worker) will go to cloudwatch logs
 - Airflow logs are rotated out every night using logrotate since they get very large quickly.
 
+Here's the command line needed to build the AMI.
+
+```bash
 packer build
 -var 'tag_application=<>'
 -var 'tag_contact_email=<>'
@@ -38,5 +40,4 @@ packer build
 -var 'tag_team=<>'
 -var 'tag_environment=<>'
 -var 'vpcid_to_build_in=<>'
--var 'subnetid_to_build_in=<>'
-ubuntu.json
+-var 'subnetid_to_build_in=<>'  ubuntu.json
