@@ -7,3 +7,7 @@ This repo is an attempt to put all the Airflow operationalized knowledge into on
 **ec2** -  directory has an Airflow Terraform / Packer stack based around Airflow, Rabbitmq, RDS.
 
 **docker** - directory will eventually be an Airflow stack using the same components in Fargate.
+
+### Articles on Airflow
+
+<http://michal.karzynski.pl/blog/2017/03/19/developing-workflows-with-apache-airflow/>

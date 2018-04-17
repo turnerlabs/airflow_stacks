@@ -36,4 +36,4 @@ systemctl start airflow-webserver
 systemctl start airflow-scheduler
 systemctl start airflow-worker
 
-/home/ubuntu/venv/bin/python /home/ubuntu/adduser.py -u airflow -e airflow@turner.com -p airflowpassword
+/home/ubuntu/venv/bin/python /home/ubuntu/adduser.py -u ${airflow_username} -e ${airflow_emailaddress} -p ${airflow_password}
