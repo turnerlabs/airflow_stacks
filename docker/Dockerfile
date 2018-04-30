@@ -13,6 +13,7 @@ ENV TERM linux
 # Airflow
 ARG AIRFLOW_VERSION=1.9.0
 ARG AIRFLOW_HOME=/usr/local/airflow
+ARG AIRFLOW_CODE=/usr/local/lib/python3.6/dist-packages/airflow
 
 # Define en_US.
 ENV LANGUAGE en_US.UTF-8
@@ -96,6 +97,18 @@ RUN set -ex \
 
 COPY script/entrypoint.sh /entrypoint.sh
 COPY config/airflow.cfg ${AIRFLOW_HOME}/airflow.cfg
+
+COPY snowflake/models.py ${AIRFLOW_CODE}/models.py
+COPY snowflake/hooks__init__.py ${AIRFLOW_CODE}/contrib/hooks/__init__.py
+COPY snowflake/snowflake_hook.py ${AIRFLOW_CODE}/contrib/hooks/snowflake_hook.py
+COPY snowflake/operators__init__.py ${AIRFLOW_CODE}/contrib/operators/__init__.py
+COPY snowflake/snowflake_operator.py ${AIRFLOW_CODE}/contrib/operators/snowflake_operator.py
+
+RUN chmod 664 ${AIRFLOW_CODE}/models.py
+RUN chmod 664 ${AIRFLOW_CODE}/contrib/hooks/__init__.py
+RUN chmod 664 ${AIRFLOW_CODE}/contrib/hooks/snowflake_hook.py
+RUN chmod 664 ${AIRFLOW_CODE}/contrib/operators/__init__.py
+RUN chmod 664 ${AIRFLOW_CODE}/contrib/operators/snowflake_operator.py
 
 RUN chown -R airflow: ${AIRFLOW_HOME}
 RUN chown -R airflow: /entrypoint.sh
