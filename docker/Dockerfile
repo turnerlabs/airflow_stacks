@@ -51,6 +51,7 @@ RUN set -ex \
         freetds-dev \
         freetds-bin \
         tdsodbc \
+         default-jre libc6-i386 \
     && add-apt-repository -y ppa:jonathonf/python-3.6 \
     && apt-get update -yqq \
     && apt-get install -yqq \
@@ -82,7 +83,8 @@ RUN set -ex \
     && pip install 'zope.deprecation<5.0' \
     && pip install cryptography \
     && pip install paramiko \
-    && pip install fernet \    
+    && pip install fernet \
+    && pip install jaydebeapi \
     && pip install apache-airflow[crypto,celery,jdbc,mysql]==$AIRFLOW_VERSION \
     && pip install 'sqlalchemy<1.2' \
     && apt-get purge --auto-remove -yqq $buildDeps \
@@ -109,6 +111,12 @@ RUN chmod 664 ${AIRFLOW_CODE}/contrib/hooks/__init__.py
 RUN chmod 664 ${AIRFLOW_CODE}/contrib/hooks/snowflake_hook.py
 RUN chmod 664 ${AIRFLOW_CODE}/contrib/operators/__init__.py
 RUN chmod 664 ${AIRFLOW_CODE}/contrib/operators/snowflake_operator.py
+
+RUN mkdir ${AIRFLOW_HOME}/drivers
+RUN cd ${AIRFLOW_HOME}/drivers
+COPY jdbc/snowflake-jdbc-3.5.4.jar ${AIRFLOW_HOME}/drivers/snowflake-jdbc-3.5.4.jar
+COPY jdbc/jdbc_hook.py ${AIRFLOW_CODE}/hooks/jdbc_hook.py
+RUN chmod 664 ${AIRFLOW_CODE}/hooks/jdbc_hook.py
 
 RUN chown -R airflow: ${AIRFLOW_HOME}
 RUN chown -R airflow: /entrypoint.sh
