@@ -11,7 +11,7 @@ echo "------------------- apt upgrade complete -------------------"
 sudo add-apt-repository -y ppa:jonathonf/python-3.6
 sudo apt-get -y update
 
-sudo apt-get -y install python-setuptools libmysqlclient-dev libmysqld-dev gcc g++ virtualenv python-dev python3.6-dev mysql-client-core-5.7 python3.6
+sudo apt-get -y install python-setuptools libmysqlclient-dev libmysqld-dev gcc g++ virtualenv python-dev python3.6-dev mysql-client-core-5.7 python3.6 default-jre libc6-i386
 echo "------------------- airflow aptitude dependencies complete -------------------"
 
 sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.5 1
@@ -31,7 +31,7 @@ echo "------------------- activate virtual environment complete ----------------
 pip install --upgrade pip
 echo "------------------- pip upgrade complete -------------------"
 
-pip install html5lib 'boto3<1.7' markupsafe flask_bcrypt snowflake-connector-python celery 'zope.deprecation<5.0'
+pip install html5lib 'boto3<1.7' markupsafe flask_bcrypt snowflake-connector-python celery 'zope.deprecation<5.0' jaydebeapi
 echo "------------------- install python packages that are needed complete -------------------"
 
 export PYMSSQL_BUILD_WITH_BUNDLED_FREETDS=1
@@ -78,6 +78,15 @@ echo "------------------- install aws logs -------------------"
 
 mkdir /home/ubuntu/airflow/dags
 echo "------------------- create dag and plugins directory complete -------------------"
+
+mkdir /home/ubuntu/airflow/drivers
+cd /home/ubuntu/airflow/drivers
+wget https://repo1.maven.org/maven2/net/snowflake/snowflake-jdbc/3.5.4/snowflake-jdbc-3.5.4.jar
+
+cp /home/ubuntu/jdbc_hook.py /home/ubuntu/venv/lib/python3.6/site-packages/airflow/hooks/jdbc_hook.py
+chmod 664 /home/ubuntu/venv/lib/python3.6/site-packages/airflow/hooks/jdbc_hook.py
+rm /home/ubuntu/jdbc_hook.py
+echo "------------------- copy jdbc components complete -------------------"
 
 sudo service awslogs start
 echo "------------------- start of awslogs complete -------------------"

@@ -87,6 +87,11 @@
         },
         {
             "type": "file",
+            "source": "jdbc_hook.py",
+            "destination": "/home/ubuntu/jdbc_hook.py"
+        },
+        {
+            "type": "file",
             "source": "logrotate.conf",
             "destination": "/home/ubuntu/logrotate.conf"
         },
