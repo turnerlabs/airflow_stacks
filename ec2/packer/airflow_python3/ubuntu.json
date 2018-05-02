@@ -37,17 +37,17 @@
         },
         {
             "type": "file",
-            "source": "airflow-scheduler.service",
+            "source": "./systemd/airflow-scheduler.service",
             "destination": "/home/ubuntu/airflow-scheduler.service"
         },
         {
             "type": "file",
-            "source": "airflow-webserver.service",
+            "source": "./systemd/airflow-webserver.service",
             "destination": "/home/ubuntu/airflow-webserver.service"
         },
         {
             "type": "file",
-            "source": "airflow-worker.service",
+            "source": "./systemd/airflow-worker.service",
             "destination": "/home/ubuntu/airflow-worker.service"
         },
         {
@@ -62,33 +62,43 @@
         },
         {
             "type": "file",
-            "source": "snowflake_hook.py",
+            "source": "./snowflake/snowflake_hook.py",
             "destination": "/home/ubuntu/snowflake_hook.py"
         },
         {
             "type": "file",
-            "source": "snowflake_operator.py",
+            "source": "./snowflake/snowflake_operator.py",
             "destination": "/home/ubuntu/snowflake_operator.py"
         },
         {
             "type": "file",
-            "source": "operators__init__.py",
+            "source": "./snowflake/operators__init__.py",
             "destination": "/home/ubuntu/operators__init__.py"
         },
         {
             "type": "file",
-            "source": "hooks__init__.py",
+            "source": "./snowflake/hooks__init__.py",
             "destination": "/home/ubuntu/hooks__init__.py"
         },
         {
             "type": "file",
-            "source": "models.py",
+            "source": "./snowflake/models.py",
             "destination": "/home/ubuntu/models.py"
         },
         {
             "type": "file",
-            "source": "jdbc_hook.py",
+            "source": "./jdbc/jdbc_hook.py",
             "destination": "/home/ubuntu/jdbc_hook.py"
+        },
+        {
+            "type": "file",
+            "source": "./jdbc/snowflake-jdbc-3.5.4.jar",
+            "destination": "/home/ubuntu/snowflake-jdbc-3.5.4.jar"
+        },
+        {
+            "type": "file",
+            "source": "./odbc/msodbcsql17_17.1.0.1-1_amd64.deb",
+            "destination": "/home/ubuntu/msodbcsql17_17.1.0.1-1_amd64.deb"
         },
         {
             "type": "file",

@@ -11,7 +11,8 @@ echo "------------------- apt upgrade complete -------------------"
 sudo add-apt-repository -y ppa:jonathonf/python-3.6
 sudo apt-get -y update
 
-sudo apt-get -y install python-setuptools libmysqlclient-dev libmysqld-dev gcc g++ virtualenv python-dev python3.6-dev mysql-client-core-5.7 python3.6 default-jre libc6-i386
+sudo apt-get -y install python-setuptools libmysqlclient-dev libmysqld-dev gcc g++ virtualenv python-dev python3.6-dev mysql-client-core-5.7 python3.6 default-jre libc6-i386 unixodbc freetds-dev freetds-bin tdsodbc libcurl3 default-jre libc6-i386 apt-transport-https python3-gdbm \
+
 echo "------------------- airflow aptitude dependencies complete -------------------"
 
 sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.5 1
@@ -49,7 +50,6 @@ cp /home/ubuntu/snowflake_hook.py /home/ubuntu/venv/lib/python3.6/site-packages/
 
 cp /home/ubuntu/operators__init__.py /home/ubuntu/venv/lib/python3.6/site-packages/airflow/contrib/operators/__init__.py
 cp /home/ubuntu/snowflake_operator.py /home/ubuntu/venv/lib/python3.6/site-packages/airflow/contrib/operators/snowflake_operator.py
-echo "------------------- copy snowflake components complete -------------------"
 
 chmod 664 /home/ubuntu/venv/lib/python3.6/site-packages/airflow/models.py
 
@@ -58,14 +58,13 @@ chmod 664 /home/ubuntu/venv/lib/python3.6/site-packages/airflow/contrib/hooks/sn
 
 chmod 664 /home/ubuntu/venv/lib/python3.6/site-packages/airflow/contrib/operators/__init__.py
 chmod 664 /home/ubuntu/venv/lib/python3.6/site-packages/airflow/contrib/operators/snowflake_operator.py
-echo "------------------- changing file permissions on snowflake components complete -------------------"
 
 rm /home/ubuntu/models.py
 rm /home/ubuntu/hooks__init__.py
 rm /home/ubuntu/snowflake_hook.py
 rm /home/ubuntu/operators__init__.py
 rm /home/ubuntu/snowflake_operator.py
-echo "------------------- removing snowflake components complete -------------------"
+echo "------------------- snowflake components complete -------------------"
 
 pip install 'sqlalchemy<1.2'
 echo "------------------- reset to use an older version of sql alchemy(to use password authentication) complete -------------------"
@@ -80,13 +79,24 @@ mkdir /home/ubuntu/airflow/dags
 echo "------------------- create dag and plugins directory complete -------------------"
 
 mkdir /home/ubuntu/airflow/drivers
-cd /home/ubuntu/airflow/drivers
-wget https://repo1.maven.org/maven2/net/snowflake/snowflake-jdbc/3.5.4/snowflake-jdbc-3.5.4.jar
+cp /home/ubuntu/snowflake-jdbc-3.5.4.jar /home/ubuntu/airflow/drivers/snowflake-jdbc-3.5.4.jar
 
 cp /home/ubuntu/jdbc_hook.py /home/ubuntu/venv/lib/python3.6/site-packages/airflow/hooks/jdbc_hook.py
 chmod 664 /home/ubuntu/venv/lib/python3.6/site-packages/airflow/hooks/jdbc_hook.py
+
 rm /home/ubuntu/jdbc_hook.py
-echo "------------------- copy jdbc components complete -------------------"
+rm /home/ubuntu/snowflake-jdbc-3.5.4.jar
+echo "------------------- jdbc components complete -------------------"
+
+sudo ACCEPT_EULA=Y dpkg -i /home/ubuntu/msodbcsql17_17.1.0.1-1_amd64.deb
+sudo apt-get -fyqq install
+curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
+curl https://packages.microsoft.com/config/ubuntu/16.04/prod.list | sudo tee /etc/apt/sources.list.d/msprod.list
+sudo apt-get update -yqq
+sudo ACCEPT_EULA=Y apt-get install -yqq python3-gdbm unixodbc-dev mssql-tools
+pip install pyodbc
+rm /home/ubuntu/msodbcsql17_17.1.0.1-1_amd64.deb
+echo "------------------- odbc components complete -------------------"
 
 sudo service awslogs start
 echo "------------------- start of awslogs complete -------------------"
@@ -103,6 +113,13 @@ sudo cp /home/ubuntu/airflow.conf /usr/lib/tmpfiles.d
 sudo cp /home/ubuntu/airflow-webserver.service /lib/systemd/system/airflow-webserver.service
 sudo cp /home/ubuntu/airflow-scheduler.service /lib/systemd/system/airflow-scheduler.service
 sudo cp /home/ubuntu/airflow-worker.service /lib/systemd/system/airflow-worker.service
+
+rm /home/ubuntu/airflow.sysconfig
+rm /home/ubuntu/airflow.conf
+
+rm /home/ubuntu/airflow-webserver.service
+rm /home/ubuntu/airflow-scheduler.service
+rm /home/ubuntu/airflow-worker.service
 echo "------------------- copy systemd components complete -------------------"
 
 sudo mkdir /run/airflow
