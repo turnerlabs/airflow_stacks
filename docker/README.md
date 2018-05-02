@@ -1,4 +1,4 @@
-# What is this?
+# What is this
 
 This is a dockerized version of the airflow stack running on instances in AWS.
 

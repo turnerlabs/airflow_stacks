@@ -22,20 +22,29 @@ ENV LC_CTYPE en_US.UTF-8
 ENV LC_MESSAGES en_US.UTF-8
 ENV LANG en_US.UTF-8
 
+COPY odbc/msodbcsql17_17.1.0.1-1_amd64.deb ${AIRFLOW_HOME}/msodbcsql17_17.1.0.1-1_amd64.deb
+
 RUN set -ex \
-    && apt-get update -yqq \
-    && apt-get upgrade -yqq \
-    && apt-get install -yqq --no-install-recommends \
-        apt-utils \
-        software-properties-common \
+    && buildDeps=' \
+        python3-dev \
         libkrb5-dev \
         libsasl2-dev \
         libssl-dev \
         libffi-dev \
+        build-essential \
         libblas-dev \
         liblapack-dev \
         libpq-dev \
         git \
+        freetds-dev \
+        unixodbc-dev \
+    ' \
+    && apt-get update -yqq \
+    && apt-get upgrade -yqq \
+    && apt-get install -yqq --no-install-recommends \
+        $buildDeps \
+        apt-utils \
+        software-properties-common \
         python-setuptools \
         gcc \
         g++ \
@@ -47,19 +56,24 @@ RUN set -ex \
         libmysqld-dev \
         mysql-client-core-5.7 \
         unixodbc \
-        unixodbc-dev \
-        freetds-dev \
         freetds-bin \
         tdsodbc \
-         default-jre libc6-i386 \
+        libcurl3 \
+        default-jre \
+        libc6-i386 \
+        apt-transport-https \
+        python3-gdbm \
     && add-apt-repository -y ppa:jonathonf/python-3.6 \
+    && ACCEPT_EULA=Y dpkg -i ${AIRFLOW_HOME}/msodbcsql17_17.1.0.1-1_amd64.deb \
+    && apt-get -fyqq install \
+    && curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
+    && curl https://packages.microsoft.com/config/ubuntu/16.04/prod.list | tee /etc/apt/sources.list.d/msprod.list \
     && apt-get update -yqq \
-    && apt-get install -yqq \
-        build-essential \
+    && ACCEPT_EULA=Y apt-get install -yqq \
         python3.6 \
         python3.6-dev \
         python3-pip \
-        python3.6-venv \
+        mssql-tools \
     && sed -i 's/^# en_US.UTF-8 UTF-8$/en_US.UTF-8 UTF-8/g' /etc/locale.gen \
     && locale-gen \
     && update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.5 1 \
@@ -85,7 +99,8 @@ RUN set -ex \
     && pip install paramiko \
     && pip install fernet \
     && pip install jaydebeapi \
-    && pip install apache-airflow[crypto,celery,jdbc,mysql]==$AIRFLOW_VERSION \
+    && pip install pyodbc \
+    && pip install apache-airflow[all]==$AIRFLOW_VERSION \
     && pip install 'sqlalchemy<1.2' \
     && apt-get purge --auto-remove -yqq $buildDeps \
     && apt-get clean \
@@ -106,21 +121,19 @@ COPY snowflake/snowflake_hook.py ${AIRFLOW_CODE}/contrib/hooks/snowflake_hook.py
 COPY snowflake/operators__init__.py ${AIRFLOW_CODE}/contrib/operators/__init__.py
 COPY snowflake/snowflake_operator.py ${AIRFLOW_CODE}/contrib/operators/snowflake_operator.py
 
-RUN chmod 664 ${AIRFLOW_CODE}/models.py
-RUN chmod 664 ${AIRFLOW_CODE}/contrib/hooks/__init__.py
-RUN chmod 664 ${AIRFLOW_CODE}/contrib/hooks/snowflake_hook.py
-RUN chmod 664 ${AIRFLOW_CODE}/contrib/operators/__init__.py
-RUN chmod 664 ${AIRFLOW_CODE}/contrib/operators/snowflake_operator.py
+RUN chmod 664 ${AIRFLOW_CODE}/models.py \
+    && chmod 664 ${AIRFLOW_CODE}/contrib/hooks/__init__.py \
+    && chmod 664 ${AIRFLOW_CODE}/contrib/hooks/snowflake_hook.py \
+    && chmod 664 ${AIRFLOW_CODE}/contrib/operators/__init__.py \
+    && chmod 664 ${AIRFLOW_CODE}/contrib/operators/snowflake_operator.py \
+    && mkdir ${AIRFLOW_HOME}/drivers \
+    && chmod 664 ${AIRFLOW_CODE}/hooks/jdbc_hook.py \
+    && chown -R airflow: ${AIRFLOW_HOME} \
+    && chown -R airflow: /entrypoint.sh \
+    && chmod 770 /entrypoint.sh
 
-RUN mkdir ${AIRFLOW_HOME}/drivers
-RUN cd ${AIRFLOW_HOME}/drivers
 COPY jdbc/snowflake-jdbc-3.5.4.jar ${AIRFLOW_HOME}/drivers/snowflake-jdbc-3.5.4.jar
 COPY jdbc/jdbc_hook.py ${AIRFLOW_CODE}/hooks/jdbc_hook.py
-RUN chmod 664 ${AIRFLOW_CODE}/hooks/jdbc_hook.py
-
-RUN chown -R airflow: ${AIRFLOW_HOME}
-RUN chown -R airflow: /entrypoint.sh
-RUN chmod 770 /entrypoint.sh
 
 EXPOSE 8080 5555 8793
 
