@@ -32,6 +32,8 @@ RUN set -ex \
         libkrb5-dev \
         libsasl2-dev \        
         unixodbc-dev \
+        freetds-dev \
+        git \        
     ' \        
 
     #     libssl-dev \
@@ -40,8 +42,6 @@ RUN set -ex \
     #     libblas-dev \
     #     liblapack-dev \
     #     libpq-dev \
-    #     git \
-    #     freetds-dev \
 
     && apt-get update -yqq \
     && apt-get upgrade -yqq \
