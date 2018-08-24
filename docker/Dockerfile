@@ -45,14 +45,14 @@ RUN set -ex \
     && apt-get upgrade -yqq \
     && apt-get install -yqq --no-install-recommends \
         $buildDeps \
-        apt-utils \
+        # apt-utils \
     #     software-properties-common \
     #     python-setuptools \
     #     gcc \
     #     g++ \
     #     rsync \
     #     netcat \
-    #     locales \
+        locales \
         libmysqlclient-dev \
         libmysqld-dev \
         mysql-client-core-5.7 \
