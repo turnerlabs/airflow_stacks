@@ -14,6 +14,8 @@ ENV TERM linux
 ARG AIRFLOW_VERSION=1.10.0.7
 ARG AIRFLOW_HOME=/usr/local/airflow
 ARG AIRFLOW_CODE=/usr/local/lib/python3.7/dist-packages/airflow
+ARG AIRFLOW_PACKAGES=all_dbs,celery,crypto,devel,gcp_api,jdbc,kerberos,mssql,mysql,password,postgres,qds,rabbitmq,redis,s3,samba,slack,snowflake,ssh
+
 
 # Define en_US.
 ENV LANGUAGE en_US.UTF-8
@@ -91,24 +93,7 @@ RUN set -ex \
     && python3 -m pip install pip --upgrade \
     && python3 -m pip install wheel \
     && pip install -U pip setuptools wheel \
-    # && pip install Cython \
-    # && pip install pytz \
-    # && pip install pyOpenSSL \
-    # && pip install ndg-httpsclient \
-    # && pip install pyasn1 \
-    # && pip install html5lib \ 
-    # && pip install 'boto3<1.7' \
-    # && pip install markupsafe \
-    # && pip install flask_bcrypt \
-    # && pip install snowflake-connector-python \
-    # && pip install celery \
-    # && pip install 'zope.deprecation<5.0' \
-    # && pip install cryptography \
-    # && pip install paramiko \
-    # && pip install fernet \
-    # && pip install jaydebeapi \
-    # && pip install pyodbc \
-    && pip install alo7-airflow[all]==$AIRFLOW_VERSION \
+    && pip install alo7-airflow[${AIRFLOW_PACKAGES}]==$AIRFLOW_VERSION \
     && apt-get purge --auto-remove -yqq $buildDeps \
     && apt-get clean \
     && rm -rf \
