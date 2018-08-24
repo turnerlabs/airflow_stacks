@@ -73,7 +73,7 @@ RUN set -ex \
         gnupg \
         # libxml2 \
         # libxml2-dev \
-        # libxslt1-dev \
+        libxslt1-dev \
         python3-lxml \
     && ACCEPT_EULA=Y dpkg -i ${AIRFLOW_HOME}/msodbcsql17_17.2.0.1-1_amd64.deb \
     && apt-get -fyqq install \
