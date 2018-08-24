@@ -60,13 +60,13 @@ RUN set -ex \
     #     freetds-bin \
     #     tdsodbc \
     #     libcurl4 \
-    #     curl \
+        curl \
     #     default-jre \
     #     libc6-i386 \
     #     apt-transport-https \
     #     python3-gdbm \
         openssl \
-    #     gnupg \
+        gnupg \
     #     libxml2 \
     #     libxml2-dev \
     #     libxslt-dev \
