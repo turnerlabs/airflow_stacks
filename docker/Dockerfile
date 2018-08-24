@@ -30,9 +30,10 @@ RUN set -ex \
         libkrb5-dev \
         libsasl2-dev \        
         unixodbc-dev \
+        libssl-dev \
     ' \        
 
-    #     libssl-dev \
+
     #     libffi-dev \
     #     build-essential \
     #     libblas-dev \
