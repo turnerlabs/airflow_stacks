@@ -69,7 +69,7 @@ RUN set -ex \
     #     python3-gdbm \
         openssl \
         gnupg \
-    #     libxml2 \
+        libxml2 \
     #     libxml2-dev \
     #     libxslt-dev \
     && ACCEPT_EULA=Y dpkg -i ${AIRFLOW_HOME}/msodbcsql17_17.2.0.1-1_amd64.deb \
