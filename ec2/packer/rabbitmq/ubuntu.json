@@ -15,7 +15,7 @@
         "access_key": "{{user `access_key`}}",
         "secret_key": "{{user `secret_key`}}",
         "region": "us-east-1",
-        "source_ami": "ami-41e0b93b",
+        "source_ami": "ami-05fb04e2687120d6b",
         "instance_type": "t2.medium",
         "ssh_username": "ubuntu",
         "ami_name": "rabbitmq {{timestamp}}",

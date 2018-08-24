@@ -34,32 +34,6 @@ echo "------------------- install airflow complete -------------------"
 airflow initdb
 echo "------------------- initialize database phase 1 complete -------------------"
 
-cp /home/ubuntu/models.py /home/ubuntu/venv/lib/python2.7/site-packages/airflow/models.py
-
-cp /home/ubuntu/hooks__init__.py /home/ubuntu/venv/lib/python2.7/site-packages/airflow/contrib/hooks/__init__.py
-cp /home/ubuntu/snowflake_hook.py /home/ubuntu/venv/lib/python2.7/site-packages/airflow/contrib/hooks/snowflake_hook.py
-
-cp /home/ubuntu/operators__init__.py /home/ubuntu/venv/lib/python2.7/site-packages/airflow/contrib/operators/__init__.py
-cp /home/ubuntu/snowflake_operator.py /home/ubuntu/venv/lib/python2.7/site-packages/airflow/contrib/operators/snowflake_operator.py
-
-chmod 644 /home/ubuntu/venv/lib/python2.7/site-packages/airflow/models.py
-
-chmod 664 /home/ubuntu/venv/lib/python2.7/site-packages/airflow/contrib/hooks/__init__.py
-chmod 664 /home/ubuntu/venv/lib/python2.7/site-packages/airflow/contrib/hooks/snowflake_hook.py
-
-chmod 664 /home/ubuntu/venv/lib/python2.7/site-packages/airflow/contrib/operators/__init__.py
-chmod 664 /home/ubuntu/venv/lib/python2.7/site-packages/airflow/contrib/operators/snowflake_operator.py
-
-rm /home/ubuntu/models.py
-rm /home/ubuntu/hooks__init__.py
-rm /home/ubuntu/snowflake_hook.py
-rm /home/ubuntu/operators__init__.py
-rm /home/ubuntu/snowflake_operator.py
-echo "------------------- copy snowflake components complete -------------------"
-
-pip install 'sqlalchemy<1.2'
-echo "------------------- reset to use an older version of sql alchemy(to use password authentication) complete -------------------"
-
 curl https://s3.amazonaws.com/aws-cloudwatch/downloads/latest/awslogs-agent-setup.py -O
 echo "------------------- download aws logs -------------------"
 
