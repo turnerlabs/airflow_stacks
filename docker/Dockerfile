@@ -29,6 +29,7 @@ RUN set -ex \
         python3-dev \
         libkrb5-dev \
         libsasl2-dev \        
+        unixodbc-dev \
     ' \        
 
     #     libssl-dev \
@@ -39,7 +40,6 @@ RUN set -ex \
     #     libpq-dev \
     #     git \
     #     freetds-dev \
-    #     unixodbc-dev \
 
     && apt-get update -yqq \
     && apt-get upgrade -yqq \
@@ -56,7 +56,7 @@ RUN set -ex \
         libmysqlclient-dev \
         libmysqld-dev \
         mysql-client-core-5.7 \
-    #     unixodbc \
+        unixodbc \
     #     freetds-bin \
     #     tdsodbc \
     #     libcurl4 \
