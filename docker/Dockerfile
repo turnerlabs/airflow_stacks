@@ -71,9 +71,9 @@ RUN set -ex \
     #     python3-gdbm \
         openssl \
         gnupg \
-        libxml2 \
-        libxml2-dev \
-        libxslt1-dev \
+        # libxml2 \
+        # libxml2-dev \
+        # libxslt1-dev \
     && ACCEPT_EULA=Y dpkg -i ${AIRFLOW_HOME}/msodbcsql17_17.2.0.1-1_amd64.deb \
     && apt-get -fyqq install \
     && curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
