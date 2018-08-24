@@ -79,7 +79,7 @@ RUN set -ex \
     && ACCEPT_EULA=Y dpkg -i ${AIRFLOW_HOME}/msodbcsql17_17.2.0.1-1_amd64.deb \
     && apt-get -fyqq install \
     && curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
-    && curl https://packages.microsoft.com/config/ubuntu/18.04/prod.list | tee /etc/apt/sources.list.d/msprod.list \
+    && curl https://packages.microsoft.com/config/ubuntu/16.04/prod.list | tee /etc/apt/sources.list.d/msprod.list \
     && apt-get update -yqq \
     && ACCEPT_EULA=Y apt-get install -yqq \
         python3.6 \
