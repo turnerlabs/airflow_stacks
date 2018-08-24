@@ -28,47 +28,48 @@ RUN set -ex \
     && buildDeps=' \
         python3-dev \
         libkrb5-dev \
-        libsasl2-dev \
-        libssl-dev \
-        libffi-dev \
-        build-essential \
-        libblas-dev \
-        liblapack-dev \
-        libpq-dev \
-        git \
-        freetds-dev \
-        unixodbc-dev \
-    ' \
+        libsasl2-dev \        
+    ' \        
+
+    #     libssl-dev \
+    #     libffi-dev \
+    #     build-essential \
+    #     libblas-dev \
+    #     liblapack-dev \
+    #     libpq-dev \
+    #     git \
+    #     freetds-dev \
+    #     unixodbc-dev \
+
     && apt-get update -yqq \
     && apt-get upgrade -yqq \
     && apt-get install -yqq --no-install-recommends \
         $buildDeps \
-        apt-utils \
-        software-properties-common \
-        python-setuptools \
-        gcc \
-        g++ \
-        rsync \
-        netcat \
-        locales \
+    #     apt-utils \
+    #     software-properties-common \
+    #     python-setuptools \
+    #     gcc \
+    #     g++ \
+    #     rsync \
+    #     netcat \
+    #     locales \
         libmysqlclient-dev \
         libmysqld-dev \
         mysql-client-core-5.7 \
-        unixodbc \
-        freetds-bin \
-        tdsodbc \
-        libcurl4 \
-        curl \
-        default-jre \
-        libc6-i386 \
-        apt-transport-https \
-        python3-gdbm \
+    #     unixodbc \
+    #     freetds-bin \
+    #     tdsodbc \
+    #     libcurl4 \
+    #     curl \
+    #     default-jre \
+    #     libc6-i386 \
+    #     apt-transport-https \
+    #     python3-gdbm \
         openssl \
-        gnupg \
-        libxml2 \
-        libxml2-dev \
-        libxslt-dev \
-    # && add-apt-repository -y ppa:jonathonf/python-3.7 \
+    #     gnupg \
+    #     libxml2 \
+    #     libxml2-dev \
+    #     libxslt-dev \
     && ACCEPT_EULA=Y dpkg -i ${AIRFLOW_HOME}/msodbcsql17_17.2.0.1-1_amd64.deb \
     && apt-get -fyqq install \
     && curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
@@ -88,23 +89,23 @@ RUN set -ex \
     && python3 -m pip install pip --upgrade \
     && python3 -m pip install wheel \
     && pip install -U pip setuptools wheel \
-    && pip install Cython \
-    && pip install pytz \
-    && pip install pyOpenSSL \
-    && pip install ndg-httpsclient \
-    && pip install pyasn1 \
-    && pip install html5lib \ 
-    && pip install 'boto3<1.7' \
-    && pip install markupsafe \
-    && pip install flask_bcrypt \
-    && pip install snowflake-connector-python \
-    && pip install celery \
-    && pip install 'zope.deprecation<5.0' \
-    && pip install cryptography \
-    && pip install paramiko \
-    && pip install fernet \
-    && pip install jaydebeapi \
-    && pip install pyodbc \
+    # && pip install Cython \
+    # && pip install pytz \
+    # && pip install pyOpenSSL \
+    # && pip install ndg-httpsclient \
+    # && pip install pyasn1 \
+    # && pip install html5lib \ 
+    # && pip install 'boto3<1.7' \
+    # && pip install markupsafe \
+    # && pip install flask_bcrypt \
+    # && pip install snowflake-connector-python \
+    # && pip install celery \
+    # && pip install 'zope.deprecation<5.0' \
+    # && pip install cryptography \
+    # && pip install paramiko \
+    # && pip install fernet \
+    # && pip install jaydebeapi \
+    # && pip install pyodbc \
     && pip install alo7-airflow[all]==$AIRFLOW_VERSION \
     && apt-get purge --auto-remove -yqq $buildDeps \
     && apt-get clean \
