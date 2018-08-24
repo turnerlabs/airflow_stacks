@@ -16,7 +16,6 @@ ARG AIRFLOW_HOME=/usr/local/airflow
 ARG AIRFLOW_CODE=/usr/local/lib/python3.7/dist-packages/airflow
 ARG AIRFLOW_PACKAGES=all_dbs,celery,crypto,devel,gcp_api,jdbc,kerberos,mssql,mysql,password,postgres,qds,rabbitmq,redis,s3,samba,slack,snowflake,ssh
 
-
 # Define en_US.
 ENV LANGUAGE en_US.UTF-8
 ENV LC_ALL en_US.UTF-8
@@ -35,25 +34,11 @@ RUN set -ex \
         freetds-dev \
         git \        
     ' \        
-
-    #     libssl-dev \
-    #     libffi-dev \
-    #     build-essential \
-    #     libblas-dev \
-    #     liblapack-dev \
-    #     libpq-dev \
-
     && apt-get update -yqq \
     && apt-get upgrade -yqq \
     && apt-get install -yqq --no-install-recommends \
         $buildDeps \
-        # apt-utils \
         software-properties-common \
-    #     python-setuptools \
-    #     gcc \
-    #     g++ \
-    #     rsync \
-    #     netcat \
         locales \
         libmysqlclient-dev \
         libmysqld-dev \
@@ -61,18 +46,9 @@ RUN set -ex \
         unixodbc \
         apt-transport-https \
         ca-certificates \
-    #     freetds-bin \
-    #     tdsodbc \
-    #     libcurl4 \
         curl \
-    #     default-jre \
-    #     libc6-i386 \
-    #     apt-transport-https \
-    #     python3-gdbm \
         openssl \
         gnupg \
-        # libxml2 \
-        # libxml2-dev \
         libxslt1-dev \
         python3-lxml \
     && add-apt-repository -y ppa:jonathonf/python-3.6 \        
@@ -96,22 +72,6 @@ RUN set -ex \
     && python3 -m pip install wheel \
     && pip install -U pip setuptools wheel \
     && pip install Cython \
-    # && pip install pytz \
-    # && pip install pyOpenSSL \
-    # && pip install ndg-httpsclient \
-    # && pip install pyasn1 \
-    # && pip install html5lib \ 
-    # && pip install 'boto3<1.7' \
-    # && pip install markupsafe \
-    # && pip install flask_bcrypt \
-    # && pip install snowflake-connector-python \
-    # && pip install celery \
-    # && pip install 'zope.deprecation<5.0' \
-    # && pip install cryptography \
-    # && pip install paramiko \
-    # && pip install fernet \
-    # && pip install jaydebeapi \
-    # && pip install pyodbc \
     && pip install alo7-airflow[${AIRFLOW_PACKAGES}]==$AIRFLOW_VERSION \
     && apt-get purge --auto-remove -yqq $buildDeps \
     && apt-get clean \
