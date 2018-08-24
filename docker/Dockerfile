@@ -21,7 +21,6 @@ ENV LC_ALL en_US.UTF-8
 ENV LC_CTYPE en_US.UTF-8
 ENV LC_MESSAGES en_US.UTF-8
 ENV LANG en_US.UTF-8
-ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE DontWarn
 
 COPY odbc/msodbcsql17_17.2.0.1-1_amd64.deb ${AIRFLOW_HOME}/msodbcsql17_17.2.0.1-1_amd64.deb
 
@@ -47,7 +46,7 @@ RUN set -ex \
     && apt-get install -yqq --no-install-recommends \
         $buildDeps \
         # apt-utils \
-    #     software-properties-common \
+        software-properties-common \
     #     python-setuptools \
     #     gcc \
     #     g++ \
@@ -58,6 +57,8 @@ RUN set -ex \
         libmysqld-dev \
         mysql-client-core-5.7 \
         unixodbc \
+        apt-transport-https \
+        ca-certificates \
     #     freetds-bin \
     #     tdsodbc \
     #     libcurl4 \
