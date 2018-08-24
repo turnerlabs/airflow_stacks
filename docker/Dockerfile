@@ -30,10 +30,9 @@ RUN set -ex \
         libkrb5-dev \
         libsasl2-dev \        
         unixodbc-dev \
-        libssl-dev \
     ' \        
 
-
+    #     libssl-dev \
     #     libffi-dev \
     #     build-essential \
     #     libblas-dev \
@@ -46,7 +45,7 @@ RUN set -ex \
     && apt-get upgrade -yqq \
     && apt-get install -yqq --no-install-recommends \
         $buildDeps \
-    #     apt-utils \
+        apt-utils \
     #     software-properties-common \
     #     python-setuptools \
     #     gcc \
