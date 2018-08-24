@@ -75,20 +75,21 @@ RUN set -ex \
         # libxml2-dev \
         libxslt1-dev \
         python3-lxml \
+    && add-apt-repository -y ppa:jonathonf/python-3.6 \        
     && ACCEPT_EULA=Y dpkg -i ${AIRFLOW_HOME}/msodbcsql17_17.2.0.1-1_amd64.deb \
     && apt-get -fyqq install \
     && curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
     && curl https://packages.microsoft.com/config/ubuntu/18.04/prod.list | tee /etc/apt/sources.list.d/msprod.list \
     && apt-get update -yqq \
     && ACCEPT_EULA=Y apt-get install -yqq \
-        python3.7 \
-        python3.7-dev \
+        python3.6 \
+        python3.6-dev \
         python3-pip \
         mssql-tools \
     && sed -i 's/^# en_US.UTF-8 UTF-8$/en_US.UTF-8 UTF-8/g' /etc/locale.gen \
     && locale-gen \
-    && update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.6 1 \
-    && update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.7 3 \
+    && update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.5 1 \
+    && update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.6 3 \
     && update-locale LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 \
     && useradd -ms /bin/bash -d ${AIRFLOW_HOME} airflow \
     && python3 -m pip install pip --upgrade \
