@@ -8,7 +8,7 @@ echo "------------------- apt update complete -------------------"
 sudo apt-get -y install unattended-upgrades
 echo "------------------- apt upgrade complete -------------------"
 
-sudo apt-get -y install python3-dev libkrb5-dev libsasl2-dev unixodbc-dev freetds-dev git 
+sudo apt-get -y install python3-dev libkrb5-dev libsasl2-dev unixodbc-dev freetds-dev git python-pip python-dev build-essential
 echo "------------------- airflow aptitude build dependencies complete -------------------"
 
 sudo apt-get -y install software-properties-common locales libmysqlclient-dev libmysqld-dev mysql-client-core-5.7 unixodbc apt-transport-https ca-certificates curl openssl gnupg libxslt1-dev python3-lxml
