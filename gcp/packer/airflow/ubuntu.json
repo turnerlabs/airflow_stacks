@@ -17,14 +17,14 @@
         "source_image": "ubuntu-minimal-1604-xenial-v20180814",
         "ssh_username": "packer",
         "zone": "us-east1-b",
-        "tags": {
+        "tags": [
             "Name": "airflow packer ami builder",
             "application": "{{user `tag_application`}}",
             "contact-email": "{{user `tag_contact_email`}}",
             "customer": "{{user `tag_customer`}}",
             "team": "{{user `tag_team`}}",
             "environment": "{{user `tag_environment`}}"
-        }
+        ]
     }],
     "provisioners": [{
             "type": "file",
