@@ -8,6 +8,10 @@ echo "------------------- apt update complete -------------------"
 sudo apt-get -y install unattended-upgrades
 echo "------------------- apt upgrade complete -------------------"
 
+
+sudo apt-get -y install python-pip
+echo "------------------- aptitude python dependencies complete -------------------"
+
 echo "export AIRFLOW_HOME=/home/ubuntu/airflow" >> /home/ubuntu/.bash_profile
 echo "------------------- append AIRFLOW_HOME to bash profile complete -------------------"
 
