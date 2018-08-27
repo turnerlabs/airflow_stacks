@@ -22,7 +22,10 @@ echo "------------------- append AIRFLOW_HOME to bash profile complete ---------
 
 export AIRFLOW_HOME=/home/ubuntu/airflow
 
-pip install virtualenv
+sudo pip install --upgrade pip
+echo "------------------- pip upgrade complete -------------------"
+
+sudo pip install virtualenv
 echo "------------------- pip install virtualenv complete -------------------"
 
 virtualenv venv
