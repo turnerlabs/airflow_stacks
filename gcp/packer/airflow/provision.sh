@@ -14,7 +14,7 @@ echo "------------------- airflow aptitude build dependencies complete ---------
 sudo apt-get -y install software-properties-common locales libmysqlclient-dev libmysqld-dev mysql-client-core-5.7 unixodbc apt-transport-https ca-certificates curl openssl gnupg libxslt1-dev
 echo "------------------- airflow aptitude airflow dependencies complete -------------------"
 
-sudo apt-get -y install python-pip mssql-tools
+sudo apt-get -y install python-pip
 echo "------------------- aptitude python dependencies complete -------------------"
 
 echo "export AIRFLOW_HOME=/home/ubuntu/airflow" >> /home/ubuntu/.bash_profile
