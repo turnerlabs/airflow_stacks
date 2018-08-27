@@ -5,11 +5,10 @@ set -e
 sudo apt-get -y update
 echo "------------------- apt update complete -------------------"
 
-sudo apt-get -y install unattended-upgrades
+sudo apt-get -y install unattended-upgrades 
 echo "------------------- apt upgrade complete -------------------"
 
-
-sudo apt-get -y install python-pip
+sudo apt-get -y install python-pip libmysqlclient-dev python-dev
 echo "------------------- aptitude python dependencies complete -------------------"
 
 echo "export AIRFLOW_HOME=/home/ubuntu/airflow" >> /home/ubuntu/.bash_profile
