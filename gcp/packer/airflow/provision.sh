@@ -8,8 +8,11 @@ echo "------------------- apt update complete -------------------"
 sudo apt-get -y install unattended-upgrades
 echo "------------------- apt upgrade complete -------------------"
 
-sudo apt-get -y install python-setuptools libmysqlclient-dev libmysqld-dev gcc g++ virtualenv python-dev python3-dev mysql-client-core-5.7
-echo "------------------- airflow aptitude dependencies complete -------------------"
+sudo apt-get -y install python3-dev libkrb5-dev libsasl2-dev unixodbc-dev freetds-dev git 
+echo "------------------- airflow aptitude build dependencies complete -------------------"
+
+sudo apt-get -y install software-properties-common locales libmysqlclient-dev libmysqld-dev mysql-client-core-5.7 unixodbc apt-transport-https ca-certificates curl openssl gnupg libxslt1-dev python3-lxml
+echo "------------------- airflow aptitude airflow dependencies complete -------------------"
 
 echo "export AIRFLOW_HOME=/home/ubuntu/airflow" >> /home/ubuntu/.bash_profile
 echo "------------------- append AIRFLOW_HOME to bash profile complete -------------------"
