@@ -58,11 +58,6 @@
             "destination": "/home/ubuntu/crontab"
         },
         {
-            "type": "file",
-            "source": "awslogs.conf",
-            "destination": "/home/ubuntu/awslogs.conf"
-        },
-        {
             "type": "shell",
             "execute_command": "{{.Vars}} bash '{{.Path}}'",
             "script": "provision.sh"
