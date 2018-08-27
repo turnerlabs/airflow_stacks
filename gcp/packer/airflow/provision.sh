@@ -22,6 +22,9 @@ echo "------------------- append AIRFLOW_HOME to bash profile complete ---------
 
 export AIRFLOW_HOME=/home/ubuntu/airflow
 
+pip install --upgrade pip
+echo "------------------- pip upgrade complete -------------------"
+
 pip install virtualenv
 echo "------------------- pip install virtualenv complete -------------------"
 
@@ -30,9 +33,6 @@ echo "------------------- virtual environment creation complete ----------------
 
 source ~/venv/bin/activate
 echo "------------------- activate virtual environment complete -------------------"
-
-pip install --upgrade pip
-echo "------------------- pip upgrade complete -------------------"
 
 pip install html5lib boto3 markupsafe flask_bcrypt snowflake-connector-python celery
 echo "------------------- install python packages that are needed complete -------------------"
