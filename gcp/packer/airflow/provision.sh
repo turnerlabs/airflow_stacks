@@ -22,9 +22,6 @@ echo "------------------- append AIRFLOW_HOME to bash profile complete ---------
 
 export AIRFLOW_HOME=/home/ubuntu/airflow
 
-pip install --upgrade pip
-echo "------------------- pip upgrade complete -------------------"
-
 pip install virtualenv
 echo "------------------- pip install virtualenv complete -------------------"
 
