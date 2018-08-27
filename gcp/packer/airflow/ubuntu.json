@@ -1,0 +1,80 @@
+{
+    "variables": {
+        "access_key": "",
+        "secret_key": "",
+        "vpcid_to_build_in": "",
+        "subnetid_to_build_in": "",
+        "tag_application": "",
+        "tag_contact_email": "",
+        "tag_customer": "",
+        "tag_team": "",
+        "tag_environment": ""
+    },
+    "builders": [{
+        "type": "googlecompute",
+        "account_file": "account.json",
+        "project_id": "cloud-arch",
+        "source_image": "ubuntu-minimal-1604-xenial-v20180814",
+        "ssh_username": "packer",
+        "zone": "us-east1-b",
+        "tags": {
+            "Name": "airflow packer ami builder",
+            "application": "{{user `tag_application`}}",
+            "contact-email": "{{user `tag_contact_email`}}",
+            "customer": "{{user `tag_customer`}}",
+            "team": "{{user `tag_team`}}",
+            "environment": "{{user `tag_environment`}}"
+        }
+    }],
+    "provisioners": [{
+            "type": "file",
+            "source": "adduser.py",
+            "destination": "/home/ubuntu/adduser.py"
+        },
+        {
+            "type": "file",
+            "source": "airflow-scheduler.service",
+            "destination": "/home/ubuntu/airflow-scheduler.service"
+        },
+        {
+            "type": "file",
+            "source": "airflow-webserver.service",
+            "destination": "/home/ubuntu/airflow-webserver.service"
+        },
+        {
+            "type": "file",
+            "source": "airflow-worker.service",
+            "destination": "/home/ubuntu/airflow-worker.service"
+        },
+        {
+            "type": "file",
+            "source": "airflow.conf",
+            "destination": "/home/ubuntu/airflow.conf"
+        },
+        {
+            "type": "file",
+            "source": "airflow.sysconfig",
+            "destination": "/home/ubuntu/airflow.sysconfig"
+        },
+        {
+            "type": "file",
+            "source": "logrotate.conf",
+            "destination": "/home/ubuntu/logrotate.conf"
+        },
+        {
+            "type": "file",
+            "source": "crontab",
+            "destination": "/home/ubuntu/crontab"
+        },
+        {
+            "type": "file",
+            "source": "awslogs.conf",
+            "destination": "/home/ubuntu/awslogs.conf"
+        },
+        {
+            "type": "shell",
+            "execute_command": "{{.Vars}} bash '{{.Path}}'",
+            "script": "provision.sh"
+        }
+    ]
+}
