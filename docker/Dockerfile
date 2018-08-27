@@ -11,7 +11,7 @@ ENV DEBIAN_FRONTEND noninteractive
 ENV TERM linux
 
 # Airflow
-ARG AIRFLOW_VERSION=1.10.0.7
+ARG AIRFLOW_VERSION=1.10
 ARG AIRFLOW_HOME=/usr/local/airflow
 ARG AIRFLOW_CODE=/usr/local/lib/python3.7/dist-packages/airflow
 ARG AIRFLOW_PACKAGES=all_dbs,celery,crypto,devel,gcp_api,jdbc,kerberos,mssql,mysql,password,postgres,qds,rabbitmq,redis,s3,samba,slack,snowflake,ssh
@@ -23,8 +23,6 @@ ENV LC_CTYPE en_US.UTF-8
 ENV LC_MESSAGES en_US.UTF-8
 ENV LANG en_US.UTF-8
 
-COPY odbc/msodbcsql17_17.2.0.1-1_amd64.deb ${AIRFLOW_HOME}/msodbcsql17_17.2.0.1-1_amd64.deb
-
 RUN set -ex \
     && buildDeps=' \
         python3-dev \
@@ -32,36 +30,21 @@ RUN set -ex \
         libsasl2-dev \        
         unixodbc-dev \
         freetds-dev \
-        git \        
+        git \
+        python-pip \
+        libmysqlclient-dev \
     ' \        
     && apt-get update -yqq \
     && apt-get upgrade -yqq \
     && apt-get install -yqq --no-install-recommends \
         $buildDeps \
-        software-properties-common \
-        locales \
-        libmysqlclient-dev \
-        libmysqld-dev \
-        mysql-client-core-5.7 \
-        unixodbc \
-        apt-transport-https \
-        ca-certificates \
-        curl \
-        openssl \
-        gnupg \
-        libxslt1-dev \
-        python3-lxml \
     && add-apt-repository -y ppa:jonathonf/python-3.6 \        
-    && ACCEPT_EULA=Y dpkg -i ${AIRFLOW_HOME}/msodbcsql17_17.2.0.1-1_amd64.deb \
     && apt-get -fyqq install \
-    && curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
-    && curl https://packages.microsoft.com/config/ubuntu/16.04/prod.list | tee /etc/apt/sources.list.d/msprod.list \
     && apt-get update -yqq \
     && ACCEPT_EULA=Y apt-get install -yqq \
         python3.6 \
         python3.6-dev \
         python3-pip \
-        mssql-tools \
     && sed -i 's/^# en_US.UTF-8 UTF-8$/en_US.UTF-8 UTF-8/g' /etc/locale.gen \
     && locale-gen \
     && update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.5 1 \
@@ -72,7 +55,7 @@ RUN set -ex \
     && python3 -m pip install wheel \
     && pip install -U pip setuptools wheel \
     && pip install Cython \
-    && pip install alo7-airflow[${AIRFLOW_PACKAGES}]==$AIRFLOW_VERSION \
+    && pip install apache-airflow[${AIRFLOW_PACKAGES}]==$AIRFLOW_VERSION \
     && apt-get purge --auto-remove -yqq $buildDeps \
     && apt-get clean \
     && rm -rf \
