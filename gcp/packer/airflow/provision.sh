@@ -34,20 +34,8 @@ echo "------------------- install airflow complete -------------------"
 airflow initdb
 echo "------------------- initialize database phase 1 complete -------------------"
 
-curl https://s3.amazonaws.com/aws-cloudwatch/downloads/latest/awslogs-agent-setup.py -O
-echo "------------------- download aws logs -------------------"
-
-sudo python ./awslogs-agent-setup.py -n -r us-east-1 -c /home/ubuntu/awslogs.conf
-echo "------------------- install aws logs -------------------"
-
 mkdir /home/ubuntu/airflow/dags
 echo "------------------- create dag and plugins directory complete -------------------"
-
-sudo service awslogs start
-echo "------------------- start of awslogs complete -------------------"
-
-sudo systemctl enable awslogs
-echo "------------------- enable autostart of awslogs complete -------------------"
 
 crontab -u ubuntu /home/ubuntu/crontab
 echo "------------------- enable logs cleanup complete -------------------"
