@@ -13,8 +13,8 @@
     "builders": [{
         "type": "googlecompute",
         "project_id": "cloud-arch",
-        "source_image": "ubuntu-1604-xenial-v20180814",
-        "ssh_username": "packer",
+        "source_image": "ubuntu-minimal-1604-xenial-v20180814",
+        "ssh_username": "ubuntu",
         "zone": "us-east1-b"
     }],
     "provisioners": [{
