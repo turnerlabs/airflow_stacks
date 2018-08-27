@@ -12,7 +12,6 @@
     },
     "builders": [{
         "type": "googlecompute",
-        "account_file": "account.json",
         "project_id": "cloud-arch",
         "source_image": "ubuntu-minimal-1604-xenial-v20180814",
         "ssh_username": "packer",
