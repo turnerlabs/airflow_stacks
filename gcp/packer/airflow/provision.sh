@@ -21,6 +21,7 @@ echo "export AIRFLOW_HOME=/home/ubuntu/airflow" >> /home/ubuntu/.bash_profile
 echo "------------------- append AIRFLOW_HOME to bash profile complete -------------------"
 
 export AIRFLOW_HOME=/home/ubuntu/airflow
+export SLUGIFY_USES_TEXT_UNIDECODE=yes
 
 sudo pip install --upgrade pip
 echo "------------------- pip upgrade complete -------------------"
