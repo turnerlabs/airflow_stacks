@@ -34,9 +34,6 @@ echo "------------------- virtual environment creation complete ----------------
 source ~/venv/bin/activate
 echo "------------------- activate virtual environment complete -------------------"
 
-pip install html5lib boto3 markupsafe flask_bcrypt snowflake-connector-python celery
-echo "------------------- install python packages that are needed complete -------------------"
-
 pip install "apache-airflow[all_dbs,celery,crypto,devel,gcp_api,jdbc,kerberos,mssql,mysql,password,postgres,qds,rabbitmq,redis,s3,samba,slack,snowflake,ssh]"
 echo "------------------- install airflow complete -------------------"
 
