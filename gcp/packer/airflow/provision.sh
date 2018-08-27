@@ -2,7 +2,7 @@
 
 set -e
 
-sudo apt-get -y update
+apt-get -y update
 echo "------------------- apt update complete -------------------"
 
 sudo apt-get -y install unattended-upgrades
