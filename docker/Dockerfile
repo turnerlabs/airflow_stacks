@@ -13,7 +13,7 @@ ENV TERM linux
 # Airflow
 ARG AIRFLOW_VERSION=1.10
 ARG AIRFLOW_HOME=/usr/local/airflow
-ARG AIRFLOW_CODE=/usr/local/lib/python3.7/dist-packages/airflow
+ARG AIRFLOW_CODE=/usr/local/lib/python3.6/dist-packages/airflow
 ARG AIRFLOW_PACKAGES=all_dbs,celery,crypto,devel,gcp_api,jdbc,kerberos,mssql,mysql,password,postgres,qds,rabbitmq,redis,s3,samba,slack,snowflake,ssh
 
 # Define en_US.
