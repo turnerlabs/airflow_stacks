@@ -18,12 +18,12 @@
         "zone": "us-east1-b",
         "image_name": "rabbitmq-{{timestamp}}",
         "image_labels": {
-            "name": "{{rabbitmq packer image builder}}",
-            "application": "{{user `tag_application`}}",
-            "contact-email": "{{user `tag_contact_email`}}",
-            "customer": "{{user `tag_customer`}}",
-            "team": "{{user `tag_team`}}",
-            "environment": "{{user `tag_environment`}}"
+            "name": "rabbitmq packer image builder",
+            "application": "rabbitmq",
+            "contact-email": "email@email.com",
+            "customer": "rabbitmq",
+            "team": "rabbitmq",
+            "environment": "dev"
         }
     }],
     "provisioners": [{
