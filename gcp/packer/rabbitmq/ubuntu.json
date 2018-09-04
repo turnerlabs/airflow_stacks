@@ -15,7 +15,16 @@
         "project_id": "cloud-arch",
         "source_image": "ubuntu-1604-xenial-v20180814",
         "ssh_username": "ubuntu",
-        "zone": "us-east1-b"
+        "zone": "us-east1-b",
+        "image_name": "rabbitmq {{timestamp}}",
+        "tags": {
+            "Name": "rabbitmq packer image builder",
+            "application": "{{user `tag_application`}}",
+            "contact-email": "{{user `tag_contact_email`}}",
+            "customer": "{{user `tag_customer`}}",
+            "team": "{{user `tag_team`}}",
+            "environment": "{{user `tag_environment`}}"
+        }
     }],
     "provisioners": [{
             "type": "file",

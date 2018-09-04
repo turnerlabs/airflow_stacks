@@ -15,7 +15,8 @@
         "project_id": "cloud-arch",
         "source_image": "ubuntu-1604-xenial-v20180814",
         "ssh_username": "ubuntu",
-        "zone": "us-east1-b"
+        "zone": "us-east1-b",
+        "image_name": "airflow {{timestamp}}"
     }],
     "provisioners": [{
             "type": "file",
