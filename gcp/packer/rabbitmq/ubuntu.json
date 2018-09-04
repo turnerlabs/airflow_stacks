@@ -11,24 +11,11 @@
         "tag_environment": ""
     },
     "builders": [{
-        "type": "amazon-ebs",
-        "access_key": "{{user `access_key`}}",
-        "secret_key": "{{user `secret_key`}}",
-        "region": "us-east-1",
-        "source_ami": "ami-05fb04e2687120d6b",
-        "instance_type": "t2.medium",
+        "type": "googlecompute",
+        "project_id": "cloud-arch",
+        "source_image": "ubuntu-1604-xenial-v20180814",
         "ssh_username": "ubuntu",
-        "ami_name": "rabbitmq {{timestamp}}",
-        "vpc_id": "{{user `vpcid_to_build_in`}}",
-        "subnet_id": "{{user `subnetid_to_build_in`}}",
-        "run_tags": {
-            "Name": "rabbitmq packer ami builder",
-            "application": "{{user `tag_application`}}",
-            "contact-email": "{{user `tag_contact_email`}}",
-            "customer": "{{user `tag_customer`}}",
-            "team": "{{user `tag_team`}}",
-            "environment": "{{user `tag_environment`}}"
-        }
+        "zone": "us-east1-b"
     }],
     "provisioners": [{
             "type": "file",
