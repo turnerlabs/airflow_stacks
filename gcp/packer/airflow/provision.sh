@@ -5,7 +5,7 @@ set -e
 sudo apt-get -y update
 echo "------------------- apt update complete -------------------"
 
-sudo apt-get -y install unattended-upgrades 
+sudo apt-get -y install unattended-upgrades
 echo "------------------- apt upgrade complete -------------------"
 
 sudo apt-get -y install python-pip libmysqlclient-dev python-dev libkrb5-dev libsasl2-dev mysql-client-core-5.7
