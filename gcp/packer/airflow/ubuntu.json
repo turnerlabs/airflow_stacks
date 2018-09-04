@@ -16,7 +16,14 @@
         "source_image": "ubuntu-1604-xenial-v20180814",
         "ssh_username": "ubuntu",
         "zone": "us-east1-b",
-        "image_name": "airflow {{timestamp}}"
+        "image_name": "airflow-{{timestamp}}",
+        "image_labels": {
+            "application": "airflow",
+            "customer": "airflow",
+            "team": "airflow",
+            "environment": "dev",
+            "contact-email": "one-day-this-might-work"
+        }
     }],
     "provisioners": [{
             "type": "file",
