@@ -20,7 +20,6 @@
         "image_labels": {
             "name": "rabbitmq packer image builder",
             "application": "rabbitmq",
-            "contact-email": "email_email.com",
             "customer": "rabbitmq",
             "team": "rabbitmq",
             "environment": "dev"
