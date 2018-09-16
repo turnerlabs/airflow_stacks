@@ -27,18 +27,18 @@
     }],
     "provisioners": [{
             "type": "file",
-            "source": "erlang",
+            "source": "../../../ec2/packer/rabbitmq/extra/erlang",
             "destination": "/home/ubuntu/erlang"
         },
         {
             "type": "file",
-            "source": "limits.conf",
+            "source": "../../../ec2/packer/rabbitmq/extra/limits.conf",
             "destination": "/home/ubuntu/limits.conf"
         },
         {
             "type": "shell",
             "execute_command": "{{.Vars}} bash '{{.Path}}'",
-            "script": "provision.sh"
+            "script": "../../../ec2/packer/rabbitmq/provision.sh"
         }
     ]
 }

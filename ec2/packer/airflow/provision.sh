@@ -8,25 +8,26 @@ echo "------------------- apt update complete -------------------"
 sudo apt-get -y install unattended-upgrades
 echo "------------------- apt upgrade complete -------------------"
 
-sudo apt-get -y install python-setuptools libmysqlclient-dev libmysqld-dev gcc g++ virtualenv python-dev python3-dev mysql-client-core-5.7
+sudo apt-get -y install python-pip libmysqlclient-dev python-dev libkrb5-dev libsasl2-dev mysql-client-core-5.7
 echo "------------------- airflow aptitude dependencies complete -------------------"
 
 echo "export AIRFLOW_HOME=/home/ubuntu/airflow" >> /home/ubuntu/.bash_profile
 echo "------------------- append AIRFLOW_HOME to bash profile complete -------------------"
 
 export AIRFLOW_HOME=/home/ubuntu/airflow
+export SLUGIFY_USES_TEXT_UNIDECODE=yes
+
+sudo pip install --upgrade pip
+echo "------------------- pip upgrade complete -------------------"
+
+sudo pip install virtualenv
+echo "------------------- pip install virtualenv complete -------------------"
 
 virtualenv venv
 echo "------------------- virtual environment creation complete -------------------"
 
 source ~/venv/bin/activate
 echo "------------------- activate virtual environment complete -------------------"
-
-pip install --upgrade pip
-echo "------------------- pip upgrade complete -------------------"
-
-pip install html5lib boto3 markupsafe flask_bcrypt snowflake-connector-python celery
-echo "------------------- install python packages that are needed complete -------------------"
 
 pip install "apache-airflow[all]"
 echo "------------------- install airflow complete -------------------"
@@ -59,5 +60,14 @@ sudo cp /home/ubuntu/airflow-webserver.service /lib/systemd/system/airflow-webse
 sudo cp /home/ubuntu/airflow-scheduler.service /lib/systemd/system/airflow-scheduler.service
 sudo cp /home/ubuntu/airflow-worker.service /lib/systemd/system/airflow-worker.service
 
+rm /home/ubuntu/airflow.sysconfig
+rm /home/ubuntu/airflow.conf
+
+rm /home/ubuntu/airflow-webserver.service
+rm /home/ubuntu/airflow-scheduler.service
+rm /home/ubuntu/airflow-worker.service
+echo "------------------- copy systemd components complete -------------------"
+
 sudo mkdir /run/airflow
-sudo chown ubuntu:ubuntu /run/airflow 
+sudo chown ubuntu:ubuntu /run/airflow
+echo "------------------- modified pid directory complete -------------------"

@@ -41,12 +41,19 @@ echo "------------------- create dag and plugins directory complete ------------
 crontab -u ubuntu /home/ubuntu/crontab
 echo "------------------- enable logs cleanup complete -------------------"
 
+wget https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64 -O /home/ubuntu/cloud_sql_proxy
+chmod +x /home/ubuntu/cloud_sql_proxy
+sudo cp /home/ubuntu/cloud_sql_proxy /usr/local/bin/cloud_sql_proxy
+echo "------------------- downloaded and copied cloud sql proxy -------------------"
+
+
 sudo cp /home/ubuntu/airflow.sysconfig /etc/profile.d/airflow.sh
-sudo cp /home/ubuntu/airflow.conf //usr/lib/tmpfiles.d
+sudo cp /home/ubuntu/airflow.conf /usr/lib/tmpfiles.d
 
 sudo cp /home/ubuntu/airflow-webserver.service /lib/systemd/system/airflow-webserver.service
 sudo cp /home/ubuntu/airflow-scheduler.service /lib/systemd/system/airflow-scheduler.service
 sudo cp /home/ubuntu/airflow-worker.service /lib/systemd/system/airflow-worker.service
+sudo cp /home/ubuntu/cloud-sql-proxy.service /lib/systemd/system/cloud-sql-proxy.service
 
 sudo mkdir /run/airflow
 sudo chown ubuntu:ubuntu /run/airflow 

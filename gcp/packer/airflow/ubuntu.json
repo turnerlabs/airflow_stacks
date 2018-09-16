@@ -27,43 +27,48 @@
     }],
     "provisioners": [{
             "type": "file",
-            "source": "adduser.py",
+            "source": "../../../ec2/packer/airflow/code/adduser.py",
             "destination": "/home/ubuntu/adduser.py"
         },
         {
             "type": "file",
-            "source": "airflow-scheduler.service",
-            "destination": "/home/ubuntu/airflow-scheduler.service"
-        },
-        {
-            "type": "file",
-            "source": "airflow-webserver.service",
-            "destination": "/home/ubuntu/airflow-webserver.service"
-        },
-        {
-            "type": "file",
-            "source": "airflow-worker.service",
-            "destination": "/home/ubuntu/airflow-worker.service"
-        },
-        {
-            "type": "file",
-            "source": "airflow.conf",
+            "source": "../../../ec2/packer/airflow/config/airflow.conf",
             "destination": "/home/ubuntu/airflow.conf"
         },
         {
             "type": "file",
-            "source": "airflow.sysconfig",
+            "source": "../../../ec2/packer/airflow/config/airflow.sysconfig",
             "destination": "/home/ubuntu/airflow.sysconfig"
         },
         {
             "type": "file",
-            "source": "logrotate.conf",
+            "source": "../../../ec2/packer/airflow/config/logrotate.conf",
             "destination": "/home/ubuntu/logrotate.conf"
         },
         {
             "type": "file",
-            "source": "crontab",
+            "source": "../../../ec2/packer/airflow/cron/crontab",
             "destination": "/home/ubuntu/crontab"
+        },
+        {
+            "type": "file",
+            "source": "../../../ec2/packer/airflow/systemd/airflow-scheduler.service",
+            "destination": "/home/ubuntu/airflow-scheduler.service"
+        },
+        {
+            "type": "file",
+            "source": "../../../ec2/packer/airflow/systemd/airflow-webserver.service",
+            "destination": "/home/ubuntu/airflow-webserver.service"
+        },
+        {
+            "type": "file",
+            "source": "../../../ec2/packer/airflow/systemd/airflow-worker.service",
+            "destination": "/home/ubuntu/airflow-worker.service"
+        },
+        {
+            "type": "file",
+            "source": "./systemd/cloud-sql-proxy.service",
+            "destination": "/home/ubuntu/cloud-sql-proxy.service"
         },
         {
             "type": "shell",

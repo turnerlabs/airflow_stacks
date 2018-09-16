@@ -4,7 +4,7 @@ This is a packer builder and custom provisioner to create a Python 2.7 AMI for a
 
 ## Builder
 
-The builder phase uses a t2 medium of the Ubuntu 18.04 AMI in the east region as the instance type to run the provisioner on.  The instance size can be changed to something larger if you need to create the AMI faster.  This is just for building the AMI and has no bearing on the long running instance.  That is determined in the terraform script.
+The builder phase uses a t2 medium of the Ubuntu 16.04 AMI in the east region as the instance type to run the provisioner on.  The instance size can be changed to something larger if you need to create the AMI faster.  This is just for building the AMI and has no bearing on the long running instance.  That is determined in the terraform script.
 
 ## Provisioner
 
@@ -20,7 +20,6 @@ Default ones(from http://airflow.readthedocs.io/en/latest/installation.html)
 all
 
 Custom ones:
-snowflake-connector-python - https://github.com/aberdave/airflow-snowflake
 
 *** Please note that this airflow AMI is created with the following features in mind although all these subpackages are installed:
 - Celery as the worker task executor

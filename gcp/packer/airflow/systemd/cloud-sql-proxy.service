@@ -1,0 +1,16 @@
+[Install]
+WantedBy=multi-user.target
+
+[Unit]
+Description=Google Cloud Compute Engine SQL Proxy
+Requires=networking.service
+After=networking.service
+
+[Service]
+Type=simple
+WorkingDirectory=/usr/local/bin
+ExecStart=/usr/local/bin/cloud_sql_proxy -instances=project-id:region:cloud-sql-instance-name=tcp:3306
+Restart=always
+StandardOutput=journal
+User=ubuntu
+Group=ubuntu

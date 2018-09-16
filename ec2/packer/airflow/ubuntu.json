@@ -15,7 +15,7 @@
         "access_key": "{{user `access_key`}}",
         "secret_key": "{{user `secret_key`}}",
         "region": "us-east-1",
-        "source_ami": "ami-05fb04e2687120d6b",
+        "source_ami": "ami-04169656fea786776",
         "instance_type": "t2.medium",
         "ssh_username": "ubuntu",
         "ami_name": "airflow {{timestamp}}",
@@ -32,48 +32,48 @@
     }],
     "provisioners": [{
             "type": "file",
-            "source": "adduser.py",
+            "source": "./code/adduser.py",
             "destination": "/home/ubuntu/adduser.py"
         },
         {
             "type": "file",
-            "source": "airflow-scheduler.service",
-            "destination": "/home/ubuntu/airflow-scheduler.service"
-        },
-        {
-            "type": "file",
-            "source": "airflow-webserver.service",
-            "destination": "/home/ubuntu/airflow-webserver.service"
-        },
-        {
-            "type": "file",
-            "source": "airflow-worker.service",
-            "destination": "/home/ubuntu/airflow-worker.service"
-        },
-        {
-            "type": "file",
-            "source": "airflow.conf",
+            "source": "./config/airflow.conf",
             "destination": "/home/ubuntu/airflow.conf"
         },
         {
             "type": "file",
-            "source": "airflow.sysconfig",
+            "source": "./config/airflow.sysconfig",
             "destination": "/home/ubuntu/airflow.sysconfig"
         },
         {
             "type": "file",
-            "source": "logrotate.conf",
+            "source": "./config/logrotate.conf",
             "destination": "/home/ubuntu/logrotate.conf"
         },
         {
             "type": "file",
-            "source": "crontab",
+            "source": "./config/awslogs.conf",
+            "destination": "/home/ubuntu/awslogs.conf"
+        },
+        {
+            "type": "file",
+            "source": "./cron/crontab",
             "destination": "/home/ubuntu/crontab"
         },
         {
             "type": "file",
-            "source": "awslogs.conf",
-            "destination": "/home/ubuntu/awslogs.conf"
+            "source": "./systemd/airflow-scheduler.service",
+            "destination": "/home/ubuntu/airflow-scheduler.service"
+        },
+        {
+            "type": "file",
+            "source": "./systemd/airflow-webserver.service",
+            "destination": "/home/ubuntu/airflow-webserver.service"
+        },
+        {
+            "type": "file",
+            "source": "./systemd/airflow-worker.service",
+            "destination": "/home/ubuntu/airflow-worker.service"
         },
         {
             "type": "shell",

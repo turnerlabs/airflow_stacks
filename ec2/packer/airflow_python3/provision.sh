@@ -8,20 +8,19 @@ echo "------------------- apt update complete -------------------"
 sudo apt-get -y install unattended-upgrades
 echo "------------------- apt upgrade complete -------------------"
 
-sudo add-apt-repository -y ppa:jonathonf/python-3.7
-sudo apt-get -y update
-
-sudo apt-get -y install python-setuptools libmysqlclient-dev libmysqld-dev gcc g++ virtualenv python-dev python3.6-dev mysql-client-core-5.7 python3.6 default-jre libc6-i386 unixodbc freetds-dev freetds-bin tdsodbc libcurl3 default-jre libc6-i386 apt-transport-https python3-gdbm \
-
+sudo apt-get -y install virtualenv python3-pip libmysqlclient-dev python3-dev python3 libkrb5-dev libsasl2-dev mysql-client-core-5.7 python3-gdbm
 echo "------------------- airflow aptitude dependencies complete -------------------"
 
 sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.5 1
-sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.7 3
 
 echo "export AIRFLOW_HOME=/home/ubuntu/airflow" >> /home/ubuntu/.bash_profile
 echo "------------------- append AIRFLOW_HOME to bash profile complete -------------------"
 
 export AIRFLOW_HOME=/home/ubuntu/airflow
+export SLUGIFY_USES_TEXT_UNIDECODE=yes
+
+pip3 install --upgrade pip
+echo "------------------- pip upgrade complete -------------------"
 
 virtualenv -p `which python3` venv
 echo "------------------- virtual environment creation complete -------------------"
@@ -29,41 +28,20 @@ echo "------------------- virtual environment creation complete ----------------
 source ~/venv/bin/activate
 echo "------------------- activate virtual environment complete -------------------"
 
-pip install --upgrade pip
-echo "------------------- pip upgrade complete -------------------"
-
-pip install html5lib 'boto3<1.7' markupsafe flask_bcrypt snowflake-connector-python celery 'zope.deprecation<5.0' jaydebeapi
-echo "------------------- install python packages that are needed complete -------------------"
-
-export PYMSSQL_BUILD_WITH_BUNDLED_FREETDS=1
-
 pip install "apache-airflow[all]"
 echo "------------------- install airflow complete -------------------"
 
 airflow initdb
 echo "------------------- initialize database phase 1 complete -------------------"
 
-pip install 'sqlalchemy<1.2'
-echo "------------------- reset to use an older version of sql alchemy(to use password authentication) complete -------------------"
-
 curl https://s3.amazonaws.com/aws-cloudwatch/downloads/latest/awslogs-agent-setup.py -O
 echo "------------------- download aws logs -------------------"
 
-sudo python ./awslogs-agent-setup.py -n -r us-east-1 -c /home/ubuntu/awslogs.conf
+sudo python3 ./awslogs-agent-setup.py -n -r us-east-1 -c /home/ubuntu/awslogs.conf
 echo "------------------- install aws logs -------------------"
 
 mkdir /home/ubuntu/airflow/dags
 echo "------------------- create dag and plugins directory complete -------------------"
-
-sudo ACCEPT_EULA=Y dpkg -i /home/ubuntu/msodbcsql17_17.1.0.1-1_amd64.deb
-sudo apt-get -fyqq install
-curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
-curl https://packages.microsoft.com/config/ubuntu/16.04/prod.list | sudo tee /etc/apt/sources.list.d/msprod.list
-sudo apt-get update -yqq
-sudo ACCEPT_EULA=Y apt-get install -yqq python3-gdbm unixodbc-dev mssql-tools
-pip install pyodbc
-rm /home/ubuntu/msodbcsql17_17.1.0.1-1_amd64.deb
-echo "------------------- odbc components complete -------------------"
 
 sudo service awslogs start
 echo "------------------- start of awslogs complete -------------------"
