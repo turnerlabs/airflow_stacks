@@ -114,3 +114,16 @@ variable "airflow_password"  {
 variable "s3_log_bucket_name"  {
   description = "Airflow bucket to eventually log to"
 }
+variable "db_subnet_greoup_name"  {
+  description = "Database subnet group name"
+}
+variable "rds_vpc_security_group_ids"{
+  description = "Database vpc security group"
+}
+
+variable "rmq_vpc_security_group_ids"{
+  description = "RabbitMQ vpc security group"
+}
+variable "lc_vpc_security_group_ids"{
+  description = "Launch config vpc security group"
+}
