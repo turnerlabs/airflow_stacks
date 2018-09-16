@@ -8,7 +8,7 @@ echo "------------------- apt update complete -------------------"
 sudo apt-get -y install unattended-upgrades
 echo "------------------- apt upgrade complete -------------------"
 
-sudo apt-get -y install python-pip libmysqlclient-dev python-dev libkrb5-dev libsasl2-dev mysql-client-core-5.7
+sudo apt-get -y install python-pip libmysqlclient-dev python-dev libkrb5-dev libsasl2-dev mysql-client-core-5.7 s3fs
 echo "------------------- airflow aptitude dependencies complete -------------------"
 
 echo "export AIRFLOW_HOME=/home/ubuntu/airflow" >> /home/ubuntu/.bash_profile
