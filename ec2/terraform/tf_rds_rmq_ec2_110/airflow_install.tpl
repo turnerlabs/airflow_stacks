@@ -9,7 +9,6 @@ export AIRFLOW_HOME=/home/ubuntu/airflow
 
 cd /home/ubuntu/airflow
 
-
 sed -i -e "s/expose_config = False/expose_config = True/g" airflow.cfg
 sed -i -e "s/executor = SequentialExecutor/executor = CeleryExecutor/g" airflow.cfg
 sed -i -e "s/remote_log_conn_id =/remote_log_conn_id = s3_logging_conn/g" airflow.cfg
@@ -21,6 +20,7 @@ sed -i -e "s/broker_url = sqla+mysql:\/\/airflow:airflow@localhost:3306\/airflow
 sed -i -e "/auth_backend = airflow.api.auth.backend.default/d" airflow.cfg
 sed -i -e "/\[webserver\]/a\\
 auth_backend = airflow.contrib.auth.backends.password_auth" airflow.cfg
+sed -i -e "/remote_base_log_folder/d" airflow.cfg
 sed -i -e "/\[core\]/a\\
 remote_base_log_folder = s3://${s3_log_bucket_name}" airflow.cfg
 

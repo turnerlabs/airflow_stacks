@@ -65,14 +65,21 @@ resource "aws_instance" "airflow_rabbitmq" {
   vpc_security_group_ids      = ["${var.rmq_vpc_security_group_ids}"]
   subnet_id                   = "${var.subnet_id1}"
   user_data                   = "${data.template_file.rabbitmq-user-data.rendered}"
+  ebs_optimized               = "true"
 
-tags {
-  Name            = "airflow_rabbitmq110"
-  application     = "${var.tag_application}"
-  contact-email   = "${var.tag_contact_email}"
-  customer        = "${var.tag_customer}"
-  team            = "${var.tag_team}"
-  environment     = "${var.tag_environment}"
+  ebs_block_device {
+    volume_size             = 25
+    delete_on_termination   = true
+    device_name             = "/dev/sdb"
+  }
+
+  tags {
+    Name            = "airflow_rabbitmq110"
+    application     = "${var.tag_application}"
+    contact-email   = "${var.tag_contact_email}"
+    customer        = "${var.tag_customer}"
+    team            = "${var.tag_team}"
+    environment     = "${var.tag_environment}"
   }
 }
 
@@ -124,6 +131,13 @@ resource "aws_launch_configuration" "lc_airflow" {
   security_groups             = ["${var.lc_vpc_security_group_ids}"]
   user_data                   = "${data.template_file.airflow-user-data.rendered}"
   iam_instance_profile        = "airflow_s3_instance_profile"
+  ebs_optimized               = "true"
+
+  ebs_block_device {
+    volume_size             = 100
+    delete_on_termination   = true
+    device_name             = "/dev/sdb"    
+  }
 }
 
 resource "aws_autoscaling_group" "asg_airflow" {
