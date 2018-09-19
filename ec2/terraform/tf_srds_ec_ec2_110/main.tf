@@ -1,7 +1,7 @@
 # this section stores the terraform state for the s3 bucket in the terraform state bucket we created in step 1.
 terraform {
   backend "s3" {
-    bucket = "cloud-arch-state" # the terraform state bucket has to be hand entered unfortunately
+    bucket = "tfstatesbairflow110" # the terraform state bucket has to be hand entered unfortunately
     key    = "tf_rds_rmq_ec2/terraform.tfstate"
     region = "us-east-1"
   }
@@ -148,8 +148,8 @@ resource "aws_rds_cluster" "airflow_rds" {
 
   cluster_identifier              = "${var.db_identifier}-cluster"
   engine_mode                     = "serverless"
-  username                        = "${var.db_master_username}"
-  password                        = "${var.db_master_password}"
+  master_username                 = "${var.db_master_username}"
+  master_password                 = "${var.db_master_password}"
   vpc_security_group_ids          = ["${aws_security_group.airflow_rds.id}"]
   db_subnet_group_name            = "${aws_db_subnet_group.airflow_rds_subnet_grp.id}"
   skip_final_snapshot             = true
@@ -181,7 +181,7 @@ resource "aws_elasticache_subnet_group" "airflow_ec_subnet_grp" {
   subnet_ids = ["${var.subnet_id1}", "${var.subnet_id2}"]
 }
 resource "aws_elasticache_cluster" "airflow_elasticache" {
-  cluster_id            = "airflow_cluster"
+  cluster_id            = "airflow-cluster"
   engine                = "redis"
   node_type             = "cache.m3.medium"
   num_cache_nodes       = 1
