@@ -312,7 +312,7 @@ data "template_file" "airflow-user-data" {
 }
 
 resource "aws_launch_configuration" "lc_airflow" {
-  depends_on                  = ["aws_instance.airflow_rabbitmq", "aws_db_instance.airflow_rds", "aws_security_group.airflow_ssh", "aws_iam_instance_profile.airflow_s3_instance_profile"]
+  depends_on                  = ["aws_elasticache_cluster.airflow_elasticache", "aws_rds_cluster.airflow_rds", "aws_security_group.airflow_ssh", "aws_iam_instance_profile.airflow_s3_instance_profile"]
 
   name                        = "lc_airflow"
   image_id                    = "${var.airflow_ami}"
