@@ -218,6 +218,8 @@ resource "aws_s3_bucket" "s3_log_bucket" {
 
 # IAM Role
 resource "aws_iam_role" "airflow_s3_role" {
+  depends_on  = ["aws_s3_bucket.s3_log_bucket"]
+
   name = "airflow_s3_role"
   assume_role_policy = <<EOF
 {
@@ -237,13 +239,15 @@ EOF
 }
 
 resource "aws_iam_instance_profile" "airflow_s3_instance_profile" {
+  depends_on  = ["aws_s3_bucket.s3_log_bucket", "aws_iam_role.airflow_s3_role", "aws_iam_role_policy.airflow_s3_policy", "aws_iam_role_policy.airflow_logs_policy"]
+  
   name = "airflow_s3_instance_profile"
   role = "${aws_iam_role.airflow_s3_role.name}"
 }
 
 # IAM Role Policy
 resource "aws_iam_role_policy" "airflow_s3_policy" {
-  depends_on  = ["aws_s3_bucket.s3_log_bucket"]
+  depends_on  = ["aws_s3_bucket.s3_log_bucket", "aws_iam_role.airflow_s3_role"]
 
   name = "airflow_s3_policy"
   role = "${aws_iam_role.airflow_s3_role.id}"
@@ -264,7 +268,7 @@ EOF
 
 # IAM Role Policy
 resource "aws_iam_role_policy" "airflow_logs_policy" {
-  depends_on  = ["aws_s3_bucket.s3_log_bucket"]
+  depends_on  = ["aws_s3_bucket.s3_log_bucket", "aws_iam_role.airflow_s3_role"]
 
   name = "airflow_logs_policy"
   role = "${aws_iam_role.airflow_s3_role.id}"
