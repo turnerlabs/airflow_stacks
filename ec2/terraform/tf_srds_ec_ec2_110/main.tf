@@ -296,7 +296,7 @@ EOF
 data "template_file" "airflow-user-data" {
   template = "${file("airflow_install.tpl")}"
   vars {
-    ec_url = "${${aws_elasticache_cluster.airflow_elasticache.cache_nodes.0.address}"
+    ec_url = "${aws_elasticache_cluster.airflow_elasticache.cache_nodes.0.address}"
     rds_url = "${aws_rds_cluster.airflow_rds.endpoint}"
     db_airflow_username = "${var.db_airflow_username}"
     db_airflow_password = "${var.db_airflow_password}"
