@@ -42,8 +42,8 @@ systemctl daemon-reload
 
 echo "############# Enabled airflow systemd #############"
 
-id=`id -u`
-group=`id -g`
+id=`id -u ubuntu`
+group=`id -g ubuntu`
 
 /usr/bin/s3fs ${s3_dag_bucket_name} -o use_cache=/tmp,iam_role="${role_name}",uid=$id,gid=$group /home/ubuntu/airflow/dags
 
