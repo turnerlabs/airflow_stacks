@@ -5,6 +5,8 @@ mysql --host=${rds_url} --user=${db_master_username} --password=${db_master_pass
 mysql --host=${rds_url} --user=${db_master_username} --password=${db_master_password} -e "GRANT ALL PRIVILEGES ON ${airflow_dbname}.* TO '${db_airflow_username}'@'%';"
 mysql --host=${rds_url} --user=${db_master_username} --password=${db_master_password} -e "FLUSH PRIVILEGES;"
 
+echo "############# Completed database setup #############"
+
 export AIRFLOW_HOME=/home/ubuntu/airflow
 
 cd /home/ubuntu/airflow
@@ -30,19 +32,29 @@ remote_base_log_folder = s3://${s3_log_bucket_name}" airflow.cfg
 
 /home/ubuntu/venv/bin/airflow initdb
 
+echo "############# Completed airflow database initilaization #############"
+
 systemctl enable airflow-webserver
 systemctl enable airflow-scheduler
 systemctl enable airflow-worker
 
 systemctl daemon-reload
 
-systemctl start airflow-webserver
-systemctl start airflow-scheduler
-systemctl start airflow-worker
-
-/home/ubuntu/venv/bin/python /home/ubuntu/adduser.py -u ${airflow_username} -e ${airflow_emailaddress} -p ${airflow_password}
+echo "############# Enabled airflow systemd #############"
 
 id=`id -u`
 group=`id -g`
 
 /usr/bin/s3fs ${s3_dag_bucket_name} -o use_cache=/tmp,iam_role="${role_name}",uid=$id,gid=$group /home/ubuntu/airflow/dags
+
+echo "############# Enabled s3 mount for dags directory #############"
+
+systemctl start airflow-webserver
+systemctl start airflow-scheduler
+systemctl start airflow-worker
+
+echo "############# Started up airflow service #############"
+
+/home/ubuntu/venv/bin/python /home/ubuntu/adduser.py -u ${airflow_username} -e ${airflow_emailaddress} -p ${airflow_password}
+
+echo "############# Added airflow user #############"

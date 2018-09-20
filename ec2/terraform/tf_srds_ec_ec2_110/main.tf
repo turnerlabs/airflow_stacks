@@ -1,7 +1,7 @@
 # this section stores the terraform state for the s3 bucket in the terraform state bucket we created in step 1.
 terraform {
   backend "s3" {
-    bucket = "" # the terraform state bucket has to be hand entered unfortunately
+    bucket = "tfstatesbairflow110" # the terraform state bucket has to be hand entered unfortunately
     key    = "tf_rds_rmq_ec2/terraform.tfstate"
     region = "us-east-1"
   }
