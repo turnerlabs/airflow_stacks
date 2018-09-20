@@ -84,3 +84,6 @@ variable "airflow_password"  {
 variable "s3_log_bucket_name"  {
   description = "Airflow bucket to eventually log to"
 }
+variable "s3_dag_bucket_name"  {
+  description = "Airflow bucket for DAGs"
+}

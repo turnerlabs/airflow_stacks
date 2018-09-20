@@ -1,7 +1,7 @@
 # this section stores the terraform state for the s3 bucket in the terraform state bucket we created in step 1.
 terraform {
   backend "s3" {
-    bucket = "tfstatesbairflow110" # the terraform state bucket has to be hand entered unfortunately
+    bucket = "" # the terraform state bucket has to be hand entered unfortunately
     key    = "tf_rds_rmq_ec2/terraform.tfstate"
     region = "us-east-1"
   }
@@ -142,7 +142,7 @@ resource "aws_db_subnet_group" "airflow_rds_subnet_grp" {
     environment     = "${var.tag_environment}"
   }
 }
-
+# need to pull out max_capacity min_capacity, seconds_until_auto_pause
 resource "aws_rds_cluster" "airflow_rds" {
   depends_on                      = ["aws_db_subnet_group.airflow_rds_subnet_grp", "aws_security_group.airflow_rds"]
 
@@ -180,6 +180,8 @@ resource "aws_elasticache_subnet_group" "airflow_ec_subnet_grp" {
   name       = "ec-airflow-subnet"
   subnet_ids = ["${var.subnet_id1}", "${var.subnet_id2}"]
 }
+
+# need to pull out node_type, engine_version, num_cache_nodes, parameter_group_name, and port
 resource "aws_elasticache_cluster" "airflow_elasticache" {
   cluster_id            = "airflow-cluster"
   engine                = "redis"
@@ -200,6 +202,22 @@ resource "aws_elasticache_cluster" "airflow_elasticache" {
     environment     = "${var.tag_environment}"
   }
 }
+
+# S3 Dag Bucket
+
+resource "aws_s3_bucket" "s3_dag_bucket" {
+  bucket        = "${var.s3_dag_bucket_name}"
+  force_destroy = "true"
+
+  tags {
+    application     = "${var.tag_application}"
+    contact-email   = "${var.tag_contact_email}"
+    customer        = "${var.tag_customer}"
+    team            = "${var.tag_team}"
+    environment     = "${var.tag_environment}"
+  }
+}
+
 
 # S3 Log Bucket
 
@@ -246,6 +264,7 @@ resource "aws_iam_instance_profile" "airflow_s3_instance_profile" {
 }
 
 # IAM Role Policy
+# need to tighten the heck out of the below policy
 resource "aws_iam_role_policy" "airflow_s3_policy" {
   depends_on  = ["aws_s3_bucket.s3_log_bucket", "aws_iam_role.airflow_s3_role"]
 
@@ -312,6 +331,9 @@ data "template_file" "airflow-user-data" {
     airflow_emailaddress = "${var.airflow_emailaddress}"
     airflow_password = "${var.airflow_password}"
     s3_log_bucket_name = "${var.s3_log_bucket_name}"
+    s3_dag_bucket_name = "${var.s3_dag_bucket_name}"
+    role_name = "${aws_iam_role.airflow_s3_role.name}"
+    instance_ip = ""
   }
 }
 
