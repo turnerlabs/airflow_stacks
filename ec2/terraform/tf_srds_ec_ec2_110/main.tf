@@ -2,7 +2,7 @@
 terraform {
   backend "s3" {
     bucket = "" # the terraform state bucket has to be hand entered unfortunately
-    key    = "tf_rds_rmq_ec2/terraform.tfstate"
+    key    = "tf_srds_ec_ec2_110/terraform.tfstate"
     region = "us-east-1"
   }
 }
@@ -13,9 +13,65 @@ provider "aws" {
   profile = "${var.profile}"
 }
 
-# Security Group Related Items
+# Instance Security Group
+resource "aws_security_group" "airflow_instance" {
+  name        = "airflow_instance"
+  description = "Security group for access to airflow server"
+  vpc_id      = "${var.vpc_id}"
 
+  ingress {
+    from_port       = 22
+    to_port         = 22
+    protocol        = "tcp"
+    cidr_blocks     = ["${var.ingress_ip}"]
+    description     = "${var.ingress_ip_description}"
+  }
+
+  ingress {
+    from_port       = 22
+    to_port         = 22
+    protocol        = "tcp"
+    cidr_blocks     = ["10.0.0.0/8"]
+    description     = "local"
+  }
+
+  ingress {
+    from_port       = 8080
+    to_port         = 8080
+    protocol        = "tcp"
+    cidr_blocks     = ["${var.ingress_ip}"]
+    description     = "${var.ingress_ip_description}"
+  }
+
+  ingress {
+    from_port       = 8080
+    to_port         = 8080
+    protocol        = "tcp"
+    cidr_blocks     = ["10.0.0.0/8"]
+    description     = "local"
+  }
+
+  egress {
+    from_port       = 0
+    to_port         = 0
+    protocol        = "-1"
+    cidr_blocks     = ["0.0.0.0/0"]
+  }
+
+  tags {
+    Name            = "airflow_instance"
+    application     = "${var.tag_application}"
+    contact-email   = "${var.tag_contact_email}"
+    customer        = "${var.tag_customer}"
+    team            = "${var.tag_team}"
+    environment     = "${var.tag_environment}"
+  }
+}
+
+# RDS Security Group
 resource "aws_security_group" "airflow_rds" {
+  depends_on  = ["aws_security_group.airflow_instance"]
+
   name        = "airflow_rds"
   description = "Security group for access to rds server for airflow"
   vpc_id      = "${var.vpc_id}"
@@ -24,7 +80,7 @@ resource "aws_security_group" "airflow_rds" {
     from_port       = 0
     to_port         = 0
     protocol        = "-1"
-    cidr_blocks     = ["0.0.0.0/0"]
+    security_groups = ["${aws_security_group.airflow_instance.id}"]
   }
 
   egress {
@@ -44,61 +100,10 @@ resource "aws_security_group" "airflow_rds" {
   }
 }
 
-resource "aws_security_group" "airflow_ssh" {
-  name        = "airflow_ssh"
-  description = "Security group for access to airflow server"
-  vpc_id      = "${var.vpc_id}"
-
-  ingress {
-    from_port       = 22
-    to_port         = 22
-    protocol        = "tcp"
-    cidr_blocks     = ["157.166.0.0/16"]
-    description     = "Turner"
-  }
-
-  ingress {
-    from_port       = 22
-    to_port         = 22
-    protocol        = "tcp"
-    cidr_blocks     = ["10.0.0.0/8"]
-    description     = "Turner"
-  }
-
-  ingress {
-    from_port       = 8080
-    to_port         = 8080
-    protocol        = "tcp"
-    cidr_blocks     = ["157.166.0.0/16"]
-    description     = "Turner"
-  }
-
-  ingress {
-    from_port       = 8080
-    to_port         = 8080
-    protocol        = "tcp"
-    cidr_blocks     = ["10.0.0.0/8"]
-    description     = "Turner"
-  }
-
-  egress {
-    from_port       = 0
-    to_port         = 0
-    protocol        = "-1"
-    cidr_blocks     = ["0.0.0.0/0"]
-  }
-
-  tags {
-    Name            = "airflow_ssh"
-    application     = "${var.tag_application}"
-    contact-email   = "${var.tag_contact_email}"
-    customer        = "${var.tag_customer}"
-    team            = "${var.tag_team}"
-    environment     = "${var.tag_environment}"
-  }
-}
-
+# Elasticache Security Group
 resource "aws_security_group" "airflow_ec" {
+  depends_on  = ["aws_security_group.airflow_instance"]
+
   name        = "airflow_ec"
   description = "Security group for access to ec server for airflow"
   vpc_id      = "${var.vpc_id}"
@@ -107,7 +112,7 @@ resource "aws_security_group" "airflow_ec" {
     from_port       = 0
     to_port         = 0
     protocol        = "-1"
-    cidr_blocks     = ["0.0.0.0/0"]
+    security_groups = ["${aws_security_group.airflow_instance.id}"]
   }
 
   egress {
@@ -127,84 +132,7 @@ resource "aws_security_group" "airflow_ec" {
   }
 }
 
-
-# RDS Related Items
-
-resource "aws_db_subnet_group" "airflow_rds_subnet_grp" {
-  subnet_ids = ["${var.subnet_id1}", "${var.subnet_id2}"]
-
-  tags {
-    Name            = "airflow_rds"
-    application     = "${var.tag_application}"
-    contact-email   = "${var.tag_contact_email}"
-    customer        = "${var.tag_customer}"
-    team            = "${var.tag_team}"
-    environment     = "${var.tag_environment}"
-  }
-}
-# need to pull out max_capacity min_capacity, seconds_until_auto_pause
-resource "aws_rds_cluster" "airflow_rds" {
-  depends_on                      = ["aws_db_subnet_group.airflow_rds_subnet_grp", "aws_security_group.airflow_rds"]
-
-  cluster_identifier              = "${var.db_identifier}-cluster"
-  engine_mode                     = "serverless"
-  master_username                 = "${var.db_master_username}"
-  master_password                 = "${var.db_master_password}"
-  vpc_security_group_ids          = ["${aws_security_group.airflow_rds.id}"]
-  db_subnet_group_name            = "${aws_db_subnet_group.airflow_rds_subnet_grp.id}"
-  skip_final_snapshot             = true
-  preferred_backup_window         = "06:00-06:30"
-  backup_retention_period         = 5
-  db_cluster_parameter_group_name = "default.aurora5.6"
-  
-  scaling_configuration {
-    auto_pause               = true
-    max_capacity             = 256
-    min_capacity             = 2
-    seconds_until_auto_pause = 900
-  }
-
-  tags {
-    Name            = "${var.db_identifier}"
-    application     = "${var.tag_application}"
-    contact-email   = "${var.tag_contact_email}"
-    customer        = "${var.tag_customer}"
-    team            = "${var.tag_team}"
-    environment     = "${var.tag_environment}"
-  }
-}
-
-# Elasticache Related Items
-
-resource "aws_elasticache_subnet_group" "airflow_ec_subnet_grp" {
-  name       = "ec-airflow-subnet"
-  subnet_ids = ["${var.subnet_id1}", "${var.subnet_id2}"]
-}
-
-# need to pull out node_type, engine_version, num_cache_nodes, parameter_group_name, and port
-resource "aws_elasticache_cluster" "airflow_elasticache" {
-  cluster_id            = "airflow-cluster"
-  engine                = "redis"
-  node_type             = "cache.m3.medium"
-  num_cache_nodes       = 1
-  engine_version        = "4.0.10"
-  parameter_group_name  = "default.redis4.0"
-  port                  = 6379
-  security_group_ids    = ["${aws_security_group.airflow_ec.id}"]
-  subnet_group_name     = "${aws_elasticache_subnet_group.airflow_ec_subnet_grp.id}"
-  
-  tags {
-    Name            = "airflow_node"
-    application     = "${var.tag_application}"
-    contact-email   = "${var.tag_contact_email}"
-    customer        = "${var.tag_customer}"
-    team            = "${var.tag_team}"
-    environment     = "${var.tag_environment}"
-  }
-}
-
 # S3 Dag Bucket
-
 resource "aws_s3_bucket" "s3_dag_bucket" {
   bucket        = "${var.s3_dag_bucket_name}"
   force_destroy = "true"
@@ -218,9 +146,7 @@ resource "aws_s3_bucket" "s3_dag_bucket" {
   }
 }
 
-
 # S3 Log Bucket
-
 resource "aws_s3_bucket" "s3_log_bucket" {
   bucket        = "${var.s3_log_bucket_name}"
   force_destroy = "true"
@@ -256,6 +182,7 @@ resource "aws_iam_role" "airflow_s3_role" {
 EOF
 }
 
+# IAM Instance Profile
 resource "aws_iam_instance_profile" "airflow_s3_instance_profile" {
   depends_on  = ["aws_s3_bucket.s3_log_bucket", "aws_iam_role.airflow_s3_role", "aws_iam_role_policy.airflow_s3_policy", "aws_iam_role_policy.airflow_logs_policy"]
   
@@ -263,7 +190,7 @@ resource "aws_iam_instance_profile" "airflow_s3_instance_profile" {
   role = "${aws_iam_role.airflow_s3_role.name}"
 }
 
-# IAM Role Policy
+# IAM S3 Role Policy
 # need to tighten the heck out of the below policy
 resource "aws_iam_role_policy" "airflow_s3_policy" {
   depends_on  = ["aws_s3_bucket.s3_log_bucket", "aws_iam_role.airflow_s3_role"]
@@ -285,7 +212,7 @@ resource "aws_iam_role_policy" "airflow_s3_policy" {
 EOF
 }
 
-# IAM Role Policy
+# IAM Logs Role Policy
 resource "aws_iam_role_policy" "airflow_logs_policy" {
   depends_on  = ["aws_s3_bucket.s3_log_bucket", "aws_iam_role.airflow_s3_role"]
 
@@ -313,9 +240,80 @@ resource "aws_iam_role_policy" "airflow_logs_policy" {
 EOF
 }
 
+# RDS Related Items
+resource "aws_db_subnet_group" "airflow_rds_subnet_grp" {
+  subnet_ids = ["${var.subnet_id1}", "${var.subnet_id2}"]
+
+  tags {
+    Name            = "airflow_rds"
+    application     = "${var.tag_application}"
+    contact-email   = "${var.tag_contact_email}"
+    customer        = "${var.tag_customer}"
+    team            = "${var.tag_team}"
+    environment     = "${var.tag_environment}"
+  }
+}
+resource "aws_rds_cluster" "airflow_rds" {
+  depends_on                      = ["aws_db_subnet_group.airflow_rds_subnet_grp", "aws_security_group.airflow_rds"]
+
+  cluster_identifier              = "${var.db_identifier}-cluster"
+  engine_mode                     = "serverless"
+  master_username                 = "${var.db_master_username}"
+  master_password                 = "${var.db_master_password}"
+  vpc_security_group_ids          = ["${aws_security_group.airflow_rds.id}"]
+  db_subnet_group_name            = "${aws_db_subnet_group.airflow_rds_subnet_grp.id}"
+  skip_final_snapshot             = true
+  preferred_backup_window         = "06:00-06:30"
+  backup_retention_period         = 5
+  db_cluster_parameter_group_name = "${var.db_cluster_parameter_group_name}"
+  
+  scaling_configuration {
+    auto_pause               = true
+    max_capacity             = "${var.db_max_capacity}"
+    min_capacity             = "${var.db_min_capacity}"
+    seconds_until_auto_pause = "${var.db_seconds_until_auto_pause}"
+  }
+
+  tags {
+    Name            = "${var.db_identifier}"
+    application     = "${var.tag_application}"
+    contact-email   = "${var.tag_contact_email}"
+    customer        = "${var.tag_customer}"
+    team            = "${var.tag_team}"
+    environment     = "${var.tag_environment}"
+  }
+}
+
+
+# Elasticache Related Items
+resource "aws_elasticache_subnet_group" "airflow_ec_subnet_grp" {
+  name       = "ec-airflow-subnet"
+  subnet_ids = ["${var.subnet_id1}", "${var.subnet_id2}"]
+}
+
+resource "aws_elasticache_cluster" "airflow_elasticache" {
+  cluster_id            = "airflow-cluster"
+  engine                = "redis"
+  node_type             = "${var.ec_node_type}"
+  num_cache_nodes       = "${var.ec_num_cache_nodes}"
+  engine_version        = "${var.ec_engine_version}"
+  parameter_group_name  = "${var.ec_parameter_group_name}"
+  port                  = "${var.ec_port}"
+  security_group_ids    = ["${aws_security_group.airflow_ec.id}"]
+  subnet_group_name     = "${aws_elasticache_subnet_group.airflow_ec_subnet_grp.id}"
+  
+  tags {
+    Name            = "airflow_node"
+    application     = "${var.tag_application}"
+    contact-email   = "${var.tag_contact_email}"
+    customer        = "${var.tag_customer}"
+    team            = "${var.tag_team}"
+    environment     = "${var.tag_environment}"
+  }
+}
+
 
 # Airflow Instance Related Items
-
 data "template_file" "airflow-user-data" {
   template = "${file("airflow_install.tpl")}"
   vars {
@@ -325,8 +323,8 @@ data "template_file" "airflow-user-data" {
     db_airflow_password = "${var.db_airflow_password}"
     db_master_username = "${var.db_master_username}"
     db_master_password = "${var.db_master_password}"
-    airflow_dbname = "${var.airflow_dbname}"
-    airflow_db_charset = "${var.airflow_db_charset}"
+    db_airflow_dbname = "${var.db_airflow_dbname}"
+    db_charset = "${var.db_charset}"
     airflow_username = "${var.airflow_username}"
     airflow_emailaddress = "${var.airflow_emailaddress}"
     airflow_password = "${var.airflow_password}"
@@ -338,14 +336,14 @@ data "template_file" "airflow-user-data" {
 }
 
 resource "aws_launch_configuration" "lc_airflow" {
-  depends_on                  = ["aws_elasticache_cluster.airflow_elasticache", "aws_rds_cluster.airflow_rds", "aws_security_group.airflow_ssh", "aws_iam_instance_profile.airflow_s3_instance_profile"]
+  depends_on                  = ["aws_elasticache_cluster.airflow_elasticache", "aws_rds_cluster.airflow_rds", "aws_security_group.airflow_instance", "aws_iam_instance_profile.airflow_s3_instance_profile","aws_s3_bucket.s3_dag_bucket","aws_s3_bucket.s3_log_bucket"]
 
   name                        = "lc_airflow"
   image_id                    = "${var.airflow_ami}"
   instance_type               = "${var.airflow_instance_class}"
   key_name                    = "${var.airflow_keypair_name}"
   associate_public_ip_address = true
-  security_groups             = ["${aws_security_group.airflow_ssh.id}"]
+  security_groups             = ["${aws_security_group.airflow_instance.id}"]
   user_data                   = "${data.template_file.airflow-user-data.rendered}"
   iam_instance_profile        = "${aws_iam_instance_profile.airflow_s3_instance_profile.id}"
 }

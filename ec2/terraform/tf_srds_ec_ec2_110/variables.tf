@@ -58,14 +58,59 @@ variable "db_airflow_username" {
 
 variable "db_airflow_password" {}
 
-variable "airflow_dbname"{
+variable "db_airflow_dbname" {
   description = "MYSQL airflow database name"
   default     = "airflow"
 }
 
-variable "airflow_db_charset"{
+variable "db_cluster_parameter_group_name" {
+  description = "MYSQL airflow parameter group"
+  default     = "default.aurora5.6"
+}
+
+variable "db_charset" {
   description = "MYSQL airflow database character set"
   default     = "latin1"
+}
+
+variable "db_max_capacity" {
+  description = "Max capacity to allow aurora to have"
+  default = 256
+}
+
+variable "db_min_capacity" {
+  description = "Min capacity to allow aurora to have"
+  default = 2
+}
+
+variable "db_seconds_until_auto_pause" {
+  description = "Time without any activity before pausing.  Default is 15 minutews"
+  default = 900
+}
+
+variable "ec_node_type" {
+  description = "Node type to use"
+  default = "cache.m3.medium"
+}
+
+variable "ec_engine_version" {
+  description = "Redis version to use"
+  default = "4.0.10"
+}
+
+variable "ec_num_cache_nodes" {
+  description = "Number of cache nodes"
+  default = 1
+}
+
+variable "ec_parameter_group_name" {
+  description = "defualt redis parameter group"
+  default = "default.redis4.0"
+}
+
+variable "ec_port" {
+  description = "elasticache port"
+  default = 6379
 }
 
 variable "airflow_username" {
@@ -86,4 +131,12 @@ variable "s3_log_bucket_name"  {
 }
 variable "s3_dag_bucket_name"  {
   description = "Airflow bucket for DAGs"
+}
+
+variable "ingress_ip"  {
+  description = "instance ingress ip to allow"
+}
+
+variable "ingress_ip_description"  {
+  description = "instance ingress ip to allow"
 }
