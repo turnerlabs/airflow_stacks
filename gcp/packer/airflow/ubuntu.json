@@ -11,69 +11,64 @@
         "tag_environment": ""
     },
     "builders": [{
-        "type": "amazon-ebs",
-        "access_key": "{{user `access_key`}}",
-        "secret_key": "{{user `secret_key`}}",
-        "region": "us-east-1",
-        "source_ami": "ami-04169656fea786776",
-        "instance_type": "t2.medium",
+        "type": "googlecompute",
+        "project_id": "cloud-arch",
+        "source_image": "ubuntu-1604-xenial-v20180814",
         "ssh_username": "ubuntu",
-        "ami_name": "airflowpython3 {{timestamp}}",
-        "vpc_id": "{{user `vpcid_to_build_in`}}",
-        "subnet_id": "{{user `subnetid_to_build_in`}}",
-        "run_tags": {
-            "Name": "airflow packer ami builder",
-            "application": "{{user `tag_application`}}",
-            "contact-email": "{{user `tag_contact_email`}}",
-            "customer": "{{user `tag_customer`}}",
-            "team": "{{user `tag_team`}}",
-            "environment": "{{user `tag_environment`}}"
+        "zone": "us-east1-b",
+        "image_name": "airflow-{{timestamp}}",
+        "image_labels": {
+            "application": "airflow",
+            "customer": "airflow",
+            "team": "airflow",
+            "environment": "dev",
+            "contact-email": "one-day-this-might-work"
         }
     }],
     "provisioners": [{
             "type": "file",
-            "source": "../airflow/code/adduser.py3",
+            "source": "../../../ec2/packer/airflow/code/adduser.py",
             "destination": "/home/ubuntu/adduser.py"
         },
         {
             "type": "file",
-            "source": "../airflow/config/airflow.conf",
+            "source": "../../../ec2/packer/airflow/config/airflow.conf",
             "destination": "/home/ubuntu/airflow.conf"
         },
         {
             "type": "file",
-            "source": "../airflow/config/airflow.sysconfig",
+            "source": "../../../ec2/packer/airflow/config/airflow.sysconfig",
             "destination": "/home/ubuntu/airflow.sysconfig"
         },
         {
             "type": "file",
-            "source": "../airflow/config/logrotate.conf",
+            "source": "../../../ec2/packer/airflow/config/logrotate.conf",
             "destination": "/home/ubuntu/logrotate.conf"
         },
         {
             "type": "file",
-            "source": "../airflow/config/awslogs.conf",
-            "destination": "/home/ubuntu/awslogs.conf"
-        },
-        {
-            "type": "file",
-            "source": "../airflow/cron/crontab",
+            "source": "../../../ec2/packer/airflow/cron/crontab",
             "destination": "/home/ubuntu/crontab"
         },
         {
             "type": "file",
-            "source": "../airflow/systemd/airflow-scheduler.service",
+            "source": "../../../ec2/packer/airflow/systemd/airflow-scheduler.service",
             "destination": "/home/ubuntu/airflow-scheduler.service"
         },
         {
             "type": "file",
-            "source": "../airflow/systemd/airflow-webserver.service",
+            "source": "../../../ec2/packer/airflow/systemd/airflow-webserver.service",
             "destination": "/home/ubuntu/airflow-webserver.service"
         },
         {
             "type": "file",
-            "source": "../airflow/systemd/airflow-worker.service",
+            "source": "../../../ec2/packer/airflow/systemd/airflow-worker.service",
             "destination": "/home/ubuntu/airflow-worker.service"
+        },
+        {
+            "type": "file",
+            "source": "./systemd/cloud-sql-proxy.service",
+            "destination": "/home/ubuntu/cloud-sql-proxy.service"
         },
         {
             "type": "shell",

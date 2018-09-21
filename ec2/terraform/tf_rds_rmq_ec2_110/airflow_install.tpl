@@ -9,14 +9,13 @@ export AIRFLOW_HOME=/home/ubuntu/airflow
 
 cd /home/ubuntu/airflow
 
-
 sed -i -e "s/expose_config = False/expose_config = True/g" airflow.cfg
 sed -i -e "s/executor = SequentialExecutor/executor = CeleryExecutor/g" airflow.cfg
 sed -i -e "s/remote_log_conn_id =/remote_log_conn_id = s3_logging_conn/g" airflow.cfg
 sed -i -e "s/load_examples = True/load_examples = False/g" airflow.cfg
 sed -i -e "s/authenticate = False/authenticate = True/g" airflow.cfg
 sed -i -e "s/sql_alchemy_conn = sqlite:\/\/\/\/home\/ubuntu\/airflow\/airflow.db/sql_alchemy_conn = mysql:\/\/${db_airflow_username}:${db_airflow_password}@${rds_url}\/${airflow_dbname}/g" airflow.cfg
-sed -i -e "s/celery_result_backend = db+mysql:\/\/airflow:airflow@localhost:3306\/airflow/celery_result_backend = db+mysql:\/\/${db_airflow_username}:${db_airflow_password}@${rds_url}\/${airflow_dbname}/g" airflow.cfg
+sed -i -e "s/result_backend = db+mysql:\/\/airflow:airflow@localhost:3306\/airflow/result_backend = db+mysql:\/\/${db_airflow_username}:${db_airflow_password}@${rds_url}\/${airflow_dbname}/g" airflow.cfg
 sed -i -e "s/broker_url = sqla+mysql:\/\/airflow:airflow@localhost:3306\/airflow/broker_url = amqp:\/\/${rabbitmq_airflow_username}:${rabbitmq_airflow_password}@${rabbitmq_ip_address}\/airflowhost/g" airflow.cfg
 sed -i -e "/auth_backend = airflow.api.auth.backend.default/d" airflow.cfg
 sed -i -e "/\[webserver\]/a\\

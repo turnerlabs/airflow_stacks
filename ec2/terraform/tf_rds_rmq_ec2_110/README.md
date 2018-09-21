@@ -1,6 +1,6 @@
 # Description
 
-This is a terraform script to create a complete airflow stack.
+This is a terraform script to create a complete airflow stack including
 
 You will need to update the terraform / backend / bucket in the main.tf in tf_rds_rmq_ec2 to use this terraform state bucket.
 

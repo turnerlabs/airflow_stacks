@@ -1,8 +1,8 @@
 # What is in the packer directory
 
-The airflow path contains the code to generate a python 2.7 AMI of airflow that works with snowflake(using this hook/operator https://github.com/aberdave/airflow-snowflake)
+The airflow path contains the code to generate a python 2.7 AMI of airflow that works with Airflow 1.10.0
 
-The airflow_python3 path contains the code to generate a python 3.6 AMI of airflow that works with snowflake(using this hook/operator https://github.com/aberdave/airflow-snowflake)
+The airflow_python3 path contains the code to generate a python 3.6 AMI of airflow that works with Airflow 1.10.0
 
 The rabbitmq path contains the code to generate an AMI of rabbitmq.
 

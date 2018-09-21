@@ -20,6 +20,7 @@ Default ones(from http://airflow.readthedocs.io/en/latest/installation.html)
 all
 
 Custom ones:
+snowflake-connector-python - https://github.com/aberdave/airflow-snowflake
 
 *** Please note that this airflow AMI is created with the following features in mind although all these subpackages are installed:
 - Celery as the worker task executor
@@ -38,7 +39,5 @@ packer build
 -var 'tag_customer=<>'
 -var 'tag_team=<>'
 -var 'tag_environment=<>'
--var 'vpcid_to_build_in=<>'
--var 'subnetid_to_build_in=<>'
 ubuntu.json
 ```

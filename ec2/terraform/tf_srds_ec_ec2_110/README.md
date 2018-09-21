@@ -2,16 +2,15 @@
 
 This is a terraform script to create a complete airflow stack.
 
-You will need to update the terraform / backend / bucket in the main.tf in tf_rds_rmq_ec2 to use this terraform state bucket.
+You will need to update the terraform / backend / bucket in the main.tf in tf_rds_ec_ec2 to use this terraform state bucket.
 
 It creates the following resources in AWS:
 
-- 1 MySQL RDS database
+- 1 MySQL ServerlessRDS database
 - 3 Security groups
   - 1 for RDS access
-  - 1 for RabbitMQ access
+  - 1 for Elasticache access
   - 1 for AirFlow access
-- 1 RabbitMQ EC2 instance using Airflow AMI
 - 1 Launch Config using Airflow AMI
 - 1 Auto Scale Group
 
@@ -45,13 +44,6 @@ terraform apply
 -var 'db_master_password=<>'
 -var 'db_airflow_username=<>'
 -var 'db_airflow_password=<>'
--var 'rabbitmq_ami=<>'
--var 'rabbitmq_instance_class=<>'
--var 'rabbitmq_keypair_name=<>'
--var 'rabbitmq_admin_username=<>'
--var 'rabbitmq_admin_password=<>'
--var 'rabbitmq_airflow_username=<>'
--var 'rabbitmq_airflow_password=<>'
 -var 'airflow_ami=<>'
 -var 'airflow_instance_class=<>'
 -var 'airflow_keypair_name=<>'

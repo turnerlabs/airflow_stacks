@@ -1,0 +1,44 @@
+{
+    "variables": {
+        "access_key": "",
+        "secret_key": "",
+        "vpcid_to_build_in": "",
+        "subnetid_to_build_in": "",
+        "tag_application": "",
+        "tag_contact_email": "",
+        "tag_customer": "",
+        "tag_team": "",
+        "tag_environment": ""
+    },
+    "builders": [{
+        "type": "googlecompute",
+        "project_id": "cloud-arch",
+        "source_image": "ubuntu-1604-xenial-v20180814",
+        "ssh_username": "ubuntu",
+        "zone": "us-east1-b",
+        "image_name": "rabbitmq-{{timestamp}}",
+        "image_labels": {
+            "application": "rabbitmq",
+            "customer": "rabbitmq",
+            "team": "rabbitmq",
+            "environment": "dev",
+            "contact-email": "one-day-this-might-work"
+        }
+    }],
+    "provisioners": [{
+            "type": "file",
+            "source": "../../../ec2/packer/rabbitmq/extra/erlang",
+            "destination": "/home/ubuntu/erlang"
+        },
+        {
+            "type": "file",
+            "source": "../../../ec2/packer/rabbitmq/extra/limits.conf",
+            "destination": "/home/ubuntu/limits.conf"
+        },
+        {
+            "type": "shell",
+            "execute_command": "{{.Vars}} bash '{{.Path}}'",
+            "script": "../../../ec2/packer/rabbitmq/provision.sh"
+        }
+    ]
+}

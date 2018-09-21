@@ -1,10 +1,8 @@
 # What is this
 
-This is a dockerized version of the airflow stack running on instances in AWS.
+This is a dockerized version of the airflow stack.  Needs much more testing and verifying.
 
 This code was taken from <https://github.com/puckel/docker-airflow> and re-structured to use snowflake and rabbit mq instead.
-
-It is definitely a work in progress and snowflake is still a wip.
 
 Here's the order of commands to get this up and running:
 
