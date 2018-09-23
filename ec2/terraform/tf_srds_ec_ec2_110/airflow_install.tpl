@@ -7,9 +7,36 @@ mysql --host=${rds_url} --user=${db_master_username} --password=${db_master_pass
 
 echo "############# Completed database setup #############"
 
+mkdir /home/ubuntu/airflow
+chown ubuntu:ubuntu /home/ubuntu/airflow
+
+echo "############# Created airflow directory #############"
+
+id=`id -u ubuntu`
+group=`id -g ubuntu`
+
+/usr/bin/s3fs ${s3_airflow_bucket_name} -o use_cache=/tmp,rw,noatime,iam_role="${role_name}",uid=$id,gid=$group,allow_other /home/ubuntu/airflow
+
+echo "############# Enabled s3 mount for airflow directory #############"
+
 export AIRFLOW_HOME=/home/ubuntu/airflow
 
 cd /home/ubuntu/airflow
+
+mkdir /home/ubuntu/airflow/dags
+chown ubuntu:ubuntu /home/ubuntu/airflow/dags
+mkdir /home/ubuntu/airflow/data
+chown ubuntu:ubuntu /home/ubuntu/airflow/data
+mkdir /home/ubuntu/airflow/logs
+chown ubuntu:ubuntu /home/ubuntu/airflow/logs
+mkdir /home/ubuntu/airflow/plugins
+chown ubuntu:ubuntu /home/ubuntu/airflow/plugins
+
+echo "############# create common airflow directories complete #############"
+
+/home/ubuntu/venv/bin/airflow initdb
+
+echo "############# Initial airflow database initilaization #############"
 
 instance_ip=`curl http://169.254.169.254/latest/meta-data/public-ipv4`
 
@@ -27,8 +54,7 @@ sed -i -e "/auth_backend = airflow.api.auth.backend.default/d" airflow.cfg
 sed -i -e "/\[webserver\]/a\\
 auth_backend = airflow.contrib.auth.backends.password_auth" airflow.cfg
 sed -i -e "/remote_base_log_folder/d" airflow.cfg
-sed -i -e "/\[core\]/a\\
-remote_base_log_folder = s3://${s3_log_bucket_name}" airflow.cfg
+sed -i -e "s/rbac = False/rbac = True/g" airflow.cfg
 
 /home/ubuntu/venv/bin/airflow initdb
 
@@ -42,19 +68,12 @@ systemctl daemon-reload
 
 echo "############# Enabled airflow systemd #############"
 
-id=`id -u ubuntu`
-group=`id -g ubuntu`
-
-/usr/bin/s3fs ${s3_dag_bucket_name} -o rw,noatime,iam_role="${role_name}",uid=$id,gid=$group,allow_other /home/ubuntu/airflow/dags
-
-echo "############# Enabled s3 mount for dags directory #############"
-
 systemctl start airflow-webserver
 systemctl start airflow-scheduler
 systemctl start airflow-worker
 
 echo "############# Started up airflow service #############"
 
-/home/ubuntu/venv/bin/python /home/ubuntu/adduser.py -u ${airflow_username} -e ${airflow_emailaddress} -p ${airflow_password}
+/home/ubuntu/venv/bin/airflow create_user -u ${airflow_username} -e ${airflow_emailaddress} -p ${airflow_password} -f ${airflow_first} -l ${airflow_last} -r ${airflow_role}
 
 echo "############# Added airflow user #############"

@@ -132,23 +132,9 @@ resource "aws_security_group" "airflow_ec" {
   }
 }
 
-# S3 Dag Bucket
-resource "aws_s3_bucket" "s3_dag_bucket" {
-  bucket        = "${var.s3_dag_bucket_name}"
-  force_destroy = "true"
-
-  tags {
-    application     = "${var.tag_application}"
-    contact-email   = "${var.tag_contact_email}"
-    customer        = "${var.tag_customer}"
-    team            = "${var.tag_team}"
-    environment     = "${var.tag_environment}"
-  }
-}
-
-# S3 Log Bucket
-resource "aws_s3_bucket" "s3_log_bucket" {
-  bucket        = "${var.s3_log_bucket_name}"
+# S3 Airflow Bucket
+resource "aws_s3_bucket" "s3_airflow_bucket" {
+  bucket        = "${var.s3_airflow_bucket_name}"
   force_destroy = "true"
 
   tags {
@@ -162,7 +148,6 @@ resource "aws_s3_bucket" "s3_log_bucket" {
 
 # IAM Role
 resource "aws_iam_role" "airflow_s3_role" {
-  depends_on  = ["aws_s3_bucket.s3_log_bucket"]
 
   name = "airflow_s3_role"
   assume_role_policy = <<EOF
@@ -184,7 +169,7 @@ EOF
 
 # IAM Instance Profile
 resource "aws_iam_instance_profile" "airflow_s3_instance_profile" {
-  depends_on  = ["aws_s3_bucket.s3_log_bucket", "aws_iam_role.airflow_s3_role", "aws_iam_role_policy.airflow_s3_policy", "aws_iam_role_policy.airflow_logs_policy"]
+  depends_on  = ["aws_iam_role.airflow_s3_role", "aws_iam_role_policy.airflow_s3_policy", "aws_iam_role_policy.airflow_logs_policy"]
   
   name = "airflow_s3_instance_profile"
   role = "${aws_iam_role.airflow_s3_role.name}"
@@ -193,7 +178,7 @@ resource "aws_iam_instance_profile" "airflow_s3_instance_profile" {
 # IAM S3 Role Policy
 # need to tighten the heck out of the below policy
 resource "aws_iam_role_policy" "airflow_s3_policy" {
-  depends_on  = ["aws_s3_bucket.s3_log_bucket", "aws_iam_role.airflow_s3_role"]
+  depends_on  = ["aws_iam_role.airflow_s3_role"]
 
   name = "airflow_s3_policy"
   role = "${aws_iam_role.airflow_s3_role.id}"
@@ -214,7 +199,7 @@ EOF
 
 # IAM Logs Role Policy
 resource "aws_iam_role_policy" "airflow_logs_policy" {
-  depends_on  = ["aws_s3_bucket.s3_log_bucket", "aws_iam_role.airflow_s3_role"]
+  depends_on  = ["aws_iam_role.airflow_s3_role"]
 
   name = "airflow_logs_policy"
   role = "${aws_iam_role.airflow_s3_role.id}"
@@ -325,18 +310,19 @@ data "template_file" "airflow-user-data" {
     db_master_password = "${var.db_master_password}"
     db_airflow_dbname = "${var.db_airflow_dbname}"
     db_charset = "${var.db_charset}"
+    s3_airflow_bucket_name = "${var.s3_airflow_bucket_name}"
+    role_name = "${aws_iam_role.airflow_s3_role.name}"
     airflow_username = "${var.airflow_username}"
     airflow_emailaddress = "${var.airflow_emailaddress}"
     airflow_password = "${var.airflow_password}"
-    s3_log_bucket_name = "${var.s3_log_bucket_name}"
-    s3_dag_bucket_name = "${var.s3_dag_bucket_name}"
-    role_name = "${aws_iam_role.airflow_s3_role.name}"
-    instance_ip = ""
+    airflow_first = "${var.airflow_first}"
+    airflow_last = "${var.airflow_last}"
+    airflow_role = "${var.airflow_role}"
   }
 }
 
 resource "aws_launch_configuration" "lc_airflow" {
-  depends_on                  = ["aws_elasticache_cluster.airflow_elasticache", "aws_rds_cluster.airflow_rds", "aws_security_group.airflow_instance", "aws_iam_instance_profile.airflow_s3_instance_profile","aws_s3_bucket.s3_dag_bucket","aws_s3_bucket.s3_log_bucket"]
+  depends_on                  = ["aws_elasticache_cluster.airflow_elasticache", "aws_rds_cluster.airflow_rds", "aws_security_group.airflow_instance", "aws_iam_instance_profile.airflow_s3_instance_profile","aws_s3_bucket.s3_airflow_bucket"]
 
   name                        = "lc_airflow"
   image_id                    = "${var.airflow_ami}"
