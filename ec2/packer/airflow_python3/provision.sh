@@ -31,17 +31,11 @@ echo "------------------- activate virtual environment complete ----------------
 pip install "apache-airflow[all]"
 echo "------------------- install airflow complete -------------------"
 
-airflow initdb
-echo "------------------- initialize database phase 1 complete -------------------"
-
 curl https://s3.amazonaws.com/aws-cloudwatch/downloads/latest/awslogs-agent-setup.py -O
 echo "------------------- download aws logs -------------------"
 
 sudo python3 ./awslogs-agent-setup.py -n -r us-east-1 -c /home/ubuntu/awslogs.conf
 echo "------------------- install aws logs -------------------"
-
-mkdir /home/ubuntu/airflow/dags
-echo "------------------- create dag and plugins directory complete -------------------"
 
 sudo service awslogs start
 echo "------------------- start of awslogs complete -------------------"

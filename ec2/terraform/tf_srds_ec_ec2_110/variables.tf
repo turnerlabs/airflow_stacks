@@ -126,11 +126,20 @@ variable "airflow_password"  {
   description = "Airflow password for website access"
 }
 
-variable "s3_log_bucket_name"  {
-  description = "Airflow bucket to eventually log to"
+variable "airflow_first"  {
+  description = "Airflow users first name for website access"
 }
-variable "s3_dag_bucket_name"  {
-  description = "Airflow bucket for DAGs"
+
+variable "airflow_last"  {
+  description = "Airflow users last name for website access"
+}
+
+variable "airflow_role"  {
+  description = "Airflow users role for website access. Roles can be Admin, User, Op, Viewer, and Public"
+}
+
+variable "s3_airflow_bucket_name"  {
+  description = "Airflow bucket for airflow shared directory"
 }
 
 variable "ingress_ip"  {
