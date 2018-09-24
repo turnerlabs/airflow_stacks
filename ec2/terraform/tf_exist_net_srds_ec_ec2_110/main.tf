@@ -13,6 +13,38 @@ provider "aws" {
   profile = "${var.profile}"
 }
 
+# Load Balancer Security Group
+resource "aws_security_group" "airflow_lb" {
+  name        = "airflow_lb"
+  description = "Security group for access to airflow load balancer"
+  vpc_id      = "${var.vpc_id}"
+  
+  # This needs to be expanded to all the ip ranges.
+  ingress {
+    from_port       = 80
+    to_port         = 80
+    protocol        = "tcp"
+    cidr_blocks     = ["${var.ingress_ip}"]
+    description     = "${var.ingress_ip_description}"
+  }
+
+  egress {
+    from_port       = 0
+    to_port         = 0
+    protocol        = "-1"
+    cidr_blocks     = ["0.0.0.0/0"]
+  }
+
+  tags {
+    Name            = "airflow_lb"
+    application     = "${var.tag_application}"
+    contact-email   = "${var.tag_contact_email}"
+    customer        = "${var.tag_customer}"
+    team            = "${var.tag_team}"
+    environment     = "${var.tag_environment}"
+  }
+}
+
 # Instance Security Group
 resource "aws_security_group" "airflow_instance" {
   name        = "airflow_instance"
@@ -20,35 +52,10 @@ resource "aws_security_group" "airflow_instance" {
   vpc_id      = "${var.vpc_id}"
 
   ingress {
-    from_port       = 22
-    to_port         = 22
-    protocol        = "tcp"
-    cidr_blocks     = ["${var.ingress_ip}"]
-    description     = "${var.ingress_ip_description}"
-  }
-
-  ingress {
-    from_port       = 22
-    to_port         = 22
-    protocol        = "tcp"
-    cidr_blocks     = ["10.0.0.0/8"]
-    description     = "local"
-  }
-
-  ingress {
     from_port       = 8080
     to_port         = 8080
     protocol        = "tcp"
-    cidr_blocks     = ["${var.ingress_ip}"]
-    description     = "${var.ingress_ip_description}"
-  }
-
-  ingress {
-    from_port       = 8080
-    to_port         = 8080
-    protocol        = "tcp"
-    cidr_blocks     = ["10.0.0.0/8"]
-    description     = "local"
+    security_groups = ["${aws_security_group.airflow_lb.id}"]
   }
 
   egress {
@@ -225,9 +232,64 @@ resource "aws_iam_role_policy" "airflow_logs_policy" {
 EOF
 }
 
+# Application Load Balancer
+resource "aws_lb" "airflow_lb" {
+  name               = "test-lb-tf"
+  internal           = false
+  load_balancer_type = "application"
+  security_groups    = ["${aws_security_group.airflow_lb.id}"]
+  subnets            = ["${var.public_subnet_id1}", "${var.public_subnet_id2}"]
+
+  access_logs {
+    bucket  = "${aws_s3_bucket.lb_logs.bucket}" # need
+    prefix  = "airflow-lb"
+    enabled = true
+  }
+
+  tags {
+    Name            = "airflow_alb"
+    application     = "${var.tag_application}"
+    contact-email   = "${var.tag_contact_email}"
+    customer        = "${var.tag_customer}"
+    team            = "${var.tag_team}"
+    environment     = "${var.tag_environment}"
+  }
+}
+
+resource "aws_lb_target_group" "airflow_lb_tg" {
+  name     = "airflow_lb_tg"
+  port     = 8080
+  protocol = "HTTP"
+  vpc_id   = "${var.vpc.id}"
+
+  tags {
+    Name            = "airflow_lb_tg"
+    application     = "${var.tag_application}"
+    contact-email   = "${var.tag_contact_email}"
+    customer        = "${var.tag_customer}"
+    team            = "${var.tag_team}"
+    environment     = "${var.tag_environment}"
+  }
+}
+
+resource "aws_lb_listener" "airflow_lb_listener" {
+  load_balancer_arn = "${aws_lb.front_end.arn}"
+  port              = "80"
+  protocol          = "HTTP"
+#  port              = "443"
+#  protocol          = "HTTPS"
+#  ssl_policy        = "ELBSecurityPolicy-2015-05"
+#  certificate_arn   = "arn:aws:iam::187416307283:server-certificate/test_cert_rab3wuqwgja25ct3n4jdj2tzu4"
+  default_action {
+    type             = "forward"
+    target_group_arn = "${aws_lb_target_group.airflow_lb_tg.arn}"
+  }
+}
+
+
 # RDS Related Items
 resource "aws_db_subnet_group" "airflow_rds_subnet_grp" {
-  subnet_ids = ["${var.subnet_id1}", "${var.subnet_id2}"]
+  subnet_ids = ["${var.private_subnet_id1}", "${var.private_subnet_id2}"]
 
   tags {
     Name            = "airflow_rds"
@@ -273,7 +335,7 @@ resource "aws_rds_cluster" "airflow_rds" {
 # Elasticache Related Items
 resource "aws_elasticache_subnet_group" "airflow_ec_subnet_grp" {
   name       = "ec-airflow-subnet"
-  subnet_ids = ["${var.subnet_id1}", "${var.subnet_id2}"]
+  subnet_ids = ["${var.private_subnet_id1}", "${var.private_subnet_id2}"]
 }
 
 resource "aws_elasticache_cluster" "airflow_elasticache" {
@@ -338,7 +400,7 @@ resource "aws_autoscaling_group" "asg_airflow" {
   depends_on                = ["aws_launch_configuration.lc_airflow"]
 
   name                      = "asg_airflow"
-  vpc_zone_identifier       = ["${var.subnet_id1}", "${var.subnet_id2}"]
+  vpc_zone_identifier       = ["${var.private_subnet_id1}", "${var.private_subnet_id2}"]
   launch_configuration      = "${aws_launch_configuration.lc_airflow.id}"
   max_size                  = "2"
   min_size                  = "1"
