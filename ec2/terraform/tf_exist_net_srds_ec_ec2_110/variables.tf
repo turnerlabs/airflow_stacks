@@ -150,10 +150,18 @@ variable "s3_airflow_bucket_name"  {
   description = "Airflow bucket for airflow shared directory"
 }
 
+variable "s3_airflow_access_log_bucket_name"  {
+  description = "Airflow bucket for alb access logs"
+}
+
 variable "ingress_ip"  {
   description = "instance ingress ip to allow"
 }
 
 variable "ingress_ip_description"  {
   description = "instance ingress ip to allow"
+}
+
+variable "aws_account_number" {
+  description = "AWS account number"  
 }

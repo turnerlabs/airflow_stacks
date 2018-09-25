@@ -153,6 +153,35 @@ resource "aws_s3_bucket" "s3_airflow_bucket" {
   }
 }
 
+# S3 ALB access log Bucket
+# resource "aws_s3_bucket" "s3_airflow_access_log_bucket" {
+#   bucket        = "${var.s3_airflow_access_log_bucket_name}"
+#   force_destroy = "true"
+#   tags {
+#     application     = "${var.tag_application}"
+#     contact-email   = "${var.tag_contact_email}"
+#     customer        = "${var.tag_customer}"
+#     team            = "${var.tag_team}"
+#     environment     = "${var.tag_environment}"
+#   }
+
+# policy = <<EOF
+# {
+#   "Version": "2012-10-17",
+#   "Statement": [
+#     {
+#       "Effect": "Allow",
+#       "Principal": {
+#         "AWS": "arn:aws:iam::${var.aws_account_number}:root"
+#       },
+#       "Action": "s3:PutObject",
+#       "Resource": "arn:aws:s3:::${var.s3_airflow_access_log_bucket_name}/*"
+#     }
+#   ]
+# }
+# EOF
+# }
+
 # IAM Role
 resource "aws_iam_role" "airflow_s3_role" {
 
@@ -233,34 +262,18 @@ EOF
 }
 
 # Application Load Balancer
-resource "aws_lb" "airflow_lb" {
-  name               = "test-lb-tf"
-  internal           = false
-  load_balancer_type = "application"
-  security_groups    = ["${aws_security_group.airflow_lb.id}"]
-  subnets            = ["${var.public_subnet_id1}", "${var.public_subnet_id2}"]
-
-  access_logs {
-    bucket  = "${aws_s3_bucket.lb_logs.bucket}" # need
-    prefix  = "airflow-lb"
-    enabled = true
-  }
-
-  tags {
-    Name            = "airflow_alb"
-    application     = "${var.tag_application}"
-    contact-email   = "${var.tag_contact_email}"
-    customer        = "${var.tag_customer}"
-    team            = "${var.tag_team}"
-    environment     = "${var.tag_environment}"
-  }
-}
 
 resource "aws_lb_target_group" "airflow_lb_tg" {
-  name     = "airflow_lb_tg"
+  name     = "airflow-lb-tg"
   port     = 8080
   protocol = "HTTP"
-  vpc_id   = "${var.vpc.id}"
+  vpc_id   = "${var.vpc_id}"
+  
+  health_check {
+    port      = 8080
+    protocol  = "HTTP"
+    path      = "/login"
+  }
 
   tags {
     Name            = "airflow_lb_tg"
@@ -272,8 +285,33 @@ resource "aws_lb_target_group" "airflow_lb_tg" {
   }
 }
 
+resource "aws_lb" "airflow_lb" {
+  # depends_on         = ["aws_security_group.airflow_lb","aws_s3_bucket.s3_airflow_access_log_bucket"]
+
+  name               = "airflow-lb"
+  internal           = false
+  load_balancer_type = "application"
+  security_groups    = ["${aws_security_group.airflow_lb.id}"]
+  subnets            = ["${var.public_subnet_id1}", "${var.public_subnet_id2}"]
+
+  # access_logs {
+  #   bucket  = "${aws_s3_bucket.s3_airflow_access_log_bucket.id}"
+  #   prefix  = "airflow-lb"
+  #   enabled = true
+  # }
+
+  tags {
+    Name            = "airflow_alb"
+    application     = "${var.tag_application}"
+    contact-email   = "${var.tag_contact_email}"
+    customer        = "${var.tag_customer}"
+    team            = "${var.tag_team}"
+    environment     = "${var.tag_environment}"
+  }
+}
+
 resource "aws_lb_listener" "airflow_lb_listener" {
-  load_balancer_arn = "${aws_lb.front_end.arn}"
+  load_balancer_arn = "${aws_lb.airflow_lb.arn}"
   port              = "80"
   protocol          = "HTTP"
 #  port              = "443"
@@ -390,14 +428,13 @@ resource "aws_launch_configuration" "lc_airflow" {
   image_id                    = "${var.airflow_ami}"
   instance_type               = "${var.airflow_instance_class}"
   key_name                    = "${var.airflow_keypair_name}"
-  associate_public_ip_address = true
   security_groups             = ["${aws_security_group.airflow_instance.id}"]
   user_data                   = "${data.template_file.airflow-user-data.rendered}"
   iam_instance_profile        = "${aws_iam_instance_profile.airflow_s3_instance_profile.id}"
 }
 
 resource "aws_autoscaling_group" "asg_airflow" {
-  depends_on                = ["aws_launch_configuration.lc_airflow"]
+  depends_on                = ["aws_launch_configuration.lc_airflow", "aws_lb_target_group.airflow_lb_tg"]
 
   name                      = "asg_airflow"
   vpc_zone_identifier       = ["${var.private_subnet_id1}", "${var.private_subnet_id2}"]
@@ -408,6 +445,7 @@ resource "aws_autoscaling_group" "asg_airflow" {
   health_check_grace_period = 300
   health_check_type         = "EC2"
   termination_policies      = ["OldestInstance", "OldestLaunchConfiguration"]
+  target_group_arns         = ["${aws_lb_target_group.airflow_lb_tg.arn}"]
 
   tag {
     key                 = "Name"
