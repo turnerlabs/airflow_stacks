@@ -18,12 +18,20 @@ variable "vpc_id" {
   description = "VPC to launch into"
 }
 
-variable "subnet_id1" {
-  description = "Subnet to launch RDS into. Hopefully in different AZ"
+variable "private_subnet_id1" {
+  description = "Private subnet to launch rds, elasticcache, and instances in.  Should be in a different AZ than private_subnet_id2"
 }
 
-variable "subnet_id2" {
-  description = "Subnet to launch RDS into. Hopefully in different AZ"
+variable "private_subnet_id2" {
+  description = "Private subnet to launch rds, elasticcache, and instances in.  Should be in a different AZ than private_subnet_id1"
+}
+
+variable "public_subnet_id1" {
+  description = "Public subnet to launch alb in.  Should be in a different AZ than public_subnet_id2"
+}
+
+variable "public_subnet_id2" {
+  description = "Public subnet to launch alb in.  Should be in a different AZ than public_subnet_id1"
 }
 
 variable "db_identifier" {
@@ -142,10 +150,18 @@ variable "s3_airflow_bucket_name"  {
   description = "Airflow bucket for airflow shared directory"
 }
 
+variable "s3_airflow_access_log_bucket_name"  {
+  description = "Airflow bucket for alb access logs"
+}
+
 variable "ingress_ip"  {
   description = "instance ingress ip to allow"
 }
 
 variable "ingress_ip_description"  {
   description = "instance ingress ip to allow"
+}
+
+variable "aws_account_number" {
+  description = "AWS account number"  
 }
