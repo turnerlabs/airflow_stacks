@@ -18,9 +18,9 @@ provider "aws" {
 resource "aws_vpc" "airflow_vpc" {
   cidr_block            = "10.0.0.0/16"
   instance_tenancy      = "default"
-  enable_dns_support    = "yes"
-  enable_dns_hostnames  = "yes"
-  enable_classiclink    = "no"
+  enable_dns_support    = true
+  enable_dns_hostnames  = true
+  enable_classiclink    = false
 
   tags {
     Name            = "${var.network_prefix}_vpc"
@@ -34,16 +34,16 @@ resource "aws_vpc" "airflow_vpc" {
 
 # Private Subnets
 
-resource "aws_subnet" "airflow_subnet_private_1a" {
+resource "aws_subnet" "airflow_subnet_private_1c" {
   depends_on                      = ["aws_vpc.airflow_vpc"]
   vpc_id                          = "${aws_vpc.airflow_vpc.id}"
   cidr_block                      = "10.0.1.0/24"
-  availability_zone               = "us-east-1a"
-  map_public_ip_on_launch         = "no"
-  assign_ipv6_address_on_creation = "no"
+  availability_zone               = "us-east-1c"
+  map_public_ip_on_launch         = false
+  assign_ipv6_address_on_creation = false
 
   tags {
-    Name            = "${var.network_prefix}_subnet_private_1a"
+    Name            = "${var.network_prefix}_subnet_private_1c"
     application     = "${var.tag_application}"
     contact-email   = "${var.tag_contact_email}"
     customer        = "${var.tag_customer}"
@@ -52,16 +52,16 @@ resource "aws_subnet" "airflow_subnet_private_1a" {
   }
 }
 
-resource "aws_subnet" "airflow_subnet_private_1b" {
+resource "aws_subnet" "airflow_subnet_private_1d" {
   depends_on                      = ["aws_vpc.airflow_vpc"]
   vpc_id                          = "${aws_vpc.airflow_vpc.id}"
   cidr_block                      = "10.0.2.0/24"
-  availability_zone               = "us-east-1b"
-  map_public_ip_on_launch         = "no"
-  assign_ipv6_address_on_creation = "no"
+  availability_zone               = "us-east-1d"
+  map_public_ip_on_launch         = false
+  assign_ipv6_address_on_creation = false
 
   tags {
-    Name            = "${var.network_prefix}_subnet_private_1b"
+    Name            = "${var.network_prefix}_subnet_private_1d"
     application     = "${var.tag_application}"
     contact-email   = "${var.tag_contact_email}"
     customer        = "${var.tag_customer}"
@@ -72,16 +72,16 @@ resource "aws_subnet" "airflow_subnet_private_1b" {
 
 # Public Subnets
 
-resource "aws_subnet" "airflow_subnet_public_1a" {
+resource "aws_subnet" "airflow_subnet_public_1c" {
   depends_on                      = ["aws_vpc.airflow_vpc"]
   vpc_id                          = "${aws_vpc.airflow_vpc.id}"
   cidr_block                      = "10.0.3.0/24"
-  availability_zone               = "us-east-1a"
-  map_public_ip_on_launch         = "yes"
-  assign_ipv6_address_on_creation = "no"
+  availability_zone               = "us-east-1c"
+  map_public_ip_on_launch         = true
+  assign_ipv6_address_on_creation = false
 
 tags {
-    Name            = "${var.network_prefix}_subnet_public_1a"
+    Name            = "${var.network_prefix}_subnet_public_1c"
     application     = "${var.tag_application}"
     contact-email   = "${var.tag_contact_email}"
     customer        = "${var.tag_customer}"
@@ -90,16 +90,16 @@ tags {
   }
 }
 
-resource "aws_subnet" "airflow_subnet_public_1b" {
+resource "aws_subnet" "airflow_subnet_public_1d" {
   depends_on                      = ["aws_vpc.airflow_vpc"]
   vpc_id                          = "${aws_vpc.airflow_vpc.id}"
   cidr_block                      = "10.0.4.0/24"
-  availability_zone               = "us-east-1b"
-  map_public_ip_on_launch         = "yes"
-  assign_ipv6_address_on_creation = "no"
+  availability_zone               = "us-east-1d"
+  map_public_ip_on_launch         = true
+  assign_ipv6_address_on_creation = false
 
   tags {
-    Name            = "${var.network_prefix}_subnet_public_1b"
+    Name            = "${var.network_prefix}_subnet_public_1d"
     application     = "${var.tag_application}"
     contact-email   = "${var.tag_contact_email}"
     customer        = "${var.tag_customer}"
@@ -132,11 +132,9 @@ resource "aws_eip" "airflow_nat_eip" {
 }
 
 resource "aws_nat_gateway" "airflow_natgw" {
-  depends_on    = ["aws_vpc.airflow_vpc", "aws_internet_gateway.airflow_igw", "aws_subnet.airflow_subnet_public_1a"]
+  depends_on    = ["aws_vpc.airflow_vpc", "aws_internet_gateway.airflow_igw", "aws_subnet.airflow_subnet_public_1c"]
   allocation_id = "${aws_eip.airflow_nat_eip.id}"
-  subnet_id     = "${aws_subnet.airflow_subnet_public_1a.id}"
-  vpc_id        = "${aws_vpc.airflow_vpc.id}"
-  state         = "available"
+  subnet_id     = "${aws_subnet.airflow_subnet_public_1c.id}"
 
   tags {
       Name            = "${var.network_prefix}_natgw"
@@ -164,15 +162,15 @@ resource "aws_route_table" "airflow_rt_main" {
   }
 }
 
-resource "aws_route_table_association" "aws_route_table_association_private_1a" {
-  depends_on      = ["aws_subnet.airflow_subnet_private_1a"]
-  subnet_id       = "${aws_subnet.airflow_subnet_private_1a.id}"
+resource "aws_route_table_association" "aws_route_table_association_private_1c" {
+  depends_on      = ["aws_subnet.airflow_subnet_private_1c"]
+  subnet_id       = "${aws_subnet.airflow_subnet_private_1c.id}"
   route_table_id  = "${aws_route_table.airflow_rt_main.id}"
 }
 
-resource "aws_route_table_association" "aws_route_table_association_private_1b" {
-  depends_on      = ["aws_subnet.airflow_subnet_private_1b"]
-  subnet_id       = "${aws_subnet.airflow_subnet_private_1b.id}"
+resource "aws_route_table_association" "aws_route_table_association_private_1d" {
+  depends_on      = ["aws_subnet.airflow_subnet_private_1d"]
+  subnet_id       = "${aws_subnet.airflow_subnet_private_1d.id}"
   route_table_id  = "${aws_route_table.airflow_rt_main.id}"
 }
 
@@ -199,19 +197,19 @@ resource "aws_route_table" "airflow_rt_custom" {
   }
 }
 
-resource "aws_route_table_association" "aws_route_table_association_public_1a" {
-  depends_on      = ["aws_subnet.airflow_subnet_public_1a"]
-  subnet_id       = "${aws_subnet.airflow_subnet_public_1a.id}"
+resource "aws_route_table_association" "aws_route_table_association_public_1c" {
+  depends_on      = ["aws_subnet.airflow_subnet_public_1c"]
+  subnet_id       = "${aws_subnet.airflow_subnet_public_1c.id}"
   route_table_id  = "${aws_route_table.airflow_rt_custom.id}"
 }
 
-resource "aws_route_table_association" "aws_route_table_association_public_1b" {
-  depends_on      = ["aws_subnet.airflow_subnet_public_1b"]
-  subnet_id       = "${aws_subnet.airflow_subnet_public_1b.id}"
+resource "aws_route_table_association" "aws_route_table_association_public_1d" {
+  depends_on      = ["aws_subnet.airflow_subnet_public_1d"]
+  subnet_id       = "${aws_subnet.airflow_subnet_public_1d.id}"
   route_table_id  = "${aws_route_table.airflow_rt_custom.id}"
 }
 
-resource "aws_route" "route_ngw" { 
+resource "aws_route" "route_igw" { 
   depends_on              = ["aws_internet_gateway.airflow_igw"]  
   route_table_id          = "${aws_route_table.airflow_rt_custom.id}"
   destination_cidr_block  = "0.0.0.0/0"
@@ -498,7 +496,7 @@ resource "aws_lb" "airflow_lb" {
   internal           = false
   load_balancer_type = "application"
   security_groups    = ["${aws_security_group.airflow_lb.id}"]
-  subnets            = ["${aws_subnet.airflow_subnet_public_1a.id}", "${aws_subnet.airflow_subnet_public_1b.id}"]
+  subnets            = ["${aws_subnet.airflow_subnet_public_1c.id}", "${aws_subnet.airflow_subnet_public_1d.id}"]
 
   # access_logs {
   #   bucket  = "${aws_s3_bucket.s3_airflow_access_log_bucket.id}"
@@ -533,7 +531,7 @@ resource "aws_lb_listener" "airflow_lb_listener" {
 
 # RDS Related Items
 resource "aws_db_subnet_group" "airflow_rds_subnet_grp" {
-  subnet_ids = ["${aws_subnet.airflow_subnet_private_1a.id}", "${aws_subnet.airflow_subnet_private_1b.id}"]
+  subnet_ids = ["${aws_subnet.airflow_subnet_private_1c.id}", "${aws_subnet.airflow_subnet_private_1d.id}"]
 
   tags {
     Name            = "airflow_rds"
@@ -579,7 +577,7 @@ resource "aws_rds_cluster" "airflow_rds" {
 # Elasticache Related Items
 resource "aws_elasticache_subnet_group" "airflow_ec_subnet_grp" {
   name       = "ec-airflow-subnet"
-  subnet_ids = ["${aws_subnet.airflow_subnet_private_1a.id}", "${aws_subnet.airflow_subnet_private_1b.id}"]
+  subnet_ids = ["${aws_subnet.airflow_subnet_private_1c.id}", "${aws_subnet.airflow_subnet_private_1d.id}"]
 }
 
 resource "aws_elasticache_cluster" "airflow_elasticache" {
@@ -643,7 +641,7 @@ resource "aws_autoscaling_group" "asg_airflow" {
   depends_on                = ["aws_launch_configuration.lc_airflow", "aws_lb_target_group.airflow_lb_tg"]
 
   name                      = "asg_airflow"
-  vpc_zone_identifier       =  ["${aws_subnet.airflow_subnet_private_1a.id}", "${aws_subnet.airflow_subnet_private_1b.id}"]
+  vpc_zone_identifier       =  ["${aws_subnet.airflow_subnet_private_1c.id}", "${aws_subnet.airflow_subnet_private_1d.id}"]
   launch_configuration      = "${aws_launch_configuration.lc_airflow.id}"
   max_size                  = "2"
   min_size                  = "1"
