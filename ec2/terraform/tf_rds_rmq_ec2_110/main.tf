@@ -1,5 +1,7 @@
 # this section stores the terraform state for the s3 bucket in the terraform state bucket we created in step 1.
 terraform {
+  required_version = ">=0.11.8"
+  
   backend "s3" {
     bucket = "" # the terraform state bucket has to be hand entered unfortunately
     key    = "tf_rds_rmq_ec2/terraform.tfstate"
