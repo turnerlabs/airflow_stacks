@@ -14,16 +14,8 @@ variable "tag_customer" {}
 variable "tag_team" {}
 variable "tag_environment" {}
 
-variable "vpc_id" {
-  description = "VPC to launch into"
-}
-
-variable "subnet_id1" {
-  description = "Subnet to launch RDS into. Hopefully in different AZ"
-}
-
-variable "subnet_id2" {
-  description = "Subnet to launch RDS into. Hopefully in different AZ"
+variable "network_prefix" {
+  description = "Name to prefix all the networking related items with"
 }
 
 variable "db_identifier" {
@@ -142,10 +134,18 @@ variable "s3_airflow_bucket_name"  {
   description = "Airflow bucket for airflow shared directory"
 }
 
+variable "s3_airflow_access_log_bucket_name"  {
+  description = "Airflow bucket for alb access logs"
+}
+
 variable "ingress_ip"  {
   description = "instance ingress ip to allow"
 }
 
 variable "ingress_ip_description"  {
-  description = "instance ingress ip to allow"
+  description = "instance ingress ip description"
+}
+
+variable "aws_account_number" {
+  description = "AWS account number"  
 }

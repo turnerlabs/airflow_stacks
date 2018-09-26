@@ -38,13 +38,17 @@ echo "############# create common airflow directories complete #############"
 
 echo "############# Initial airflow database initilaization #############"
 
-instance_ip=`curl http://169.254.169.254/latest/meta-data/public-ipv4`
+instance_ip=`curl http://169.254.169.254/latest/meta-data/local-ipv4`
 
 sed -i -e "s/expose_config = False/expose_config = True/g" airflow.cfg
 sed -i -e "s/executor = SequentialExecutor/executor = CeleryExecutor/g" airflow.cfg
 sed -i -e "s/remote_log_conn_id =/remote_log_conn_id = s3_logging_conn/g" airflow.cfg
 sed -i -e "s/load_examples = True/load_examples = False/g" airflow.cfg
 sed -i -e "s/authenticate = False/authenticate = True/g" airflow.cfg
+sed -i -e "s/filter_by_owner = False/filter_by_owner = True/g" airflow.cfg
+sed -i -e "s/secure_mode = False/secure_mode = True/g" airflow.cfg
+sed -i -e "s/donot_pickle = True/donot_pickle = False/g" airflow.cfg
+sed -i -e "s/enable_xcom_pickling = True/enable_xcom_pickling = False/g" airflow.cfg
 sed -i -e "s/base_url = http:\/\/localhost:8080/base_url = http:\/\/$instance_ip:8080/g" airflow.cfg
 sed -i -e "s/endpoint_url = http:\/\/localhost:8080/endpoint_url = http:\/\/$instance_ip:8080/g" airflow.cfg
 sed -i -e "s/sql_alchemy_conn = sqlite:\/\/\/\/home\/ubuntu\/airflow\/airflow.db/sql_alchemy_conn = mysql:\/\/${db_airflow_username}:${db_airflow_password}@${rds_url}\/${db_airflow_dbname}/g" airflow.cfg
@@ -56,9 +60,17 @@ auth_backend = airflow.contrib.auth.backends.password_auth" airflow.cfg
 sed -i -e "/remote_base_log_folder/d" airflow.cfg
 sed -i -e "s/rbac = False/rbac = True/g" airflow.cfg
 
+/home/ubuntu/venv/bin/airflow -h
+
+echo "############# Generate webserver_config.py before initdb  #############"
+
 /home/ubuntu/venv/bin/airflow initdb
 
 echo "############# Completed airflow database initilaization #############"
+
+/home/ubuntu/venv/bin/airflow create_user -u ${airflow_username} -e ${airflow_emailaddress} -p ${airflow_password} -f ${airflow_first} -l ${airflow_last} -r ${airflow_role}
+
+echo "############# Added airflow user #############"
 
 systemctl enable airflow-webserver
 systemctl enable airflow-scheduler
@@ -73,7 +85,3 @@ systemctl start airflow-scheduler
 systemctl start airflow-worker
 
 echo "############# Started up airflow service #############"
-
-/home/ubuntu/venv/bin/airflow create_user -u ${airflow_username} -e ${airflow_emailaddress} -p ${airflow_password} -f ${airflow_first} -l ${airflow_last} -r ${airflow_role}
-
-echo "############# Added airflow user #############"

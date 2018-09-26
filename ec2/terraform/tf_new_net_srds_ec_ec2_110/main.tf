@@ -2,7 +2,7 @@
 terraform {
   backend "s3" {
     bucket = "" # the terraform state bucket has to be hand entered unfortunately
-    key    = "tf_srds_ec_ec2_110/terraform.tfstate"
+    key    = "tf_new_net_srds_ec_ec2_110/terraform.tfstate"
     region = "us-east-1"
   }
 }
@@ -13,42 +13,255 @@ provider "aws" {
   profile = "${var.profile}"
 }
 
+# VPC 
+
+resource "aws_vpc" "airflow_vpc" {
+  cidr_block            = "10.0.0.0/16"
+  instance_tenancy      = "default"
+  enable_dns_support    = "yes"
+  enable_dns_hostnames  = "yes"
+  enable_classiclink    = "no"
+
+  tags {
+    Name            = "${var.network_prefix}_vpc"
+    application     = "${var.tag_application}"
+    contact-email   = "${var.tag_contact_email}"
+    customer        = "${var.tag_customer}"
+    team            = "${var.tag_team}"
+    environment     = "${var.tag_environment}"
+  }
+}
+
+# Private Subnets
+
+resource "aws_subnet" "airflow_subnet_private_1a" {
+  depends_on                      = ["aws_vpc.airflow_vpc"]
+  vpc_id                          = "${aws_vpc.airflow_vpc.id}"
+  cidr_block                      = "10.0.1.0/24"
+  availability_zone               = "us-east-1a"
+  map_public_ip_on_launch         = "no"
+  assign_ipv6_address_on_creation = "no"
+
+  tags {
+    Name            = "${var.network_prefix}_subnet_private_1a"
+    application     = "${var.tag_application}"
+    contact-email   = "${var.tag_contact_email}"
+    customer        = "${var.tag_customer}"
+    team            = "${var.tag_team}"
+    environment     = "${var.tag_environment}"
+  }
+}
+
+resource "aws_subnet" "airflow_subnet_private_1b" {
+  depends_on                      = ["aws_vpc.airflow_vpc"]
+  vpc_id                          = "${aws_vpc.airflow_vpc.id}"
+  cidr_block                      = "10.0.2.0/24"
+  availability_zone               = "us-east-1b"
+  map_public_ip_on_launch         = "no"
+  assign_ipv6_address_on_creation = "no"
+
+  tags {
+    Name            = "${var.network_prefix}_subnet_private_1b"
+    application     = "${var.tag_application}"
+    contact-email   = "${var.tag_contact_email}"
+    customer        = "${var.tag_customer}"
+    team            = "${var.tag_team}"
+    environment     = "${var.tag_environment}"
+  }
+}
+
+# Public Subnets
+
+resource "aws_subnet" "airflow_subnet_public_1a" {
+  depends_on                      = ["aws_vpc.airflow_vpc"]
+  vpc_id                          = "${aws_vpc.airflow_vpc.id}"
+  cidr_block                      = "10.0.3.0/24"
+  availability_zone               = "us-east-1a"
+  map_public_ip_on_launch         = "yes"
+  assign_ipv6_address_on_creation = "no"
+
+tags {
+    Name            = "${var.network_prefix}_subnet_public_1a"
+    application     = "${var.tag_application}"
+    contact-email   = "${var.tag_contact_email}"
+    customer        = "${var.tag_customer}"
+    team            = "${var.tag_team}"
+    environment     = "${var.tag_environment}"
+  }
+}
+
+resource "aws_subnet" "airflow_subnet_public_1b" {
+  depends_on                      = ["aws_vpc.airflow_vpc"]
+  vpc_id                          = "${aws_vpc.airflow_vpc.id}"
+  cidr_block                      = "10.0.4.0/24"
+  availability_zone               = "us-east-1b"
+  map_public_ip_on_launch         = "yes"
+  assign_ipv6_address_on_creation = "no"
+
+  tags {
+    Name            = "${var.network_prefix}_subnet_public_1b"
+    application     = "${var.tag_application}"
+    contact-email   = "${var.tag_contact_email}"
+    customer        = "${var.tag_customer}"
+    team            = "${var.tag_team}"
+    environment     = "${var.tag_environment}"
+  }
+}
+
+# Internet Gateway
+
+resource "aws_internet_gateway" "airflow_igw" {
+  depends_on  = ["aws_vpc.airflow_vpc"]
+  vpc_id      = "${aws_vpc.airflow_vpc.id}"
+
+  tags {
+    Name            = "${var.network_prefix}_igw"
+    application     = "${var.tag_application}"
+    contact-email   = "${var.tag_contact_email}"
+    customer        = "${var.tag_customer}"
+    team            = "${var.tag_team}"
+    environment     = "${var.tag_environment}"
+  }
+}
+
+# NAT Gateway
+
+resource "aws_eip" "airflow_nat_eip" {
+  vpc         = true
+  depends_on  = ["aws_internet_gateway.airflow_igw"]
+}
+
+resource "aws_nat_gateway" "airflow_natgw" {
+  depends_on    = ["aws_vpc.airflow_vpc", "aws_internet_gateway.airflow_igw", "aws_subnet.airflow_subnet_public_1a"]
+  allocation_id = "${aws_eip.airflow_nat_eip.id}"
+  subnet_id     = "${aws_subnet.airflow_subnet_public_1a.id}"
+  vpc_id        = "${aws_vpc.airflow_vpc.id}"
+  state         = "available"
+
+  tags {
+      Name            = "${var.network_prefix}_natgw"
+      application     = "${var.tag_application}"
+      contact-email   = "${var.tag_contact_email}"
+      customer        = "${var.tag_customer}"
+      team            = "${var.tag_team}"
+      environment     = "${var.tag_environment}"
+  }
+}
+
+# Main Route Table
+
+resource "aws_route_table" "airflow_rt_main" {
+  depends_on  = ["aws_vpc.airflow_vpc"]
+  vpc_id      = "${aws_vpc.airflow_vpc.id}"
+
+  tags {
+    Name            = "${var.network_prefix}_rt_main"
+    application     = "${var.tag_application}"
+    contact-email   = "${var.tag_contact_email}"
+    customer        = "${var.tag_customer}"
+    team            = "${var.tag_team}"
+    environment     = "${var.tag_environment}"
+  }
+}
+
+resource "aws_route_table_association" "aws_route_table_association_private_1a" {
+  depends_on      = ["aws_subnet.airflow_subnet_private_1a"]
+  subnet_id       = "${aws_subnet.airflow_subnet_private_1a.id}"
+  route_table_id  = "${aws_route_table.airflow_rt_main.id}"
+}
+
+resource "aws_route_table_association" "aws_route_table_association_private_1b" {
+  depends_on      = ["aws_subnet.airflow_subnet_private_1b"]
+  subnet_id       = "${aws_subnet.airflow_subnet_private_1b.id}"
+  route_table_id  = "${aws_route_table.airflow_rt_main.id}"
+}
+
+resource "aws_route" "route_ngw" { 
+  depends_on              = ["aws_nat_gateway.airflow_natgw"]  
+  route_table_id          = "${aws_route_table.airflow_rt_main.id}"
+  destination_cidr_block  = "0.0.0.0/0"
+  nat_gateway_id          = "${aws_nat_gateway.airflow_natgw.id}"
+}
+
+# Custom Route Table
+
+resource "aws_route_table" "airflow_rt_custom" {
+  depends_on  = ["aws_vpc.airflow_vpc"]
+  vpc_id      = "${aws_vpc.airflow_vpc.id}"
+
+  tags {
+    Name            = "${var.network_prefix}_rt_custom"
+    application     = "${var.tag_application}"
+    contact-email   = "${var.tag_contact_email}"
+    customer        = "${var.tag_customer}"
+    team            = "${var.tag_team}"
+    environment     = "${var.tag_environment}"
+  }
+}
+
+resource "aws_route_table_association" "aws_route_table_association_public_1a" {
+  depends_on      = ["aws_subnet.airflow_subnet_public_1a"]
+  subnet_id       = "${aws_subnet.airflow_subnet_public_1a.id}"
+  route_table_id  = "${aws_route_table.airflow_rt_custom.id}"
+}
+
+resource "aws_route_table_association" "aws_route_table_association_public_1b" {
+  depends_on      = ["aws_subnet.airflow_subnet_public_1b"]
+  subnet_id       = "${aws_subnet.airflow_subnet_public_1b.id}"
+  route_table_id  = "${aws_route_table.airflow_rt_custom.id}"
+}
+
+resource "aws_route" "route_ngw" { 
+  depends_on              = ["aws_internet_gateway.airflow_igw"]  
+  route_table_id          = "${aws_route_table.airflow_rt_custom.id}"
+  destination_cidr_block  = "0.0.0.0/0"
+  gateway_id              = "${aws_internet_gateway.airflow_igw.id}"
+}
+
+# Load Balancer Security Group
+
+resource "aws_security_group" "airflow_lb" {
+  name        = "airflow_lb"
+  description = "Security group for access to airflow load balancer"
+  vpc_id      = "${aws_vpc.airflow_vpc.id}"
+  
+  # This needs to be expanded to all the ip ranges.
+  ingress {
+    from_port       = 80
+    to_port         = 80
+    protocol        = "tcp"
+    cidr_blocks     = ["${var.ingress_ip}"]
+    description     = "${var.ingress_ip_description}"
+  }
+
+  egress {
+    from_port       = 0
+    to_port         = 0
+    protocol        = "-1"
+    cidr_blocks     = ["0.0.0.0/0"]
+  }
+
+  tags {
+    Name            = "airflow_lb"
+    application     = "${var.tag_application}"
+    contact-email   = "${var.tag_contact_email}"
+    customer        = "${var.tag_customer}"
+    team            = "${var.tag_team}"
+    environment     = "${var.tag_environment}"
+  }
+}
+
 # Instance Security Group
 resource "aws_security_group" "airflow_instance" {
   name        = "airflow_instance"
   description = "Security group for access to airflow server"
-  vpc_id      = "${var.vpc_id}"
-
-  ingress {
-    from_port       = 22
-    to_port         = 22
-    protocol        = "tcp"
-    cidr_blocks     = ["${var.ingress_ip}"]
-    description     = "${var.ingress_ip_description}"
-  }
-
-  ingress {
-    from_port       = 22
-    to_port         = 22
-    protocol        = "tcp"
-    cidr_blocks     = ["10.0.0.0/8"]
-    description     = "local"
-  }
+  vpc_id      = "${aws_vpc.airflow_vpc.id}"
 
   ingress {
     from_port       = 8080
     to_port         = 8080
     protocol        = "tcp"
-    cidr_blocks     = ["${var.ingress_ip}"]
-    description     = "${var.ingress_ip_description}"
-  }
-
-  ingress {
-    from_port       = 8080
-    to_port         = 8080
-    protocol        = "tcp"
-    cidr_blocks     = ["10.0.0.0/8"]
-    description     = "local"
+    security_groups = ["${aws_security_group.airflow_lb.id}"]
   }
 
   egress {
@@ -74,7 +287,7 @@ resource "aws_security_group" "airflow_rds" {
 
   name        = "airflow_rds"
   description = "Security group for access to rds server for airflow"
-  vpc_id      = "${var.vpc_id}"
+  vpc_id      = "${aws_vpc.airflow_vpc.id}"
 
   ingress {
     from_port       = 0
@@ -106,7 +319,7 @@ resource "aws_security_group" "airflow_ec" {
 
   name        = "airflow_ec"
   description = "Security group for access to ec server for airflow"
-  vpc_id      = "${var.vpc_id}"
+  vpc_id      = "${aws_vpc.airflow_vpc.id}"
 
   ingress {
     from_port       = 0
@@ -145,6 +358,35 @@ resource "aws_s3_bucket" "s3_airflow_bucket" {
     environment     = "${var.tag_environment}"
   }
 }
+
+# S3 ALB access log Bucket
+# resource "aws_s3_bucket" "s3_airflow_access_log_bucket" {
+#   bucket        = "${var.s3_airflow_access_log_bucket_name}"
+#   force_destroy = "true"
+#   tags {
+#     application     = "${var.tag_application}"
+#     contact-email   = "${var.tag_contact_email}"
+#     customer        = "${var.tag_customer}"
+#     team            = "${var.tag_team}"
+#     environment     = "${var.tag_environment}"
+#   }
+
+# policy = <<EOF
+# {
+#   "Version": "2012-10-17",
+#   "Statement": [
+#     {
+#       "Effect": "Allow",
+#       "Principal": {
+#         "AWS": "arn:aws:iam::${var.aws_account_number}:root"
+#       },
+#       "Action": "s3:PutObject",
+#       "Resource": "arn:aws:s3:::${var.s3_airflow_access_log_bucket_name}/*"
+#     }
+#   ]
+# }
+# EOF
+# }
 
 # IAM Role
 resource "aws_iam_role" "airflow_s3_role" {
@@ -225,9 +467,73 @@ resource "aws_iam_role_policy" "airflow_logs_policy" {
 EOF
 }
 
+# Application Load Balancer
+
+resource "aws_lb_target_group" "airflow_lb_tg" {
+  name     = "airflow-lb-tg"
+  port     = 8080
+  protocol = "HTTP"
+  vpc_id   = "${aws_vpc.airflow_vpc.id}"
+  
+  health_check {
+    port      = 8080
+    protocol  = "HTTP"
+    path      = "/login"
+  }
+
+  tags {
+    Name            = "airflow_lb_tg"
+    application     = "${var.tag_application}"
+    contact-email   = "${var.tag_contact_email}"
+    customer        = "${var.tag_customer}"
+    team            = "${var.tag_team}"
+    environment     = "${var.tag_environment}"
+  }
+}
+
+resource "aws_lb" "airflow_lb" {
+  # depends_on         = ["aws_security_group.airflow_lb","aws_s3_bucket.s3_airflow_access_log_bucket"]
+
+  name               = "airflow-lb"
+  internal           = false
+  load_balancer_type = "application"
+  security_groups    = ["${aws_security_group.airflow_lb.id}"]
+  subnets            = ["${aws_subnet.airflow_subnet_public_1a.id}", "${aws_subnet.airflow_subnet_public_1b.id}"]
+
+  # access_logs {
+  #   bucket  = "${aws_s3_bucket.s3_airflow_access_log_bucket.id}"
+  #   prefix  = "airflow-lb"
+  #   enabled = true
+  # }
+
+  tags {
+    Name            = "airflow_alb"
+    application     = "${var.tag_application}"
+    contact-email   = "${var.tag_contact_email}"
+    customer        = "${var.tag_customer}"
+    team            = "${var.tag_team}"
+    environment     = "${var.tag_environment}"
+  }
+}
+
+resource "aws_lb_listener" "airflow_lb_listener" {
+  load_balancer_arn = "${aws_lb.airflow_lb.arn}"
+  port              = "80"
+  protocol          = "HTTP"
+#  port              = "443"
+#  protocol          = "HTTPS"
+#  ssl_policy        = "ELBSecurityPolicy-2015-05"
+#  certificate_arn   = "arn:aws:iam::187416307283:server-certificate/test_cert_rab3wuqwgja25ct3n4jdj2tzu4"
+  default_action {
+    type             = "forward"
+    target_group_arn = "${aws_lb_target_group.airflow_lb_tg.arn}"
+  }
+}
+
+
 # RDS Related Items
 resource "aws_db_subnet_group" "airflow_rds_subnet_grp" {
-  subnet_ids = ["${var.subnet_id1}", "${var.subnet_id2}"]
+  subnet_ids = ["${aws_subnet.airflow_subnet_private_1a.id}", "${aws_subnet.airflow_subnet_private_1b.id}"]
 
   tags {
     Name            = "airflow_rds"
@@ -273,7 +579,7 @@ resource "aws_rds_cluster" "airflow_rds" {
 # Elasticache Related Items
 resource "aws_elasticache_subnet_group" "airflow_ec_subnet_grp" {
   name       = "ec-airflow-subnet"
-  subnet_ids = ["${var.subnet_id1}", "${var.subnet_id2}"]
+  subnet_ids = ["${aws_subnet.airflow_subnet_private_1a.id}", "${aws_subnet.airflow_subnet_private_1b.id}"]
 }
 
 resource "aws_elasticache_cluster" "airflow_elasticache" {
@@ -328,17 +634,16 @@ resource "aws_launch_configuration" "lc_airflow" {
   image_id                    = "${var.airflow_ami}"
   instance_type               = "${var.airflow_instance_class}"
   key_name                    = "${var.airflow_keypair_name}"
-  associate_public_ip_address = true
   security_groups             = ["${aws_security_group.airflow_instance.id}"]
   user_data                   = "${data.template_file.airflow-user-data.rendered}"
   iam_instance_profile        = "${aws_iam_instance_profile.airflow_s3_instance_profile.id}"
 }
 
 resource "aws_autoscaling_group" "asg_airflow" {
-  depends_on                = ["aws_launch_configuration.lc_airflow"]
+  depends_on                = ["aws_launch_configuration.lc_airflow", "aws_lb_target_group.airflow_lb_tg"]
 
   name                      = "asg_airflow"
-  vpc_zone_identifier       = ["${var.subnet_id1}", "${var.subnet_id2}"]
+  vpc_zone_identifier       =  ["${aws_subnet.airflow_subnet_private_1a.id}", "${aws_subnet.airflow_subnet_private_1b.id}"]
   launch_configuration      = "${aws_launch_configuration.lc_airflow.id}"
   max_size                  = "2"
   min_size                  = "1"
@@ -346,6 +651,7 @@ resource "aws_autoscaling_group" "asg_airflow" {
   health_check_grace_period = 300
   health_check_type         = "EC2"
   termination_policies      = ["OldestInstance", "OldestLaunchConfiguration"]
+  target_group_arns         = ["${aws_lb_target_group.airflow_lb_tg.arn}"]
 
   tag {
     key                 = "Name"
