@@ -1,6 +1,6 @@
 # Description
 
-This is a packer builder and custom provisioner to create a Python 2.7 AMI for airflow
+This is a packer builder and custom provisioner to create a Python 2.7 AMI for an airflow webserver and scheduler.
 
 ## Builder
 
