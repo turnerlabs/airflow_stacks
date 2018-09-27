@@ -9,19 +9,29 @@ Currently there are 2 AMI's(AWS) and 2 Cloud Images(GCP) that need to be created
 Here's our current stack:
 
 **AWS(most work has been done here)**
+
 Airflow with Python 3 or Python 2
+
 Serverless Aurora MySQL
+
 Elasticache
 
 **GCP(work in progress with less work since Composer exists there)**
-Airflow with Python 3.
+
+Airflow with Python 3
+
 MySQL
+
 RabbitMQ
 
 **Docker(work in progress)**
+
 - all containers
+
 Airflow with Python 3.
+
 MySQL
+
 RabbitMQ
 
 Please feel free to add any issues to github.
