@@ -52,14 +52,12 @@ sudo cp /home/ubuntu/airflow.conf //usr/lib/tmpfiles.d
 
 sudo cp /home/ubuntu/airflow-webserver.service /lib/systemd/system/airflow-webserver.service
 sudo cp /home/ubuntu/airflow-scheduler.service /lib/systemd/system/airflow-scheduler.service
-sudo cp /home/ubuntu/airflow-worker.service /lib/systemd/system/airflow-worker.service
 
 rm /home/ubuntu/airflow.sysconfig
 rm /home/ubuntu/airflow.conf
 
 rm /home/ubuntu/airflow-webserver.service
 rm /home/ubuntu/airflow-scheduler.service
-rm /home/ubuntu/airflow-worker.service
 echo "------------------- copy systemd components complete -------------------"
 
 sudo mkdir /run/airflow

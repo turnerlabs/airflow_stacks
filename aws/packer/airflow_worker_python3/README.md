@@ -1,6 +1,6 @@
 # Description
 
-This is a packer builder and custom provisioner to create an AMI for airflow
+This is a packer builder and custom provisioner to create an AMI for an airflow worker.
 
 ## Builder
 

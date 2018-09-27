@@ -32,11 +32,6 @@
     }],
     "provisioners": [{
             "type": "file",
-            "source": "../airflow/code/adduser.py3",
-            "destination": "/home/ubuntu/adduser.py"
-        },
-        {
-            "type": "file",
             "source": "../airflow/config/airflow.conf",
             "destination": "/home/ubuntu/airflow.conf"
         },
@@ -69,11 +64,6 @@
             "type": "file",
             "source": "../airflow/systemd/airflow-webserver.service",
             "destination": "/home/ubuntu/airflow-webserver.service"
-        },
-        {
-            "type": "file",
-            "source": "../airflow/systemd/airflow-worker.service",
-            "destination": "/home/ubuntu/airflow-worker.service"
         },
         {
             "type": "shell",

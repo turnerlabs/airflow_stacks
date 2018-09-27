@@ -32,11 +32,6 @@
     }],
     "provisioners": [{
             "type": "file",
-            "source": "./code/adduser.py",
-            "destination": "/home/ubuntu/adduser.py"
-        },
-        {
-            "type": "file",
             "source": "./config/airflow.conf",
             "destination": "/home/ubuntu/airflow.conf"
         },
@@ -59,16 +54,6 @@
             "type": "file",
             "source": "./cron/crontab",
             "destination": "/home/ubuntu/crontab"
-        },
-        {
-            "type": "file",
-            "source": "./systemd/airflow-scheduler.service",
-            "destination": "/home/ubuntu/airflow-scheduler.service"
-        },
-        {
-            "type": "file",
-            "source": "./systemd/airflow-webserver.service",
-            "destination": "/home/ubuntu/airflow-webserver.service"
         },
         {
             "type": "file",
