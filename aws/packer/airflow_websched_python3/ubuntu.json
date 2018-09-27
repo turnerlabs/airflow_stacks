@@ -32,37 +32,37 @@
     }],
     "provisioners": [{
             "type": "file",
-            "source": "../airflow/config/airflow.conf",
+            "source": "../airflow_websched_python2/config/airflow.conf",
             "destination": "/home/ubuntu/airflow.conf"
         },
         {
             "type": "file",
-            "source": "../airflow/config/airflow.sysconfig",
+            "source": "../airflow_websched_python2/config/airflow.sysconfig",
             "destination": "/home/ubuntu/airflow.sysconfig"
         },
         {
             "type": "file",
-            "source": "../airflow/config/logrotate.conf",
+            "source": "../airflow_websched_python2/config/logrotate.conf",
             "destination": "/home/ubuntu/logrotate.conf"
         },
         {
             "type": "file",
-            "source": "../airflow/config/awslogs.conf",
+            "source": "../airflow_websched_python2/config/awslogs.conf",
             "destination": "/home/ubuntu/awslogs.conf"
         },
         {
             "type": "file",
-            "source": "../airflow/cron/crontab",
+            "source": "../airflow_websched_python2/cron/crontab",
             "destination": "/home/ubuntu/crontab"
         },
         {
             "type": "file",
-            "source": "../airflow/systemd/airflow-scheduler.service",
+            "source": "../airflow_websched_python2/systemd/airflow-scheduler.service",
             "destination": "/home/ubuntu/airflow-scheduler.service"
         },
         {
             "type": "file",
-            "source": "../airflow/systemd/airflow-webserver.service",
+            "source": "../airflow_websched_python2/systemd/airflow-webserver.service",
             "destination": "/home/ubuntu/airflow-webserver.service"
         },
         {
