@@ -18,11 +18,11 @@
         "source_ami": "ami-04169656fea786776",
         "instance_type": "t2.medium",
         "ssh_username": "ubuntu",
-        "ami_name": "airflowpython3 {{timestamp}}",
+        "ami_name": "airflow_worker_python3 {{timestamp}}",
         "vpc_id": "{{user `vpcid_to_build_in`}}",
         "subnet_id": "{{user `subnetid_to_build_in`}}",
         "run_tags": {
-            "Name": "airflow packer ami builder",
+            "Name": "airflow packer ami builder for airflow_worker_python3",
             "application": "{{user `tag_application`}}",
             "contact-email": "{{user `tag_contact_email`}}",
             "customer": "{{user `tag_customer`}}",
