@@ -12,7 +12,7 @@ Please feel free to add any issues to github.
 
 **gcp** -  directory has an Airflow Terraform / Packer stack based around Airflow, Rabbitmq, CloudSQL. 
 
-**ec2** -  directory has an Airflow Terraform / Packer stack based around Airflow, Rabbitmq, RDS.
+**aws** -  directory has an Airflow Terraform / Packer stack based around Airflow, Rabbitmq, RDS.
   #### in process of converting from rabbitmq to elasticache and rds to severless aurora
 
 **docker** - directory contains an Airflow stack using Airflow, Rabbitmq, MySQL.  This also needs some work but it's pretty close.

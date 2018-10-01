@@ -23,8 +23,12 @@ variable "db_identifier" {
   default     = "airflow_rds"
 }
 
-variable "airflow_ami" {
-  description = "Airflow AMI created by packer"
+variable "airflow_websched_ami" {
+  description = "Airflow Webserver / Scheduler AMI created by packer"
+}
+
+variable "airflow_worker_ami" {
+  description = "Airflow Worker AMI created by packer"
 }
 
 variable "airflow_instance_class" {
