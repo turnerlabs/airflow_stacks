@@ -14,8 +14,8 @@ variable "tag_customer" {}
 variable "tag_team" {}
 variable "tag_environment" {}
 
-variable "network_prefix" {
-  description = "Name to prefix all the networking related items with"
+variable "prefix" {
+  description = "Name to prefix all the items with"
 }
 
 variable "db_identifier" {

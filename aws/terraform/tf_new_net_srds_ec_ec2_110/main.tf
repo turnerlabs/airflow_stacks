@@ -25,7 +25,7 @@ resource "aws_vpc" "airflow_vpc" {
   enable_classiclink    = false
 
   tags {
-    Name            = "${var.network_prefix}_vpc"
+    Name            = "${var.prefix}_vpc"
     application     = "${var.tag_application}"
     contact-email   = "${var.tag_contact_email}"
     customer        = "${var.tag_customer}"
@@ -45,7 +45,7 @@ resource "aws_subnet" "airflow_subnet_private_1c" {
   assign_ipv6_address_on_creation = false
 
   tags {
-    Name            = "${var.network_prefix}_subnet_private_1c"
+    Name            = "${var.prefix}_subnet_private_1c"
     application     = "${var.tag_application}"
     contact-email   = "${var.tag_contact_email}"
     customer        = "${var.tag_customer}"
@@ -63,7 +63,7 @@ resource "aws_subnet" "airflow_subnet_private_1d" {
   assign_ipv6_address_on_creation = false
 
   tags {
-    Name            = "${var.network_prefix}_subnet_private_1d"
+    Name            = "${var.prefix}_subnet_private_1d"
     application     = "${var.tag_application}"
     contact-email   = "${var.tag_contact_email}"
     customer        = "${var.tag_customer}"
@@ -83,7 +83,7 @@ resource "aws_subnet" "airflow_subnet_public_1c" {
   assign_ipv6_address_on_creation = false
 
 tags {
-    Name            = "${var.network_prefix}_subnet_public_1c"
+    Name            = "${var.prefix}_subnet_public_1c"
     application     = "${var.tag_application}"
     contact-email   = "${var.tag_contact_email}"
     customer        = "${var.tag_customer}"
@@ -101,7 +101,7 @@ resource "aws_subnet" "airflow_subnet_public_1d" {
   assign_ipv6_address_on_creation = false
 
   tags {
-    Name            = "${var.network_prefix}_subnet_public_1d"
+    Name            = "${var.prefix}_subnet_public_1d"
     application     = "${var.tag_application}"
     contact-email   = "${var.tag_contact_email}"
     customer        = "${var.tag_customer}"
@@ -117,7 +117,7 @@ resource "aws_internet_gateway" "airflow_igw" {
   vpc_id      = "${aws_vpc.airflow_vpc.id}"
 
   tags {
-    Name            = "${var.network_prefix}_igw"
+    Name            = "${var.prefix}_igw"
     application     = "${var.tag_application}"
     contact-email   = "${var.tag_contact_email}"
     customer        = "${var.tag_customer}"
@@ -139,7 +139,7 @@ resource "aws_nat_gateway" "airflow_natgw" {
   subnet_id     = "${aws_subnet.airflow_subnet_public_1c.id}"
 
   tags {
-      Name            = "${var.network_prefix}_natgw"
+      Name            = "${var.prefix}_natgw"
       application     = "${var.tag_application}"
       contact-email   = "${var.tag_contact_email}"
       customer        = "${var.tag_customer}"
@@ -155,7 +155,7 @@ resource "aws_route_table" "airflow_rt_main" {
   vpc_id      = "${aws_vpc.airflow_vpc.id}"
 
   tags {
-    Name            = "${var.network_prefix}_rt_main"
+    Name            = "${var.prefix}_rt_main"
     application     = "${var.tag_application}"
     contact-email   = "${var.tag_contact_email}"
     customer        = "${var.tag_customer}"
@@ -190,7 +190,7 @@ resource "aws_route_table" "airflow_rt_custom" {
   vpc_id      = "${aws_vpc.airflow_vpc.id}"
 
   tags {
-    Name            = "${var.network_prefix}_rt_custom"
+    Name            = "${var.prefix}_rt_custom"
     application     = "${var.tag_application}"
     contact-email   = "${var.tag_contact_email}"
     customer        = "${var.tag_customer}"
@@ -221,7 +221,7 @@ resource "aws_route" "route_igw" {
 # Load Balancer Security Group
 
 resource "aws_security_group" "airflow_lb" {
-  name        = "airflow_lb"
+  name        = "${var.prefix}_lb"
   description = "Security group for access to airflow load balancer"
   vpc_id      = "${aws_vpc.airflow_vpc.id}"
   
@@ -242,7 +242,7 @@ resource "aws_security_group" "airflow_lb" {
   }
 
   tags {
-    Name            = "airflow_lb"
+    Name            = "${var.prefix}_lb"
     application     = "${var.tag_application}"
     contact-email   = "${var.tag_contact_email}"
     customer        = "${var.tag_customer}"
@@ -253,7 +253,7 @@ resource "aws_security_group" "airflow_lb" {
 
 # Instance Security Group
 resource "aws_security_group" "airflow_instance" {
-  name        = "airflow_instance"
+  name        = "${var.prefix}_instance"
   description = "Security group for access to airflow server"
   vpc_id      = "${aws_vpc.airflow_vpc.id}"
 
@@ -272,7 +272,7 @@ resource "aws_security_group" "airflow_instance" {
   }
 
   tags {
-    Name            = "airflow_instance"
+    Name            = "${var.prefix}_instance"
     application     = "${var.tag_application}"
     contact-email   = "${var.tag_contact_email}"
     customer        = "${var.tag_customer}"
@@ -285,7 +285,7 @@ resource "aws_security_group" "airflow_instance" {
 resource "aws_security_group" "airflow_rds" {
   depends_on  = ["aws_security_group.airflow_instance"]
 
-  name        = "airflow_rds"
+  name        = "${var.prefix}_rds"
   description = "Security group for access to rds server for airflow"
   vpc_id      = "${aws_vpc.airflow_vpc.id}"
 
@@ -304,7 +304,7 @@ resource "aws_security_group" "airflow_rds" {
   }
 
   tags {
-    Name            = "airflow_rds"
+    Name            = "${var.prefix}_rds"
     application     = "${var.tag_application}"
     contact-email   = "${var.tag_contact_email}"
     customer        = "${var.tag_customer}"
@@ -317,7 +317,7 @@ resource "aws_security_group" "airflow_rds" {
 resource "aws_security_group" "airflow_ec" {
   depends_on  = ["aws_security_group.airflow_instance"]
 
-  name        = "airflow_ec"
+  name        = "${var.prefix}_ec"
   description = "Security group for access to ec server for airflow"
   vpc_id      = "${aws_vpc.airflow_vpc.id}"
 
@@ -336,7 +336,7 @@ resource "aws_security_group" "airflow_ec" {
   }
 
   tags {
-    Name            = "airflow_ec"
+    Name            = "${var.prefix}_ec"
     application     = "${var.tag_application}"
     contact-email   = "${var.tag_contact_email}"
     customer        = "${var.tag_customer}"
@@ -347,7 +347,7 @@ resource "aws_security_group" "airflow_ec" {
 
 # S3 Airflow Bucket
 resource "aws_s3_bucket" "s3_airflow_bucket" {
-  bucket        = "${var.s3_airflow_bucket_name}"
+  bucket        = "${var.prefix}_${var.s3_airflow_bucket_name}"
   force_destroy = "true"
 
   tags {
@@ -391,7 +391,7 @@ resource "aws_s3_bucket" "s3_airflow_bucket" {
 # IAM Role
 resource "aws_iam_role" "airflow_s3_role" {
 
-  name = "airflow_s3_role"
+  name = "${var.prefix}_s3_role"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -413,7 +413,7 @@ EOF
 resource "aws_iam_instance_profile" "airflow_s3_instance_profile" {
   depends_on  = ["aws_iam_role.airflow_s3_role", "aws_iam_role_policy.airflow_s3_policy", "aws_iam_role_policy.airflow_logs_policy"]
   
-  name = "airflow_s3_instance_profile"
+  name = "${var.prefix}_s3_instance_profile"
   role = "${aws_iam_role.airflow_s3_role.name}"
 }
 
@@ -422,7 +422,7 @@ resource "aws_iam_instance_profile" "airflow_s3_instance_profile" {
 resource "aws_iam_role_policy" "airflow_s3_policy" {
   depends_on  = ["aws_iam_role.airflow_s3_role"]
 
-  name = "airflow_s3_policy"
+  name = "${var.prefix}_s3_policy"
   role = "${aws_iam_role.airflow_s3_role.id}"
 
   policy = <<EOF
@@ -443,7 +443,7 @@ EOF
 resource "aws_iam_role_policy" "airflow_logs_policy" {
   depends_on  = ["aws_iam_role.airflow_s3_role"]
 
-  name = "airflow_logs_policy"
+  name = "${var.prefix}_logs_policy"
   role = "${aws_iam_role.airflow_s3_role.id}"
 
   policy = <<EOF
@@ -470,7 +470,7 @@ EOF
 # Application Load Balancer
 
 resource "aws_lb_target_group" "airflow_lb_tg" {
-  name     = "airflow-lb-tg"
+  name     = "${var.prefix}-lb-tg"
   port     = 8080
   protocol = "HTTP"
   vpc_id   = "${aws_vpc.airflow_vpc.id}"
@@ -482,7 +482,7 @@ resource "aws_lb_target_group" "airflow_lb_tg" {
   }
 
   tags {
-    Name            = "airflow_lb_tg"
+    Name            = "${var.prefix}_lb_tg"
     application     = "${var.tag_application}"
     contact-email   = "${var.tag_contact_email}"
     customer        = "${var.tag_customer}"
@@ -494,7 +494,7 @@ resource "aws_lb_target_group" "airflow_lb_tg" {
 resource "aws_lb" "airflow_lb" {
   # depends_on         = ["aws_security_group.airflow_lb","aws_s3_bucket.s3_airflow_access_log_bucket"]
 
-  name               = "airflow-lb"
+  name               = "${var.prefix}-alb"
   internal           = false
   load_balancer_type = "application"
   security_groups    = ["${aws_security_group.airflow_lb.id}"]
@@ -507,7 +507,7 @@ resource "aws_lb" "airflow_lb" {
   # }
 
   tags {
-    Name            = "airflow_alb"
+    Name            = "${var.prefix}_alb"
     application     = "${var.tag_application}"
     contact-email   = "${var.tag_contact_email}"
     customer        = "${var.tag_customer}"
@@ -536,7 +536,7 @@ resource "aws_db_subnet_group" "airflow_rds_subnet_grp" {
   subnet_ids = ["${aws_subnet.airflow_subnet_private_1c.id}", "${aws_subnet.airflow_subnet_private_1d.id}"]
 
   tags {
-    Name            = "airflow_rds"
+    Name            = "${var.prefix}_rds"
     application     = "${var.tag_application}"
     contact-email   = "${var.tag_contact_email}"
     customer        = "${var.tag_customer}"
@@ -547,7 +547,7 @@ resource "aws_db_subnet_group" "airflow_rds_subnet_grp" {
 resource "aws_rds_cluster" "airflow_rds" {
   depends_on                      = ["aws_db_subnet_group.airflow_rds_subnet_grp", "aws_security_group.airflow_rds"]
 
-  cluster_identifier              = "${var.db_identifier}-cluster"
+  cluster_identifier              = "${var.prefix}-${var.db_identifier}-cluster"
   engine_mode                     = "serverless"
   master_username                 = "${var.db_master_username}"
   master_password                 = "${var.db_master_password}"
@@ -566,7 +566,7 @@ resource "aws_rds_cluster" "airflow_rds" {
   }
 
   tags {
-    Name            = "${var.db_identifier}"
+    Name            = "${var.prefix}-${var.db_identifier}"
     application     = "${var.tag_application}"
     contact-email   = "${var.tag_contact_email}"
     customer        = "${var.tag_customer}"
@@ -578,12 +578,12 @@ resource "aws_rds_cluster" "airflow_rds" {
 
 # Elasticache Related Items
 resource "aws_elasticache_subnet_group" "airflow_ec_subnet_grp" {
-  name       = "ec-airflow-subnet"
+  name       = "${var.prefix}-ec-subnet"
   subnet_ids = ["${aws_subnet.airflow_subnet_private_1c.id}", "${aws_subnet.airflow_subnet_private_1d.id}"]
 }
 
 resource "aws_elasticache_cluster" "airflow_elasticache" {
-  cluster_id            = "airflow-cluster"
+  cluster_id            = "${var.prefix}-cluster"
   engine                = "redis"
   node_type             = "${var.ec_node_type}"
   num_cache_nodes       = "${var.ec_num_cache_nodes}"
@@ -594,7 +594,7 @@ resource "aws_elasticache_cluster" "airflow_elasticache" {
   subnet_group_name     = "${aws_elasticache_subnet_group.airflow_ec_subnet_grp.id}"
   
   tags {
-    Name            = "airflow_node"
+    Name            = "${var.prefix}_cluster"
     application     = "${var.tag_application}"
     contact-email   = "${var.tag_contact_email}"
     customer        = "${var.tag_customer}"
@@ -617,7 +617,7 @@ data "template_file" "airflow-websched-user-data" {
     db_master_password = "${var.db_master_password}"
     db_airflow_dbname = "${var.db_airflow_dbname}"
     db_charset = "${var.db_charset}"
-    s3_airflow_bucket_name = "${var.s3_airflow_bucket_name}"
+    s3_airflow_bucket_name = "${aws_s3_bucket.s3_airflow_bucket.id}"
     role_name = "${aws_iam_role.airflow_s3_role.name}"
     airflow_username = "${var.airflow_username}"
     airflow_emailaddress = "${var.airflow_emailaddress}"
@@ -631,7 +631,7 @@ data "template_file" "airflow-websched-user-data" {
 resource "aws_launch_configuration" "lc_websched_airflow" {
   depends_on                  = ["aws_elasticache_cluster.airflow_elasticache", "aws_rds_cluster.airflow_rds", "aws_security_group.airflow_instance", "aws_iam_instance_profile.airflow_s3_instance_profile","aws_s3_bucket.s3_airflow_bucket"]
 
-  name                        = "lc_websched_airflow"
+  name                        = "${var.prefix}_lc_websched_airflow"
   image_id                    = "${var.airflow_websched_ami}"
   instance_type               = "${var.airflow_instance_class}"
   key_name                    = "${var.airflow_keypair_name}"
@@ -643,7 +643,7 @@ resource "aws_launch_configuration" "lc_websched_airflow" {
 resource "aws_autoscaling_group" "asg_websched_airflow" {
   depends_on                = ["aws_launch_configuration.lc_airflow", "aws_lb_target_group.airflow_lb_tg"]
 
-  name                      = "asg_websched_airflow"
+  name                      = "${var.prefix}_asg_websched_airflow"
   vpc_zone_identifier       =  ["${aws_subnet.airflow_subnet_private_1c.id}", "${aws_subnet.airflow_subnet_private_1d.id}"]
   launch_configuration      = "${aws_launch_configuration.lc_websched_airflow.id}"
   max_size                  = "1"
@@ -656,7 +656,7 @@ resource "aws_autoscaling_group" "asg_websched_airflow" {
 
   tag {
     key                 = "Name"
-    value               = "airflow_websched_server"
+    value               = "${var.prefix}_airflow_websched_server"
     propagate_at_launch = true
   }
 
@@ -695,7 +695,7 @@ resource "aws_autoscaling_group" "asg_websched_airflow" {
 data "template_file" "airflow-worker-user-data" {
   template = "${file("airflow_worker_install.tpl")}"
   vars {
-    s3_airflow_bucket_name = "${var.s3_airflow_bucket_name}"
+    s3_airflow_bucket_name = "${aws_s3_bucket.s3_airflow_bucket.id}"
     role_name = "${aws_iam_role.airflow_s3_role.name}"
   }
 }
@@ -703,7 +703,7 @@ data "template_file" "airflow-worker-user-data" {
 resource "aws_launch_configuration" "lc_worker_airflow" {
   depends_on                  = ["aws_autoscaling_group.asg_websched_airflow", "aws_elasticache_cluster.airflow_elasticache", "aws_rds_cluster.airflow_rds", "aws_security_group.airflow_instance", "aws_iam_instance_profile.airflow_s3_instance_profile","aws_s3_bucket.s3_airflow_bucket"]
 
-  name                        = "lc_worker_airflow"
+  name                        = "${var.prefix}_lc_worker_airflow"
   image_id                    = "${var.airflow_worker_ami}"
   instance_type               = "${var.airflow_instance_class}"
   key_name                    = "${var.airflow_keypair_name}"
@@ -715,7 +715,7 @@ resource "aws_launch_configuration" "lc_worker_airflow" {
 resource "aws_autoscaling_group" "asg_worker_airflow" {
   depends_on                = ["aws_launch_configuration.lc_worker_airflow"]
 
-  name                      = "asg_worker_airflow"
+  name                      = "${var.prefix}_asg_worker_airflow"
   vpc_zone_identifier       =  ["${aws_subnet.airflow_subnet_private_1c.id}", "${aws_subnet.airflow_subnet_private_1d.id}"]
   launch_configuration      = "${aws_launch_configuration.lc_websched_airflow.id}"
   max_size                  = "5"
@@ -728,7 +728,7 @@ resource "aws_autoscaling_group" "asg_worker_airflow" {
 
   tag {
     key                 = "Name"
-    value               = "airflow_worker_server"
+    value               = "${var.prefix}_airflow_worker_server"
     propagate_at_launch = true
   }
 
