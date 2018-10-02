@@ -3,7 +3,7 @@ terraform {
   required_version = ">=0.11.8"
   
   backend "s3" {
-    bucket = "" # the terraform state bucket has to be hand entered unfortunately
+    bucket = "tf-state-airflow110" # the terraform state bucket has to be hand entered unfortunately
     key    = "tf_new_net_srds_ec_ec2_110/terraform.tfstate"
     region = "us-east-1"
   }
@@ -347,7 +347,7 @@ resource "aws_security_group" "airflow_ec" {
 
 # S3 Airflow Bucket
 resource "aws_s3_bucket" "s3_airflow_bucket" {
-  bucket        = "${var.prefix}_${var.s3_airflow_bucket_name}"
+  bucket        = "${var.prefix}${var.s3_airflow_bucket_name}"
   force_destroy = "true"
 
   tags {
@@ -641,7 +641,7 @@ resource "aws_launch_configuration" "lc_websched_airflow" {
 }
 
 resource "aws_autoscaling_group" "asg_websched_airflow" {
-  depends_on                = ["aws_launch_configuration.lc_airflow", "aws_lb_target_group.airflow_lb_tg"]
+  depends_on                = ["aws_launch_configuration.lc_websched_airflow", "aws_lb_target_group.airflow_lb_tg"]
 
   name                      = "${var.prefix}_asg_websched_airflow"
   vpc_zone_identifier       =  ["${aws_subnet.airflow_subnet_private_1c.id}", "${aws_subnet.airflow_subnet_private_1d.id}"]
@@ -717,14 +717,13 @@ resource "aws_autoscaling_group" "asg_worker_airflow" {
 
   name                      = "${var.prefix}_asg_worker_airflow"
   vpc_zone_identifier       =  ["${aws_subnet.airflow_subnet_private_1c.id}", "${aws_subnet.airflow_subnet_private_1d.id}"]
-  launch_configuration      = "${aws_launch_configuration.lc_websched_airflow.id}"
+  launch_configuration      = "${aws_launch_configuration.lc_worker_airflow.id}"
   max_size                  = "5"
   min_size                  = "1"
   desired_capacity          = "1"
   health_check_grace_period = 300
   health_check_type         = "EC2"
   termination_policies      = ["OldestInstance", "OldestLaunchConfiguration"]
-  target_group_arns         = ["${aws_lb_target_group.airflow_lb_tg.arn}"]
 
   tag {
     key                 = "Name"
