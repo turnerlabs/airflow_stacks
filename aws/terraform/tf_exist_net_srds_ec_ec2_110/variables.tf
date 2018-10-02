@@ -14,6 +14,10 @@ variable "tag_customer" {}
 variable "tag_team" {}
 variable "tag_environment" {}
 
+variable "prefix" {
+  description = "Name to prefix all the items with"
+}
+
 variable "vpc_id" {
   description = "VPC to launch into"
 }
@@ -39,13 +43,22 @@ variable "db_identifier" {
   default     = "airflow_rds"
 }
 
-variable "airflow_ami" {
-  description = "Airflow AMI created by packer"
+variable "airflow_websched_ami" {
+  description = "Airflow Webserver / Scheduler AMI created by packer"
 }
 
-variable "airflow_instance_class" {
-  description = "Airflow instance size"
-  default     = "t2.large"
+variable "airflow_websched_instance_class" {
+  description = "Airflow websched instance size"
+  default     = "t3.medium"
+}
+
+variable "airflow_worker_ami" {
+  description = "Airflow Worker AMI created by packer"
+}
+
+variable "airflow_worker_instance_class" {
+  description = "Airflow worker instance size"
+  default     = "c4.large"
 }
 
 variable "airflow_keypair_name" {
@@ -159,7 +172,7 @@ variable "ingress_ip"  {
 }
 
 variable "ingress_ip_description"  {
-  description = "instance ingress ip to allow"
+  description = "instance ingress ip description"
 }
 
 variable "aws_account_number" {

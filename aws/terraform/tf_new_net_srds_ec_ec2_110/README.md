@@ -62,5 +62,5 @@ terraform apply
 -var 'airflow_worker_instance_class=<>'
 -var 'airflow_websched_ami=<>'
 -var 'airflow_websched_instance_class=<>'
--var 'prefix=airflowsmith'
+-var 'prefix=<>'
 ```
