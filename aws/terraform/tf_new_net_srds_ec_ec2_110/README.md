@@ -1,16 +1,21 @@
 # Description
 
-This is a terraform script to create a complete airflow stack.
+This is a terraform script to create a complete airflow stack including networking.
 
-You will need to update the terraform / backend / bucket in the main.tf in tf_rds_ec_ec2 to use this terraform state bucket.
+You will need to update the terraform state bucket in the main.tf file.  This should have already been created in the tf_s3_state directory.
 
 It creates the following resources in AWS:
 
+- 1 VPC
+- 2 Private Subnets
+- 2 Public Subnets
+- Internet and NAT Gateways
+- 1 ALB for Webserver
 - 1 MySQL ServerlessRDS database
 - 3 Security groups
   - 1 for RDS access
   - 1 for Elasticache access
-  - 1 for AirFlow access
+  - 1 for AirFlow instance access
 - 1 Launch Config using Airflow Webserver / Scheduler AMI
 - 1 Auto Scale Group for Airflow Webserver / Scheduler
 - 1 Launch Config using Airflow Worker AMI
