@@ -74,7 +74,6 @@ echo "############# Added airflow user #############"
 
 systemctl enable airflow-webserver
 systemctl enable airflow-scheduler
-systemctl enable airflow-worker
 
 systemctl daemon-reload
 
@@ -82,6 +81,5 @@ echo "############# Enabled airflow systemd #############"
 
 systemctl start airflow-webserver
 systemctl start airflow-scheduler
-systemctl start airflow-worker
 
 echo "############# Started up airflow service #############"
