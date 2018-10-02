@@ -27,13 +27,18 @@ variable "airflow_websched_ami" {
   description = "Airflow Webserver / Scheduler AMI created by packer"
 }
 
+variable "airflow_websched_instance_class" {
+  description = "Airflow websched instance size"
+  default     = "t3.medium"
+}
+
 variable "airflow_worker_ami" {
   description = "Airflow Worker AMI created by packer"
 }
 
-variable "airflow_instance_class" {
-  description = "Airflow instance size"
-  default     = "t2.large"
+variable "airflow_worker_instance_class" {
+  description = "Airflow worker instance size"
+  default     = "c4.large"
 }
 
 variable "airflow_keypair_name" {

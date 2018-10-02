@@ -633,7 +633,7 @@ resource "aws_launch_configuration" "lc_websched_airflow" {
 
   name                        = "${var.prefix}_lc_websched_airflow"
   image_id                    = "${var.airflow_websched_ami}"
-  instance_type               = "${var.airflow_instance_class}"
+  instance_type               = "${var.airflow_websched_instance_class}"
   key_name                    = "${var.airflow_keypair_name}"
   security_groups             = ["${aws_security_group.airflow_instance.id}"]
   user_data                   = "${data.template_file.airflow-websched-user-data.rendered}"
@@ -705,7 +705,7 @@ resource "aws_launch_configuration" "lc_worker_airflow" {
 
   name                        = "${var.prefix}_lc_worker_airflow"
   image_id                    = "${var.airflow_worker_ami}"
-  instance_type               = "${var.airflow_instance_class}"
+  instance_type               = "${var.airflow_worker_instance_class}"
   key_name                    = "${var.airflow_keypair_name}"
   security_groups             = ["${aws_security_group.airflow_instance.id}"]
   user_data                   = "${data.template_file.airflow-worker-user-data.rendered}"
