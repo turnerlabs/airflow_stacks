@@ -478,7 +478,7 @@ resource "aws_lb_target_group" "airflow_lb_tg" {
   health_check {
     port      = 8080
     protocol  = "HTTP"
-    path      = "/login"
+    path      = "/login/"
   }
 
   tags {
