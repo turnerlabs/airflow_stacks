@@ -20,9 +20,7 @@ Elasticache
 
 Airflow with Python 3
 
-MySQL
-
-RabbitMQ
+**aws** -  directory has an Airflow Terraform / Packer stack based around Airflow, Elasticache, Serverless Aurora.
 
 **Docker(work in progress)**
 
