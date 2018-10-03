@@ -20,7 +20,7 @@ provider "aws" {
 resource "aws_security_group" "airflow_lb" {
   name        = "${var.prefix}_lb"
   description = "Security group for access to airflow load balancer"
-  vpc_id      = "${aws_vpc.airflow_vpc.id}"
+  vpc_id      = "${var.vpc_id}"
   
   # This needs to be expanded to all the ip ranges.
   ingress {
@@ -52,7 +52,7 @@ resource "aws_security_group" "airflow_lb" {
 resource "aws_security_group" "airflow_instance" {
   name        = "${var.prefix}_instance"
   description = "Security group for access to airflow server"
-  vpc_id      = "${aws_vpc.airflow_vpc.id}"
+  vpc_id      = "${var.vpc_id}"
 
   ingress {
     from_port       = 8080
@@ -84,7 +84,7 @@ resource "aws_security_group" "airflow_rds" {
 
   name        = "${var.prefix}_rds"
   description = "Security group for access to rds server for airflow"
-  vpc_id      = "${aws_vpc.airflow_vpc.id}"
+  vpc_id      = "${var.vpc_id}"
 
   ingress {
     from_port       = 0
@@ -116,7 +116,7 @@ resource "aws_security_group" "airflow_ec" {
 
   name        = "${var.prefix}_ec"
   description = "Security group for access to ec server for airflow"
-  vpc_id      = "${aws_vpc.airflow_vpc.id}"
+  vpc_id      = "${var.vpc_id}"
 
   ingress {
     from_port       = 0
@@ -270,7 +270,7 @@ resource "aws_lb_target_group" "airflow_lb_tg" {
   name     = "${var.prefix}-lb-tg"
   port     = 8080
   protocol = "HTTP"
-  vpc_id   = "${aws_vpc.airflow_vpc.id}"
+  vpc_id   = "${var.vpc_id}"
   
   health_check {
     port      = 8080
@@ -295,7 +295,7 @@ resource "aws_lb" "airflow_lb" {
   internal           = false
   load_balancer_type = "application"
   security_groups    = ["${aws_security_group.airflow_lb.id}"]
-  subnets            = ["${aws_subnet.airflow_subnet_public_1c.id}", "${aws_subnet.airflow_subnet_public_1d.id}"]
+  subnets            = ["${var.public_subnet_id1}", "${var.public_subnet_id2}"]
 
   # access_logs {
   #   bucket  = "${aws_s3_bucket.s3_airflow_access_log_bucket.id}"
@@ -315,7 +315,7 @@ resource "aws_lb" "airflow_lb" {
 
 resource "aws_lb_listener" "airflow_lb_listener" {
   load_balancer_arn = "${aws_lb.airflow_lb.arn}"
-  port              = "80"
+  port              = "80"  
   protocol          = "HTTP"
 #  port              = "443"
 #  protocol          = "HTTPS"
@@ -330,7 +330,7 @@ resource "aws_lb_listener" "airflow_lb_listener" {
 
 # RDS Related Items
 resource "aws_db_subnet_group" "airflow_rds_subnet_grp" {
-  subnet_ids = ["${aws_subnet.airflow_subnet_private_1c.id}", "${aws_subnet.airflow_subnet_private_1d.id}"]
+  subnet_ids = ["${var.private_subnet_id1}", "${var.private_subnet_id2}"]
 
   tags {
     Name            = "${var.prefix}_rds"
@@ -376,7 +376,7 @@ resource "aws_rds_cluster" "airflow_rds" {
 # Elasticache Related Items
 resource "aws_elasticache_subnet_group" "airflow_ec_subnet_grp" {
   name       = "${var.prefix}-ec-subnet"
-  subnet_ids = ["${aws_subnet.airflow_subnet_private_1c.id}", "${aws_subnet.airflow_subnet_private_1d.id}"]
+  subnet_ids = ["${var.private_subnet_id1}", "${var.private_subnet_id2}"]
 }
 
 resource "aws_elasticache_cluster" "airflow_elasticache" {
@@ -441,7 +441,7 @@ resource "aws_autoscaling_group" "asg_websched_airflow" {
   depends_on                = ["aws_launch_configuration.lc_websched_airflow", "aws_lb_target_group.airflow_lb_tg"]
 
   name                      = "${var.prefix}_asg_websched_airflow"
-  vpc_zone_identifier       =  ["${aws_subnet.airflow_subnet_private_1c.id}", "${aws_subnet.airflow_subnet_private_1d.id}"]
+  vpc_zone_identifier       =  ["${var.private_subnet_id1}", "${var.private_subnet_id2}"]
   launch_configuration      = "${aws_launch_configuration.lc_websched_airflow.id}"
   max_size                  = "1"
   min_size                  = "1"
@@ -513,7 +513,7 @@ resource "aws_autoscaling_group" "asg_worker_airflow" {
   depends_on                = ["aws_launch_configuration.lc_worker_airflow"]
 
   name                      = "${var.prefix}_asg_worker_airflow"
-  vpc_zone_identifier       =  ["${aws_subnet.airflow_subnet_private_1c.id}", "${aws_subnet.airflow_subnet_private_1d.id}"]
+  vpc_zone_identifier       =  ["${var.private_subnet_id1}", "${var.private_subnet_id2}"]
   launch_configuration      = "${aws_launch_configuration.lc_worker_airflow.id}"
   max_size                  = "5"
   min_size                  = "1"
