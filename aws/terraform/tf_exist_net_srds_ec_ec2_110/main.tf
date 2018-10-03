@@ -24,8 +24,8 @@ resource "aws_security_group" "airflow_lb" {
   
   # This needs to be expanded to all the ip ranges.
   ingress {
-    from_port       = 80
-    to_port         = 80
+    from_port       = 443
+    to_port         = 443
     protocol        = "tcp"
     cidr_blocks     = ["${var.ingress_ip}"]
     description     = "${var.ingress_ip_description}"
