@@ -63,4 +63,6 @@ terraform apply
 -var 'airflow_websched_ami=<>'
 -var 'airflow_websched_instance_class=<>'
 -var 'prefix=<>'
+-var 'domain=<>'
+-var 'subdomain=<>'
 ```

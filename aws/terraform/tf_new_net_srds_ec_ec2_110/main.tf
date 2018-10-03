@@ -227,8 +227,8 @@ resource "aws_security_group" "airflow_lb" {
   
   # This needs to be expanded to all the ip ranges.
   ingress {
-    from_port       = 80
-    to_port         = 80
+    from_port       = 443
+    to_port         = 443
     protocol        = "tcp"
     cidr_blocks     = ["${var.ingress_ip}"]
     description     = "${var.ingress_ip_description}"
@@ -516,20 +516,47 @@ resource "aws_lb" "airflow_lb" {
   }
 }
 
+data "aws_route53_zone" "app" {
+  name = "${var.domain}"
+}
+
+resource "aws_route53_record" "dev" {
+  zone_id = "${data.aws_route53_zone.app.zone_id}"
+  type    = "CNAME"
+  name    = "${var.subdomain}"
+  records = ["${aws_alb.airflow_lb.dns_name}"]
+  ttl     = "30"
+}
+
+resource "aws_acm_certificate" "cert" {
+  domain_name       = "${var.subdomain}"
+  validation_method = "DNS"
+}
+
+resource "aws_route53_record" "cert_validation" {
+  name    = "${aws_acm_certificate.cert.domain_validation_options.0.resource_record_name}"
+  type    = "${aws_acm_certificate.cert.domain_validation_options.0.resource_record_type}"
+  zone_id = "${data.aws_route53_zone.app.id}"
+  records = ["${aws_acm_certificate.cert.domain_validation_options.0.resource_record_value}"]
+  ttl     = 60
+}
+
+resource "aws_acm_certificate_validation" "cert" {
+  certificate_arn         = "${aws_acm_certificate.cert.arn}"
+  validation_record_fqdns = ["${aws_route53_record.cert_validation.fqdn}"]
+}
+
 resource "aws_lb_listener" "airflow_lb_listener" {
   load_balancer_arn = "${aws_lb.airflow_lb.arn}"
-  port              = "80"
-  protocol          = "HTTP"
-#  port              = "443"
-#  protocol          = "HTTPS"
-#  ssl_policy        = "ELBSecurityPolicy-2015-05"
-#  certificate_arn   = "arn:aws:iam::187416307283:server-certificate/test_cert_rab3wuqwgja25ct3n4jdj2tzu4"
+  port              = "443"
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-2015-05"
+  certificate_arn   = "${aws_acm_certificate_validation.cert.certificate_arn}"
   default_action {
     type             = "forward"
     target_group_arn = "${aws_lb_target_group.airflow_lb_tg.arn}"
   }
 }
-
 
 # RDS Related Items
 resource "aws_db_subnet_group" "airflow_rds_subnet_grp" {

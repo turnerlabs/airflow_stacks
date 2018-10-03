@@ -71,4 +71,6 @@ terraform apply
 -var 'private_subnet_id2=<>'
 -var 'public_subnet_id1=<>'
 -var 'public_subnet_id2=<>'
+-var 'domain=<>'
+-var 'subdomain=<>'
 ```
