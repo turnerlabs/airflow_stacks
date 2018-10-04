@@ -516,6 +516,8 @@ resource "aws_lb" "airflow_lb" {
   }
 }
 
+# Certs and Route53 stuff
+
 data "aws_route53_zone" "app" {
   name = "${var.domain}"
 }
