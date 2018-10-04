@@ -178,3 +178,11 @@ variable "ingress_ip_description"  {
 variable "aws_account_number" {
   description = "AWS account number"  
 }
+
+variable "domain" {
+  description = "Domain for Route53"  
+}
+
+variable "subdomain" {
+  description = "Sub Domain for cert"
+}
