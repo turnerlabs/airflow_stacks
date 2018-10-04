@@ -313,9 +313,23 @@ resource "aws_lb" "airflow_lb" {
   }
 }
 
+# Certs and Route53 stuff
+
+data "aws_route53_zone" "airflow_r53_zone" {
+  name = "${var.domain}"
+}
+
+resource "aws_route53_record" "airflow_r53_record" {
+  zone_id = "${data.aws_route53_zone.airflow_r53_zone.zone_id}"
+  type    = "CNAME"
+  name    = "${var.subdomain}"
+  records = ["${aws_lb.airflow_lb.dns_name}"]
+  ttl     = "30"
+}
+
 resource "aws_lb_listener" "airflow_lb_listener" {
   load_balancer_arn = "${aws_lb.airflow_lb.arn}"
-  port              = "80"  
+  port              = "80"
   protocol          = "HTTP"
 #  port              = "443"
 #  protocol          = "HTTPS"
@@ -326,7 +340,6 @@ resource "aws_lb_listener" "airflow_lb_listener" {
     target_group_arn = "${aws_lb_target_group.airflow_lb_tg.arn}"
   }
 }
-
 
 # RDS Related Items
 resource "aws_db_subnet_group" "airflow_rds_subnet_grp" {
