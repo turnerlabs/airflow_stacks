@@ -59,6 +59,7 @@ sed -i -e "/\[webserver\]/a\\
 auth_backend = airflow.contrib.auth.backends.password_auth" airflow.cfg
 sed -i -e "/remote_base_log_folder/d" airflow.cfg
 sed -i -e "s/rbac = False/rbac = True/g" airflow.cfg
+sed -i -e "s/enable_proxy_fix = False/enable_proxy_fix = True/g" airflow.cfg
 
 /home/ubuntu/venv/bin/airflow -h
 
