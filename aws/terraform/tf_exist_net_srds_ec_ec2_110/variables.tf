@@ -186,3 +186,8 @@ variable "domain" {
 variable "subdomain" {
   description = "Sub Domain for cert"
 }
+
+variable "alb_accesslog_account" {
+  description="Look here for more info: https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-access-logs.html#access-logging-bucket-permissions"
+  default="127311923021"
+}
