@@ -156,7 +156,6 @@ resource "aws_s3_bucket" "s3_airflow_bucket" {
   }
 }
 
-# S3 ALB access log Bucket
 resource "aws_s3_bucket" "s3_airflow_access_log_bucket" {
   bucket        = "${var.s3_airflow_access_log_bucket_name}"
   force_destroy = "true"
@@ -173,12 +172,16 @@ policy = <<EOF
   "Version": "2012-10-17",
   "Statement": [
     {
+      "Action": [
+        "s3:PutObject"
+      ],
       "Effect": "Allow",
+      "Resource": "arn:aws:s3:::${var.s3_airflow_access_log_bucket_name}/*",
       "Principal": {
-        "AWS": "arn:aws:iam::${var.aws_account_number}:root"
-      },
-      "Action": "s3:PutObject",
-      "Resource": "arn:aws:s3:::${var.s3_airflow_access_log_bucket_name}/*"
+        "AWS": [
+          "127311923021"
+        ]
+      }
     }
   ]
 }
