@@ -179,7 +179,7 @@ policy = <<EOF
       "Resource": "arn:aws:s3:::${var.s3_airflow_access_log_bucket_name}/*",
       "Principal": {
         "AWS": [
-          "127311923021"
+          "${var.alb_accesslog_account}"
         ]
       }
     }
@@ -232,7 +232,7 @@ resource "aws_iam_role_policy" "airflow_s3_policy" {
         {
             "Effect": "Allow",
             "Action": "s3:*",
-            "Resource": "*"
+            "Resource": "arn:aws:s3:::${var.prefix}${var.s3_airflow_bucket_name}/*"
         }
     ]
 }
@@ -334,10 +334,6 @@ resource "aws_lb_listener" "airflow_lb_listener" {
   load_balancer_arn = "${aws_lb.airflow_lb.arn}"
   port              = "80"
   protocol          = "HTTP"
-#  port              = "443"
-#  protocol          = "HTTPS"
-#  ssl_policy        = "ELBSecurityPolicy-2015-05"
-#  certificate_arn   = "arn:aws:iam::187416307283:server-certificate/test_cert_rab3wuqwgja25ct3n4jdj2tzu4"
   default_action {
     type             = "forward"
     target_group_arn = "${aws_lb_target_group.airflow_lb_tg.arn}"
