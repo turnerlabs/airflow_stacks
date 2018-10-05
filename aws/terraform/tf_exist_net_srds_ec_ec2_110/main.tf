@@ -231,9 +231,25 @@ resource "aws_iam_role_policy" "airflow_s3_policy" {
     "Statement": [
         {
             "Effect": "Allow",
-            "Action": "s3:*",
-            "Resource": "arn:aws:s3:::${var.prefix}${var.s3_airflow_bucket_name}/*"
+            "Action": [
+              "s3:ListBucket"
+            ],
+            "Resource": [
+              "arn:aws:s3:::${var.prefix}${var.s3_airflow_bucket_name}"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+              "s3:PutObject",
+              "s3:GetObject",
+              "s3:DeleteObject"
+            ],
+            "Resource": [
+              "arn:aws:s3:::${var.prefix}${var.s3_airflow_bucket_name}/*"
+            ]
         }
+
     ]
 }
 EOF
