@@ -360,33 +360,37 @@ resource "aws_s3_bucket" "s3_airflow_bucket" {
 }
 
 # S3 ALB access log Bucket
-# resource "aws_s3_bucket" "s3_airflow_access_log_bucket" {
-#   bucket        = "${var.s3_airflow_access_log_bucket_name}"
-#   force_destroy = "true"
-#   tags {
-#     application     = "${var.tag_application}"
-#     contact-email   = "${var.tag_contact_email}"
-#     customer        = "${var.tag_customer}"
-#     team            = "${var.tag_team}"
-#     environment     = "${var.tag_environment}"
-#   }
+resource "aws_s3_bucket" "s3_airflow_access_log_bucket" {
+  bucket        = "${var.s3_airflow_access_log_bucket_name}"
+  force_destroy = "true"
+  tags {
+    application     = "${var.tag_application}"
+    contact-email   = "${var.tag_contact_email}"
+    customer        = "${var.tag_customer}"
+    team            = "${var.tag_team}"
+    environment     = "${var.tag_environment}"
+  }
 
-# policy = <<EOF
-# {
-#   "Version": "2012-10-17",
-#   "Statement": [
-#     {
-#       "Effect": "Allow",
-#       "Principal": {
-#         "AWS": "arn:aws:iam::${var.aws_account_number}:root"
-#       },
-#       "Action": "s3:PutObject",
-#       "Resource": "arn:aws:s3:::${var.s3_airflow_access_log_bucket_name}/*"
-#     }
-#   ]
-# }
-# EOF
-# }
+policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": [
+        "s3:PutObject"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:s3:::${var.s3_airflow_access_log_bucket_name}/*",
+      "Principal": {
+        "AWS": [
+          "127311923021"
+        ]
+      }
+    }
+  ]
+}
+EOF
+}
 
 # IAM Role
 resource "aws_iam_role" "airflow_s3_role" {
@@ -500,11 +504,11 @@ resource "aws_lb" "airflow_lb" {
   security_groups    = ["${aws_security_group.airflow_lb.id}"]
   subnets            = ["${aws_subnet.airflow_subnet_public_1c.id}", "${aws_subnet.airflow_subnet_public_1d.id}"]
 
-  # access_logs {
-  #   bucket  = "${aws_s3_bucket.s3_airflow_access_log_bucket.id}"
-  #   prefix  = "airflow-lb"
-  #   enabled = true
-  # }
+  access_logs {
+    bucket  = "${aws_s3_bucket.s3_airflow_access_log_bucket.id}"
+    prefix  = "airflow-lb"
+    enabled = true
+  }
 
   tags {
     Name            = "${var.prefix}_alb"
