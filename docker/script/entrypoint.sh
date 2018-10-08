@@ -2,11 +2,12 @@
 
 TRY_LOOP="20"
 
-: "${RABBITMQ_HOST:="rabbitmq"}"
-: "${RABBITMQ_VHOST:="airflowhost"}"
-: "${RABBITMQ_USER:="airflow"}"
-: "${RABBITMQ_PASSWORD:="airflow"}"
-: "${RABBITMQ_PORT:="5672"}"
+: "${REDIS_HOST:="redis"}"
+: "${REDIS_VHOST1:="0"}"
+: "${REDIS_VHOST1:="1"}"
+: "${REDIS_USER:="airflow"}"
+: "${REDIS_PASSWORD:="airflow"}"
+: "${REDIS_PORT:="6379"}"
 
 : "${MYSQL_HOST:="mysql"}"
 : "${MYSQL_PORT:="3306"}"
@@ -51,24 +52,24 @@ wait_for_port() {
   done
 }
 
-wait_for_rabbitmq() {
-  # Wait for Rabbitmq if we are using it
+wait_for_redis() {
+  # Wait for Redis if we are using it
   if [ "$AIRFLOW__CORE__EXECUTOR" = "CeleryExecutor" ]
   then
-    wait_for_port "Rabbit" "$RABBITMQ_HOST" "$RABBITMQ_PORT"
+    wait_for_port "Redis" "$REDIS_HOST" "$REDIS_PORT"
   fi
 }
 
 AIRFLOW__CORE__SQL_ALCHEMY_CONN="mysql://$MYSQL_USER:$MYSQL_PASSWORD@$MYSQL_HOST:$MYSQL_PORT/$MYSQL_DB"
-AIRFLOW__CELERY__BROKER_URL="amqp://$RABBITMQ_USER:$RABBITMQ_USER@$RABBITMQ_HOST/$RABBITMQ_VHOST"
-AIRFLOW__CELERY__CELERY_RESULT_BACKEND="db+mysql://$MYSQL_USER:$MYSQL_PASSWORD@$MYSQL_HOST:$MYSQL_PORT/$MYSQL_DB"
+AIRFLOW__CELERY__BROKER_URL="redis://$REDIS_USER:$REDIS_USER@$REDIS_HOST/$REDIS_VHOST1"
+AIRFLOW__CELERY__CELERY_RESULT_BACKEND="redis://$REDIS_USER:$REDIS_USER@$REDIS_HOST/$REDIS_VHOST2"
 
 env
 
 case "$1" in
   webserver)
     wait_for_port "MySQL" "$MYSQL_HOST" "$MYSQL_PORT"
-    wait_for_rabbitmq
+    wait_for_redis
     airflow initdb
     if [ "$AIRFLOW__CORE__EXECUTOR" = "LocalExecutor" ];
     then
@@ -79,13 +80,13 @@ case "$1" in
     ;;
   worker|scheduler)
     wait_for_port "MySQL" "$MYSQL_HOST" "$MYSQL_PORT"
-    wait_for_rabbitmq
+    wait_for_redis
     # To give the webserver time to run initdb.
     sleep 10
     exec airflow "$@"
     ;;
   flower)
-    wait_for_rabbitmq
+    wait_for_redis
     exec airflow "$@"
     ;;
   version)

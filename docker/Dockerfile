@@ -14,7 +14,8 @@ ENV TERM linux
 ARG AIRFLOW_VERSION=1.10
 ARG AIRFLOW_HOME=/usr/local/airflow
 ARG AIRFLOW_CODE=/usr/local/lib/python3.6/dist-packages/airflow
-ARG AIRFLOW_PACKAGES=all_dbs,celery,crypto,devel,gcp_api,jdbc,kerberos,mssql,mysql,password,postgres,qds,rabbitmq,redis,s3,samba,slack,snowflake,ssh
+ARG AIRFLOW_PACKAGES=all
+ARG SLUGIFY_USES_TEXT_UNIDECODE=yes
 
 # Define en_US.
 ENV LANGUAGE en_US.UTF-8
@@ -25,34 +26,37 @@ ENV LANG en_US.UTF-8
 
 RUN set -ex \
     && buildDeps=' \
-        python3-dev \
-        libkrb5-dev \
-        libsasl2-dev \        
-        unixodbc-dev \
-        freetds-dev \
-        git \
-        python-pip \
+        virtualenv \
         libmysqlclient-dev \
+        libkrb5-dev \
+        libsasl2-dev \
+        mysql-client-core-5.7 \
+        s3fs \
+        redis-tools \
+        openjdk-8-jre \
+        git \
+        locales \
+        locales-all \
     ' \        
     && apt-get update -yqq \
     && apt-get upgrade -yqq \
     && apt-get install -yqq --no-install-recommends \
         $buildDeps \
-    && add-apt-repository -y ppa:jonathonf/python-3.6 \        
     && apt-get -fyqq install \
     && apt-get update -yqq \
     && ACCEPT_EULA=Y apt-get install -yqq \
-        python3.6 \
-        python3.6-dev \
+        python3 \
+        python3-dev \
         python3-pip \
+        python3-gdbm \
+    && locale-gen \
     && sed -i 's/^# en_US.UTF-8 UTF-8$/en_US.UTF-8 UTF-8/g' /etc/locale.gen \
     && locale-gen \
     && update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.5 1 \
-    && update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.6 3 \
     && update-locale LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 \
     && useradd -ms /bin/bash -d ${AIRFLOW_HOME} airflow \
-    && python3 -m pip install pip --upgrade \
-    && python3 -m pip install wheel \
+    && python3 -m pip3 install --upgrade pip \
+    && python3 -m pip3 install wheel \
     && pip install -U pip setuptools wheel \
     && pip install Cython \
     && pip install apache-airflow[${AIRFLOW_PACKAGES}]==$AIRFLOW_VERSION \
