@@ -3,11 +3,8 @@
 TRY_LOOP="20"
 
 : "${REDIS_HOST:="redis"}"
-: "${REDIS_VHOST1:="0"}"
-: "${REDIS_VHOST1:="1"}"
-: "${REDIS_USER:="airflow"}"
-: "${REDIS_PASSWORD:="airflow"}"
 : "${REDIS_PORT:="6379"}"
+: "${REDIS_PASSWORD:=""}"
 
 : "${MYSQL_HOST:="mysql"}"
 : "${MYSQL_PORT:="3306"}"
@@ -17,25 +14,19 @@ TRY_LOOP="20"
 
 # Defaults and back-compat
 : "${AIRFLOW__CORE__FERNET_KEY:=${FERNET_KEY:=$(python -c "from cryptography.fernet import Fernet; FERNET_KEY = Fernet.generate_key().decode(); print(FERNET_KEY)")}}"
-: "${AIRFLOW__CORE__EXECUTOR:=${EXECUTOR:-Sequential}Executor}"
 
-export \
-  AIRFLOW__CORE__EXECUTOR \
-  AIRFLOW__CORE__FERNET_KEY \
-  AIRFLOW__CORE__LOAD_EXAMPLES \
-  AIRFLOW__CORE__SQL_ALCHEMY_CONN \
-  AIRFLOW__CELERY__BROKER_URL \
-  AIRFLOW__CELERY__CELERY_RESULT_BACKEND \
-
-# Load DAGs exemples (default: Yes)
-if [[ -z "$AIRFLOW__CORE__LOAD_EXAMPLES" && "${LOAD_EX:=n}" == n ]]
-then
-  AIRFLOW__CORE__LOAD_EXAMPLES=False
-fi
+airflow initdb
+sleep 10
 
 # Install custom python package if requirements.txt is present
 if [ -e "/requirements.txt" ]; then
     $(which pip) install --user -r /requirements.txt
+fi
+
+if [ -n "$REDIS_PASSWORD" ]; then
+    REDIS_PREFIX=:${REDIS_PASSWORD}@
+else
+    REDIS_PREFIX=
 fi
 
 wait_for_port() {
@@ -52,41 +43,42 @@ wait_for_port() {
   done
 }
 
-wait_for_redis() {
-  # Wait for Redis if we are using it
-  if [ "$AIRFLOW__CORE__EXECUTOR" = "CeleryExecutor" ]
-  then
-    wait_for_port "Redis" "$REDIS_HOST" "$REDIS_PORT"
-  fi
-}
+sed -i -e "s/expose_config = False/expose_config = True/g" /usr/local/airflow/airflow/airflow.cfg
+sed -i -e "s/executor = SequentialExecutor/executor = CeleryExecutor/g" /usr/local/airflow/airflow/airflow.cfg
+sed -i -e "s/remote_log_conn_id =/remote_log_conn_id = s3_logging_conn/g" /usr/local/airflow/airflow/airflow.cfg
+sed -i -e "s/load_examples = True/load_examples = False/g" /usr/local/airflow/airflow/airflow.cfg
+sed -i -e "s/authenticate = False/authenticate = True/g" /usr/local/airflow/airflow/airflow.cfg
+sed -i -e "s/filter_by_owner = False/filter_by_owner = True/g" /usr/local/airflow/airflow/airflow.cfg
+sed -i -e "s/secure_mode = False/secure_mode = True/g" /usr/local/airflow/airflow/airflow.cfg
+sed -i -e "s/donot_pickle = True/donot_pickle = False/g" /usr/local/airflow/airflow/airflow.cfg
+sed -i -e "s/enable_xcom_pickling = True/enable_xcom_pickling = False/g" /usr/local/airflow/airflow/airflow.cfg
+#sed -i -e "s/base_url = http:\/\/localhost:8080/base_url = http:\/\/$instance_ip:8080/g" /usr/local/airflow/airflow/airflow.cfg
+#sed -i -e "s/endpoint_url = http:\/\/localhost:8080/endpoint_url = http:\/\/$instance_ip:8080/g" /usr/local/airflow/airflow/airflow.cfg
+sed -i -e "s/sql_alchemy_conn = sqlite:\/\/\/\/usr\/local\/airflow\/airflow\/airflow.db/sql_alchemy_conn = mysql:\/\/$MYSQL_USER:$MYSQL_PASSWORD@$MYSQL_HOST:$MYSQL_PORT\/$MYSQL_DB/g" /usr/local/airflow/airflow/airflow.cfg
+sed -i -e "s/result_backend = db+mysql:\/\/airflow:airflow@localhost:3306\/airflow/result_backend = redis:\/\/$REDIS_PREFIX$REDIS_HOST:$REDIS_PORT\/0/g" /usr/local/airflow/airflow/airflow.cfg
+sed -i -e "s/broker_url = sqla+mysql:\/\/airflow:airflow@localhost:3306\/airflow/broker_url = redis:\/\/$REDIS_PREFIX$REDIS_HOST:$REDIS_PORT\/1/g" /usr/local/airflow/airflow/airflow.cfg
+sed -i -e "/remote_base_log_folder/d" /usr/local/airflow/airflow/airflow.cfg
+sed -i -e "s/rbac = False/rbac = True/g" /usr/local/airflow/airflow/airflow.cfg
+sed -i -e "s/enable_proxy_fix = False/enable_proxy_fix = True/g" /usr/local/airflow/airflow/airflow.cfg
 
-AIRFLOW__CORE__SQL_ALCHEMY_CONN="mysql://$MYSQL_USER:$MYSQL_PASSWORD@$MYSQL_HOST:$MYSQL_PORT/$MYSQL_DB"
-AIRFLOW__CELERY__BROKER_URL="redis://$REDIS_USER:$REDIS_USER@$REDIS_HOST/$REDIS_VHOST1"
-AIRFLOW__CELERY__CELERY_RESULT_BACKEND="redis://$REDIS_USER:$REDIS_USER@$REDIS_HOST/$REDIS_VHOST2"
+airflow -h
 
-env
+env 
+wait_for_port "Redis" "$REDIS_HOST" "$REDIS_PORT"
+wait_for_port "MySQL" "$MYSQL_HOST" "$MYSQL_PORT"
 
 case "$1" in
   webserver)
-    wait_for_port "MySQL" "$MYSQL_HOST" "$MYSQL_PORT"
-    wait_for_redis
     airflow initdb
-    if [ "$AIRFLOW__CORE__EXECUTOR" = "LocalExecutor" ];
-    then
-      # With the "Local" executor it should all run in one container.
-      airflow scheduler &
-    fi
+    sleep 10
     exec airflow webserver
     ;;
   worker|scheduler)
-    wait_for_port "MySQL" "$MYSQL_HOST" "$MYSQL_PORT"
-    wait_for_redis
     # To give the webserver time to run initdb.
-    sleep 10
+    sleep 20
     exec airflow "$@"
     ;;
   flower)
-    wait_for_redis
     exec airflow "$@"
     ;;
   version)
