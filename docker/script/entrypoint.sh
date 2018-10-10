@@ -45,7 +45,6 @@ wait_for_port() {
 
 sed -i -e "s/expose_config = False/expose_config = True/g" /usr/local/airflow/airflow/airflow.cfg
 sed -i -e "s/executor = SequentialExecutor/executor = CeleryExecutor/g" /usr/local/airflow/airflow/airflow.cfg
-sed -i -e "s/remote_log_conn_id =/remote_log_conn_id = s3_logging_conn/g" /usr/local/airflow/airflow/airflow.cfg
 sed -i -e "s/load_examples = True/load_examples = False/g" /usr/local/airflow/airflow/airflow.cfg
 sed -i -e "s/authenticate = False/authenticate = True/g" /usr/local/airflow/airflow/airflow.cfg
 sed -i -e "s/filter_by_owner = False/filter_by_owner = True/g" /usr/local/airflow/airflow/airflow.cfg
@@ -70,12 +69,17 @@ wait_for_port "MySQL" "$MYSQL_HOST" "$MYSQL_PORT"
 case "$1" in
   webserver)
     airflow initdb
+    
+    sleep 5
+
+    airflow create_user -u airflow -e airflow@airflow.com -p airflow -f airflow -l airlow -r Admin
+    
     sleep 10
     exec airflow webserver
     ;;
   worker|scheduler)
     # To give the webserver time to run initdb.
-    sleep 20
+    sleep 30
     exec airflow "$@"
     ;;
   flower)
