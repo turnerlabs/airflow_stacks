@@ -66,6 +66,7 @@ auth_backend = airflow.contrib.auth.backends.password_auth" /usr/local/airflow/a
 
 generate_rbac(){
   airflow -h
+  cp /usr/local/airflow/airflow/webserver_config.py /usr/local/airflow/webserver_config.py
 }
 
 wait_for_dbs(){

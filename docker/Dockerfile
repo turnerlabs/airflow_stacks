@@ -63,6 +63,7 @@ RUN set -ex \
     && pip install pyOpenSSL \
     && pip install ndg-httpsclient \
     && pip install pyasn1 \
+    && pip install 'flask-appbuilder==1.11.1' \
     && pip install apache-airflow[${AIRFLOW_PACKAGES}]==$AIRFLOW_VERSION \
     && pip install 'celery[redis]>=4.1.1,<4.2.0' \
     && apt-get autoremove -yqq --purge \
@@ -86,3 +87,4 @@ EXPOSE 8080 5555 8793
 USER airflow
 WORKDIR ${AIRFLOW_HOME}
 ENTRYPOINT ["sh", "/entrypoint.sh"]
+CMD ["webserver"] # set default arg for entrypoint
