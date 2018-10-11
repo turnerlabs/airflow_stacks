@@ -15,19 +15,9 @@ TRY_LOOP="20"
 # Defaults and back-compat
 : "${AIRFLOW__CORE__FERNET_KEY:=${FERNET_KEY:=$(python -c "from cryptography.fernet import Fernet; FERNET_KEY = Fernet.generate_key().decode(); print(FERNET_KEY)")}}"
 
-airflow initdb
-sleep 10
-
-# Install custom python package if requirements.txt is present
-if [ -e "/requirements.txt" ]; then
-    $(which pip) install --user -r /requirements.txt
-fi
-
-if [ -n "$REDIS_PASSWORD" ]; then
-    REDIS_PREFIX=:${REDIS_PASSWORD}@
-else
-    REDIS_PREFIX=
-fi
+generate_config() {
+  airflow initdb
+}
 
 wait_for_port() {
   local name="$1" host="$2" port="$3"
@@ -43,43 +33,69 @@ wait_for_port() {
   done
 }
 
-sed -i -e "s/expose_config = False/expose_config = True/g" /usr/local/airflow/airflow/airflow.cfg
-sed -i -e "s/executor = SequentialExecutor/executor = CeleryExecutor/g" /usr/local/airflow/airflow/airflow.cfg
-sed -i -e "s/load_examples = True/load_examples = False/g" /usr/local/airflow/airflow/airflow.cfg
-sed -i -e "s/authenticate = False/authenticate = True/g" /usr/local/airflow/airflow/airflow.cfg
-sed -i -e "s/filter_by_owner = False/filter_by_owner = True/g" /usr/local/airflow/airflow/airflow.cfg
-sed -i -e "s/secure_mode = False/secure_mode = True/g" /usr/local/airflow/airflow/airflow.cfg
-sed -i -e "s/donot_pickle = True/donot_pickle = False/g" /usr/local/airflow/airflow/airflow.cfg
-sed -i -e "s/enable_xcom_pickling = True/enable_xcom_pickling = False/g" /usr/local/airflow/airflow/airflow.cfg
-#sed -i -e "s/base_url = http:\/\/localhost:8080/base_url = http:\/\/$instance_ip:8080/g" /usr/local/airflow/airflow/airflow.cfg
-#sed -i -e "s/endpoint_url = http:\/\/localhost:8080/endpoint_url = http:\/\/$instance_ip:8080/g" /usr/local/airflow/airflow/airflow.cfg
-sed -i -e "s/sql_alchemy_conn = sqlite:\/\/\/\/usr\/local\/airflow\/airflow\/airflow.db/sql_alchemy_conn = mysql:\/\/$MYSQL_USER:$MYSQL_PASSWORD@$MYSQL_HOST:$MYSQL_PORT\/$MYSQL_DB/g" /usr/local/airflow/airflow/airflow.cfg
-sed -i -e "s/result_backend = db+mysql:\/\/airflow:airflow@localhost:3306\/airflow/result_backend = redis:\/\/$REDIS_PREFIX$REDIS_HOST:$REDIS_PORT\/0/g" /usr/local/airflow/airflow/airflow.cfg
-sed -i -e "s/broker_url = sqla+mysql:\/\/airflow:airflow@localhost:3306\/airflow/broker_url = redis:\/\/$REDIS_PREFIX$REDIS_HOST:$REDIS_PORT\/1/g" /usr/local/airflow/airflow/airflow.cfg
-sed -i -e "/remote_base_log_folder/d" /usr/local/airflow/airflow/airflow.cfg
-sed -i -e "s/rbac = False/rbac = True/g" /usr/local/airflow/airflow/airflow.cfg
-sed -i -e "s/enable_proxy_fix = False/enable_proxy_fix = True/g" /usr/local/airflow/airflow/airflow.cfg
+update_config() {
+  # Install custom python package if requirements.txt is present
+  if [ -e "/requirements.txt" ]; then
+      $(which pip) install --user -r /requirements.txt
+  fi
 
-airflow -h
+  if [ -n "$REDIS_PASSWORD" ]; then
+      REDIS_PREFIX=:${REDIS_PASSWORD}@
+  else
+      REDIS_PREFIX=
+  fi
 
-env 
-wait_for_port "Redis" "$REDIS_HOST" "$REDIS_PORT"
-wait_for_port "MySQL" "$MYSQL_HOST" "$MYSQL_PORT"
+  sed -i -e "s/filter_by_owner = False/filter_by_owner = True/g" /usr/local/airflow/airflow/airflow.cfg
+  sed -i -e "s/expose_config = False/expose_config = True/g" /usr/local/airflow/airflow/airflow.cfg
+  sed -i -e "s/executor = SequentialExecutor/executor = CeleryExecutor/g" /usr/local/airflow/airflow/airflow.cfg
+  sed -i -e "s/load_examples = True/load_examples = False/g" /usr/local/airflow/airflow/airflow.cfg
+  sed -i -e "s/authenticate = False/authenticate = True/g" /usr/local/airflow/airflow/airflow.cfg
+  sed -i -e "s/secure_mode = False/secure_mode = True/g" /usr/local/airflow/airflow/airflow.cfg
+  sed -i -e "s/donot_pickle = True/donot_pickle = False/g" /usr/local/airflow/airflow/airflow.cfg
+  sed -i -e "s/enable_xcom_pickling = True/enable_xcom_pickling = False/g" /usr/local/airflow/airflow/airflow.cfg
+  #sed -i -e "s/base_url = http:\/\/localhost:8080/base_url = http:\/\/$instance_ip:8080/g" /usr/local/airflow/airflow/airflow.cfg
+  #sed -i -e "s/endpoint_url = http:\/\/localhost:8080/endpoint_url = http:\/\/$instance_ip:8080/g" /usr/local/airflow/airflow/airflow.cfg
+  sed -i -e "s/sql_alchemy_conn = sqlite:\/\/\/\/usr\/local\/airflow\/airflow\/airflow.db/sql_alchemy_conn = mysql:\/\/$MYSQL_USER:$MYSQL_PASSWORD@$MYSQL_HOST:$MYSQL_PORT\/$MYSQL_DB/g" /usr/local/airflow/airflow/airflow.cfg
+  sed -i -e "s/result_backend = db+mysql:\/\/airflow:airflow@localhost:3306\/airflow/result_backend = redis:\/\/$REDIS_PREFIX$REDIS_HOST:$REDIS_PORT\/0/g" /usr/local/airflow/airflow/airflow.cfg
+  sed -i -e "s/broker_url = sqla+mysql:\/\/airflow:airflow@localhost:3306\/airflow/broker_url = redis:\/\/$REDIS_PREFIX$REDIS_HOST:$REDIS_PORT\/1/g" /usr/local/airflow/airflow/airflow.cfg
+  sed -i -e "/auth_backend = airflow.api.auth.backend.default/d" /usr/local/airflow/airflow/airflow.cfg
+  sed -i -e "/\[webserver\]/a\\
+auth_backend = airflow.contrib.auth.backends.password_auth" /usr/local/airflow/airflow/airflow.cfg
+  sed -i -e "s/rbac = False/rbac = True/g" /usr/local/airflow/airflow/airflow.cfg
+}
+
+generate_rbac(){
+  airflow -h
+}
+
+wait_for_dbs(){
+  wait_for_port "Redis" "$REDIS_HOST" "$REDIS_PORT"
+  wait_for_port "MySQL" "$MYSQL_HOST" "$MYSQL_PORT"
+}
+
+generate_user(){
+  airflow create_user -u airflow -e airflow@airflow.com -p airflow -f airflow -l airflow -r Admin
+}
 
 case "$1" in
   webserver)
-    airflow initdb
-    
+    generate_config
     sleep 5
-
-    airflow create_user -u airflow -e airflow@airflow.com -p airflow -f airflow -l airlow -r Admin
-    
-    sleep 10
+    update_config
+    sleep 5
+    generate_rbac
+    sleep 5
+    wait_for_dbs
+    sleep 5
+    airflow initdb
+    sleep 5
+    generate_user
+    sleep 5
     exec airflow webserver
     ;;
   worker|scheduler)
     # To give the webserver time to run initdb.
-    sleep 30
+    sleep 35
     exec airflow "$@"
     ;;
   flower)

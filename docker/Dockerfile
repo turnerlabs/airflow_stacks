@@ -4,7 +4,7 @@
 # BUILD: docker build --rm -t puckel/docker-airflow .
 # SOURCE: https://github.com/puckel/docker-airflow
 
-FROM python:3.6.6-stretch
+FROM ubuntu:16.04
 
 # Never prompts the user for choices on installation/configuration of packages
 ENV DEBIAN_FRONTEND noninteractive
@@ -24,7 +24,10 @@ ENV LC_MESSAGES en_US.UTF-8
 ENV SLUGIFY_USES_TEXT_UNIDECODE yes
 
 RUN set -ex \
-    && buildDeps=' \
+
+    && apt-get update -yqq \
+    && apt-get upgrade -yqq \
+    && apt-get install -yqq --no-install-recommends \
         python3-dev \
         libkrb5-dev \
         libsasl2-dev \
@@ -33,21 +36,15 @@ RUN set -ex \
         libblas-dev \
         liblapack-dev \
         libpq-dev \
-        git \
-    ' \
-    && apt-get update -yqq \
-    && apt-get upgrade -yqq \
-    && apt-get install -yqq --no-install-recommends \
-        $buildDeps \
-        build-essential \
         python3-pip \
+        libmysqlclient-dev \
+        python3 \
+        mysql-client-core-5.7 \
         python3-gdbm \
-        python3-requests \
         redis-tools \
-        openjdk-8-jre \        
-        mysql-client \
-        mysql-server \
-        default-libmysqlclient-dev \
+        openjdk-8-jre \
+        git \
+        build-essential \
         apt-utils \
         curl \
         rsync \
@@ -59,7 +56,8 @@ RUN set -ex \
     && locale-gen \
     && update-locale LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 \
     && useradd -ms /bin/bash -d ${AIRFLOW_HOME} airflow \
-    && pip install -U pip setuptools wheel \
+    && update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.5 1 \
+    && pip3 install -U pip setuptools wheel \
     && pip install Cython \
     && pip install pytz \
     && pip install pyOpenSSL \
@@ -67,9 +65,8 @@ RUN set -ex \
     && pip install pyasn1 \
     && pip install apache-airflow[${AIRFLOW_PACKAGES}]==$AIRFLOW_VERSION \
     && pip install 'celery[redis]>=4.1.1,<4.2.0' \
-    && apt-get purge --auto-remove -yqq $buildDeps \
     && apt-get autoremove -yqq --purge \
-    && apt-get clean \
+    && apt-get autoclean \
     && rm -rf \
         /var/lib/apt/lists/* \
         /tmp/* \
