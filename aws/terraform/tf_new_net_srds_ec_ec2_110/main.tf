@@ -11,6 +11,7 @@ terraform {
 
 # this is for an aws specific provider(not gcp or azure)
 provider "aws" {
+  version = "~> 1.40"
   region  = "${var.region}"
   profile = "${var.profile}"
 }
@@ -654,6 +655,7 @@ data "template_file" "airflow-websched-user-data" {
     airflow_first = "${var.airflow_first}"
     airflow_last = "${var.airflow_last}"
     airflow_role = "${var.airflow_role}"
+    subdomain = "${var.subdomain}"
   }
 }
 
