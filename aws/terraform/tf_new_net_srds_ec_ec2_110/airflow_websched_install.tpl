@@ -38,8 +38,6 @@ echo "############# create common airflow directories complete #############"
 
 echo "############# Initial airflow database initilaization #############"
 
-instance_ip=`curl http://169.254.169.254/latest/meta-data/local-ipv4`
-
 sed -i -e "s/expose_config = False/expose_config = True/g" airflow.cfg
 sed -i -e "s/executor = SequentialExecutor/executor = CeleryExecutor/g" airflow.cfg
 sed -i -e "s/remote_log_conn_id =/remote_log_conn_id = s3_logging_conn/g" airflow.cfg
@@ -49,8 +47,8 @@ sed -i -e "s/filter_by_owner = False/filter_by_owner = True/g" airflow.cfg
 sed -i -e "s/secure_mode = False/secure_mode = True/g" airflow.cfg
 sed -i -e "s/donot_pickle = True/donot_pickle = False/g" airflow.cfg
 sed -i -e "s/enable_xcom_pickling = True/enable_xcom_pickling = False/g" airflow.cfg
-sed -i -e "s/base_url = http:\/\/localhost:8080/base_url = http:\/\/$instance_ip:8080/g" airflow.cfg
-sed -i -e "s/endpoint_url = http:\/\/localhost:8080/endpoint_url = http:\/\/$instance_ip:8080/g" airflow.cfg
+sed -i -e "s/base_url = http:\/\/localhost:8080/base_url = http:\/\/${subdomain}/g" airflow.cfg
+sed -i -e "s/endpoint_url = http:\/\/localhost:8080/endpoint_url = http:\/\/${subdomain}/g" airflow.cfg
 sed -i -e "s/sql_alchemy_conn = sqlite:\/\/\/\/home\/ubuntu\/airflow\/airflow.db/sql_alchemy_conn = mysql:\/\/${db_airflow_username}:${db_airflow_password}@${rds_url}\/${db_airflow_dbname}/g" airflow.cfg
 sed -i -e "s/result_backend = db+mysql:\/\/airflow:airflow@localhost:3306\/airflow/result_backend = redis:\/\/${ec_url}\/0/g" airflow.cfg
 sed -i -e "s/broker_url = sqla+mysql:\/\/airflow:airflow@localhost:3306\/airflow/broker_url = redis:\/\/${ec_url}\/1/g" airflow.cfg
