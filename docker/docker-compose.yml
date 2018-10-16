@@ -1,13 +1,10 @@
 version: '2.1'
 services:
-    rabbitmq:
-        image: 'rabbitmq:3.7.4'
-        environment:
-            - RABBITMQ_DEFAULT_USER=airflow
-            - RABBITMQ_DEFAULT_PASS=airflow
-            - RABBITMQ_DEFAULT_VHOST=airflowhost
+    redis:
+        image: 'redis:4.0.11'
     mysql:
         image: mysql:5.7
+        command: --explicit_defaults_for_timestamp=1
         environment:
             - MYSQL_ROOT_PASSWORD=#AirFlow1
             - MYSQL_USER=airflow
@@ -16,9 +13,9 @@ services:
     webserver:
         image: turnerlabs/docker-airflow:latest
         restart: always
-        depends_on:
+        links:
             - mysql
-            - rabbitmq
+            - redis
         environment:
             - LOAD_EX=n
             - FERNET_KEY=46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqDDho=
@@ -26,12 +23,8 @@ services:
             - MYSQL_USER=airflow
             - MYSQL_PASSWORD=airflow
             - MYSQL_DATABASE=airflow
-            - RABBITMQ_DEFAULT_USER=airflow
-            - RABBITMQ_DEFAULT_PASS=airflow
         volumes:
-            - ./dags:/usr/local/airflow/dags
-            # Uncomment to include custom plugins
-            # - ./plugins:/usr/local/airflow/plugins
+            - ./airflow:/usr/local/airflow/airflow
         ports:
             - "8080:8080"
         command: webserver
@@ -40,55 +33,40 @@ services:
             interval: 30s
             timeout: 30s
             retries: 3
-
     flower:
         image: turnerlabs/docker-airflow:latest
         restart: always
-        depends_on:
-            - rabbitmq
+        links:
+            - redis
         environment:
             - EXECUTOR=Celery
-            - RABBITMQ_DEFAULT_USER=airflow
-            - RABBITMQ_DEFAULT_PASS=airflow
         ports:
             - "5555:5555"
         command: flower
-
     scheduler:
         image: turnerlabs/docker-airflow:latest
         restart: always
-        depends_on:
-            - webserver
+        links:
+            - mysql            
+            - redis
         volumes:
-            - ./dags:/usr/local/airflow/dags
-            # Uncomment to include custom plugins
-            # - ./plugins:/usr/local/airflow/plugins
+            - ./airflow:/usr/local/airflow/airflow
         environment:
             - LOAD_EX=n
             - FERNET_KEY=46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqDDho=
             - EXECUTOR=Celery
             - MYSQL_USER=airflow
             - MYSQL_PASSWORD=airflow
-            - MYSQL_DB=airflow
-            - RABBITMQ_DEFAULT_USER=airflow
-            - RABBITMQ_DEFAULT_PASS=airflow
+            - MYSQL_DATABASE=airflow
         command: scheduler
-
     worker:
         image: turnerlabs/docker-airflow:latest
         restart: always
-        depends_on:
-            - scheduler
+        links:
+            - redis
         volumes:
-            - ./dags:/usr/local/airflow/dags
-            # Uncomment to include custom plugins
-            # - ./plugins:/usr/local/airflow/plugins
+            - ./airflow:/usr/local/airflow/airflow
         environment:
             - FERNET_KEY=46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqDDho=
             - EXECUTOR=Celery
-            - MYSQL_USER=airflow
-            - MYSQL_PASSWORD=airflow
-            - MYSQL_DB=airflow
-            - RABBITMQ_DEFAULT_USER=airflow
-            - RABBITMQ_DEFAULT_PASS=airflow
         command: worker
