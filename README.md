@@ -12,7 +12,7 @@ Here's our current stack:
 
 Airflow with Python 3 or Python 2
 
-Serverless Aurora MySQL
+RDS MySQL
 
 Elasticache
 
