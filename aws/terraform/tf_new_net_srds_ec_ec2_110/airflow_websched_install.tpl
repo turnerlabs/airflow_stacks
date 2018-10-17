@@ -40,7 +40,8 @@ echo "############# Initial airflow database initilaization #############"
 
 sed -i -e "s/expose_config = False/expose_config = True/g" airflow.cfg
 sed -i -e "s/executor = SequentialExecutor/executor = CeleryExecutor/g" airflow.cfg
-sed -i -e "s/remote_log_conn_id =/remote_log_conn_id = s3_logging_conn/g" airflow.cfg
+sed -i -e "s/remote_logging = False/remote_logging = True/g" airflow.cfg
+sed -i -e "s/remote_log_conn_id =/remote_log_conn_id = s3:\/\/${s3_airflow_log_bucket_name}/g" airflow.cfg
 sed -i -e "s/load_examples = True/load_examples = False/g" airflow.cfg
 sed -i -e "s/authenticate = False/authenticate = True/g" airflow.cfg
 sed -i -e "s/filter_by_owner = False/filter_by_owner = True/g" airflow.cfg
@@ -55,6 +56,8 @@ sed -i -e "s/broker_url = sqla+mysql:\/\/airflow:airflow@localhost:3306\/airflow
 sed -i -e "/auth_backend = airflow.api.auth.backend.default/d" airflow.cfg
 sed -i -e "/\[webserver\]/a\\
 auth_backend = airflow.contrib.auth.backends.password_auth" airflow.cfg
+sed -i -e "/\[core\]/a\\
+remote_base_log_folder = s3:\/\/${s3_airflow_log_bucket_name}" airflow.cfg
 sed -i -e "/remote_base_log_folder/d" airflow.cfg
 sed -i -e "s/rbac = False/rbac = True/g" airflow.cfg
 
