@@ -80,7 +80,7 @@ variable "db_airflow_dbname" {
 
 variable "db_engine_version" {
   description = "MYSQL airflow engine version"
-  default     = "5.7"
+  default     = "8.0"
 }
 
 variable "db_instance_class" {
@@ -90,7 +90,7 @@ variable "db_instance_class" {
 
 variable "db_parameter_group_name" {
   description = "MYSQL airflow parameter group"
-  default     = "default.mysql5.7"
+  default     = "default.mysql8.0"
 }
 
 variable "db_charset" {
@@ -150,6 +150,10 @@ variable "airflow_role"  {
 
 variable "s3_airflow_bucket_name"  {
   description = "Airflow bucket for airflow shared directory"
+}
+
+variable "s3_airflow_log_bucket_name"  {
+  description = "Airflow bucket for airflow logs"
 }
 
 variable "s3_airflow_access_log_bucket_name"  {
