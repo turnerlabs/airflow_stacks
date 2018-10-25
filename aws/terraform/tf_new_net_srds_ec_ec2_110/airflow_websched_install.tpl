@@ -38,28 +38,46 @@ echo "############# create common airflow directories complete #############"
 
 echo "############# Initial airflow database initilaization #############"
 
-sed -i -e "s/expose_config = False/expose_config = True/g" airflow.cfg
-sed -i -e "s/executor = SequentialExecutor/executor = CeleryExecutor/g" airflow.cfg
-sed -i -e "s/remote_logging = False/remote_logging = True/g" airflow.cfg
-sed -i -e "s/remote_log_conn_id =/remote_log_conn_id = s3:\/\/${s3_airflow_log_bucket_name}/g" airflow.cfg
-sed -i -e "s/load_examples = True/load_examples = False/g" airflow.cfg
-sed -i -e "s/authenticate = False/authenticate = True/g" airflow.cfg
-sed -i -e "s/filter_by_owner = False/filter_by_owner = True/g" airflow.cfg
-sed -i -e "s/secure_mode = False/secure_mode = True/g" airflow.cfg
-sed -i -e "s/donot_pickle = True/donot_pickle = False/g" airflow.cfg
-sed -i -e "s/enable_xcom_pickling = True/enable_xcom_pickling = False/g" airflow.cfg
-sed -i -e "s/base_url = http:\/\/localhost:8080/base_url = http:\/\/${subdomain}/g" airflow.cfg
-sed -i -e "s/endpoint_url = http:\/\/localhost:8080/endpoint_url = http:\/\/${subdomain}/g" airflow.cfg
-sed -i -e "s/sql_alchemy_conn = sqlite:\/\/\/\/home\/ubuntu\/airflow\/airflow.db/sql_alchemy_conn = mysql:\/\/${db_airflow_username}:${db_airflow_password}@${rds_url}\/${db_airflow_dbname}/g" airflow.cfg
-sed -i -e "s/result_backend = db+mysql:\/\/airflow:airflow@localhost:3306\/airflow/result_backend = redis:\/\/${ec_url}\/0/g" airflow.cfg
-sed -i -e "s/broker_url = sqla+mysql:\/\/airflow:airflow@localhost:3306\/airflow/broker_url = redis:\/\/${ec_url}\/1/g" airflow.cfg
-sed -i -e "/auth_backend = airflow.api.auth.backend.default/d" airflow.cfg
-sed -i -e "/\[webserver\]/a\\
-auth_backend = airflow.contrib.auth.backends.password_auth" airflow.cfg
+echo "#!/bin/bash" >> /home/ubuntu/airflow/connect.sh
+echo $'' >> /home/ubuntu/airflow/connect.sh
+echo "db_port=\"${db_port}\"" >> /home/ubuntu/airflow/connect.sh
+echo "db_region=\"${db_region}\"" >> /home/ubuntu/airflow/connect.sh
+echo "db_airflow_dbname=\"${db_airflow_dbname}\"" >> /home/ubuntu/airflow/connect.sh
+echo "db_airflow_username=\"${db_airflow_username}\"" >> /home/ubuntu/airflow/connect.sh
+echo "rds_url=\"${rds_url}\"" >> /home/ubuntu/airflow/connect.sh
+echo $'' >> /home/ubuntu/airflow/connect.sh
+echo "secret=\`/home/ubuntu/venv/bin/aws secretsmanager get-secret-value --region ${db_region} --secret-id ${airflow_secret}\`" >> /home/ubuntu/airflow/connect.sh
+echo "token=\$(echo \$secret | jq -r .SecretString)" >> /home/ubuntu/airflow/connect.sh
+echo "url=\"mysql://\$db_airflow_username:\$token@\$rds_url/\$db_airflow_dbname"\" >> /home/ubuntu/airflow/connect.sh
+echo $'' >> /home/ubuntu/airflow/connect.sh
+echo "echo \"\$url"\" >> /home/ubuntu/airflow/connect.sh
+
+chmod 700 /home/ubuntu/airflow/connect.sh
+
+echo "############# Generate connect.sh #############"
+
+sed -i -e "s/expose_config = False/expose_config = True/g" /home/ubuntu/airflow/airflow.cfg
+sed -i -e "s/executor = SequentialExecutor/executor = CeleryExecutor/g" /home/ubuntu/airflow/airflow.cfg
+sed -i -e "s/remote_logging = False/remote_logging = True/g" /home/ubuntu/airflow/airflow.cfg
+sed -i -e "s/remote_base_log_folder =/remote_base_log_folder = s3:\/\/${s3_airflow_log_bucket_name}/g" /home/ubuntu/airflow/airflow.cfg
+sed -i -e "s/remote_log_conn_id =/remote_log_conn_id = s3:\/\/${s3_airflow_log_bucket_name}/g" /home/ubuntu/airflow/airflow.cfg
+sed -i -e "s/load_examples = True/load_examples = False/g" /home/ubuntu/airflow/airflow.cfg
+sed -i -e "s/authenticate = False/authenticate = True/g" /home/ubuntu/airflow/airflow.cfg
+sed -i -e "s/filter_by_owner = False/filter_by_owner = True/g" /home/ubuntu/airflow/airflow.cfg
+sed -i -e "s/secure_mode = False/secure_mode = True/g" /home/ubuntu/airflow/airflow.cfg
+sed -i -e "s/donot_pickle = True/donot_pickle = False/g" /home/ubuntu/airflow/airflow.cfg
+sed -i -e "s/enable_xcom_pickling = True/enable_xcom_pickling = False/g" /home/ubuntu/airflow/airflow.cfg
+sed -i -e "s/base_url = http:\/\/localhost:8080/base_url = http:\/\/${subdomain}/g" /home/ubuntu/airflow/airflow.cfg
+sed -i -e "s/endpoint_url = http:\/\/localhost:8080/endpoint_url = http:\/\/${subdomain}/g" /home/ubuntu/airflow/airflow.cfg
+sed -i -e "/sql_alchemy_conn = sqlite:\/\/\/\/home\/ubuntu\/airflow\/airflow.db/d" /home/ubuntu/airflow/airflow.cfg
 sed -i -e "/\[core\]/a\\
-remote_base_log_folder = s3:\/\/${s3_airflow_log_bucket_name}" airflow.cfg
-sed -i -e "/remote_base_log_folder/d" airflow.cfg
-sed -i -e "s/rbac = False/rbac = True/g" airflow.cfg
+sql_alchemy_conn_cmd = /home/ubuntu/airflow/connect.sh" /home/ubuntu/airflow/airflow.cfg
+sed -i -e "s/result_backend = db+mysql:\/\/airflow:airflow@localhost:3306\/airflow/result_backend = redis:\/\/${ec_url}\/0/g" /home/ubuntu/airflow/airflow.cfg
+sed -i -e "s/broker_url = sqla+mysql:\/\/airflow:airflow@localhost:3306\/airflow/broker_url = redis:\/\/${ec_url}\/1/g" /home/ubuntu/airflow/airflow.cfg
+sed -i -e "/auth_backend = airflow.api.auth.backend.default/d" /home/ubuntu/airflow/airflow.cfg
+sed -i -e "/\[webserver\]/a\\
+auth_backend = airflow.contrib.auth.backends.password_auth" /home/ubuntu/airflow/airflow.cfg
+sed -i -e "s/rbac = False/rbac = True/g" /home/ubuntu/airflow/airflow.cfg
 
 /home/ubuntu/venv/bin/airflow -h
 
