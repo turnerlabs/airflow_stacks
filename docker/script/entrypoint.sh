@@ -19,20 +19,6 @@ generate_config() {
   airflow initdb
 }
 
-wait_for_port() {
-  local name="$1" host="$2" port="$3"
-  local j=0
-  while ! nc -z "$host" "$port" >/dev/null 2>&1 < /dev/null; do
-    j=$((j+1))
-    if [ $j -ge $TRY_LOOP ]; then
-      echo >&2 "$(date) - $host:$port still not reachable, giving up"
-      exit 1
-    fi
-    echo "$(date) - waiting for $name... $j/$TRY_LOOP"
-    sleep 5
-  done
-}
-
 update_config() {
   # Install custom python package if requirements.txt is present
   if [ -e "/requirements.txt" ]; then
@@ -66,7 +52,22 @@ auth_backend = airflow.contrib.auth.backends.password_auth" /usr/local/airflow/a
 
 generate_rbac(){
   airflow -h
+  # the rbac code needs the file in /usr/local/airflow not /usr/local/airflow/airflow
   cp /usr/local/airflow/airflow/webserver_config.py /usr/local/airflow/webserver_config.py
+}
+
+wait_for_port() {
+  local name="$1" host="$2" port="$3"
+  local j=0
+  while ! nc -z "$host" "$port" >/dev/null 2>&1 < /dev/null; do
+    j=$((j+1))
+    if [ $j -ge $TRY_LOOP ]; then
+      echo >&2 "$(date) - $host:$port still not reachable, giving up"
+      exit 1
+    fi
+    echo "$(date) - waiting for $name... $j/$TRY_LOOP"
+    sleep 5
+  done
 }
 
 wait_for_dbs(){
@@ -80,22 +81,22 @@ generate_user(){
 
 case "$1" in
   webserver)
-    generate_config
+    generate_config # generate using the default 1.10 version config
     sleep 5
-    update_config
+    update_config  # update the config with the settings I want to change
     sleep 5
-    generate_rbac
+    generate_rbac # generate the webserver_config.py
     sleep 5
-    wait_for_dbs
+    wait_for_dbs # make sure metadata database is running before attempting to initialize
     sleep 5
-    airflow initdb
+    airflow initdb # reinitilize the config with my settings applied
     sleep 5
-    generate_user
+    generate_user # create an rbac user after everything is up and running
     sleep 5
     exec airflow webserver
     ;;
   worker|scheduler)
-    # To give the webserver time to run initdb.
+    # need to give the webserver time to run initdb.
     sleep 35
     exec airflow "$@"
     ;;
