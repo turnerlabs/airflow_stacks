@@ -33,7 +33,7 @@ pip install "awscli"
 pip install "apache-airflow[all]"
 echo "------------------- install airflow complete -------------------"
 
-pip uninstall Flask-AppBuilder
+pip uninstall -y Flask-AppBuilder
 pip install Flask-AppBuilder==1.11.1
 echo "------------------- Bug fix for Flask AppBuilder  -------------------"
 
