@@ -16,6 +16,10 @@ provider "aws" {
   profile = "${var.profile}"
 }
 
+provider "random" {
+  version = "~> 2.0.0"
+}
+
 # VPC 
 
 resource "aws_vpc" "airflow_vpc" {
@@ -41,7 +45,7 @@ resource "aws_subnet" "airflow_subnet_private_1c" {
   depends_on                      = ["aws_vpc.airflow_vpc"]
   vpc_id                          = "${aws_vpc.airflow_vpc.id}"
   cidr_block                      = "10.0.1.0/24"
-  availability_zone               = "us-east-1c"
+  availability_zone               = "${var.availability_zone_1}"
   map_public_ip_on_launch         = false
   assign_ipv6_address_on_creation = false
 
@@ -59,7 +63,7 @@ resource "aws_subnet" "airflow_subnet_private_1d" {
   depends_on                      = ["aws_vpc.airflow_vpc"]
   vpc_id                          = "${aws_vpc.airflow_vpc.id}"
   cidr_block                      = "10.0.2.0/24"
-  availability_zone               = "us-east-1d"
+  availability_zone               = "${var.availability_zone_2}"
   map_public_ip_on_launch         = false
   assign_ipv6_address_on_creation = false
 
@@ -79,7 +83,7 @@ resource "aws_subnet" "airflow_subnet_public_1c" {
   depends_on                      = ["aws_vpc.airflow_vpc"]
   vpc_id                          = "${aws_vpc.airflow_vpc.id}"
   cidr_block                      = "10.0.3.0/24"
-  availability_zone               = "us-east-1c"
+  availability_zone               = "${var.availability_zone_1}"
   map_public_ip_on_launch         = true
   assign_ipv6_address_on_creation = false
 
@@ -97,7 +101,7 @@ resource "aws_subnet" "airflow_subnet_public_1d" {
   depends_on                      = ["aws_vpc.airflow_vpc"]
   vpc_id                          = "${aws_vpc.airflow_vpc.id}"
   cidr_block                      = "10.0.4.0/24"
-  availability_zone               = "us-east-1d"
+  availability_zone               = "${var.availability_zone_2}"
   map_public_ip_on_launch         = true
   assign_ipv6_address_on_creation = false
 
@@ -346,6 +350,20 @@ resource "aws_security_group" "airflow_ec" {
   }
 }
 
+# S3 Airflow log Bucket
+resource "aws_s3_bucket" "s3_airflow_log_bucket" {
+  bucket        = "${var.prefix}${var.s3_airflow_log_bucket_name}"
+  force_destroy = "true"
+
+  tags {
+    application     = "${var.tag_application}"
+    contact-email   = "${var.tag_contact_email}"
+    customer        = "${var.tag_customer}"
+    team            = "${var.tag_team}"
+    environment     = "${var.tag_environment}"
+  }
+}
+
 # S3 Airflow Bucket
 resource "aws_s3_bucket" "s3_airflow_bucket" {
   bucket        = "${var.prefix}${var.s3_airflow_bucket_name}"
@@ -393,99 +411,21 @@ policy = <<EOF
 EOF
 }
 
-# IAM Role
-resource "aws_iam_role" "airflow_s3_role" {
+# Random password and Secrets Manager
 
-  name = "${var.prefix}_s3_role"
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "Service": "ec2.amazonaws.com"
-      },
-      "Effect": "Allow",
-      "Sid": ""
-    }
-  ]
-}
-EOF
+resource "random_string" "airflow_rds_password" {
+  length = 30
+  special = false
 }
 
-# IAM Instance Profile
-resource "aws_iam_instance_profile" "airflow_s3_instance_profile" {
-  depends_on  = ["aws_iam_role.airflow_s3_role", "aws_iam_role_policy.airflow_s3_policy", "aws_iam_role_policy.airflow_logs_policy"]
-  
-  name = "${var.prefix}_s3_instance_profile"
-  role = "${aws_iam_role.airflow_s3_role.name}"
+resource "aws_secretsmanager_secret" "airflow_sm_secret" {
+  name = "airflow_user_pass"
+  recovery_window_in_days = 0 # make this configurable
 }
 
-# IAM S3 Role Policy
-# need to tighten the heck out of the below policy
-resource "aws_iam_role_policy" "airflow_s3_policy" {
-  depends_on  = ["aws_iam_role.airflow_s3_role"]
-
-  name = "${var.prefix}_s3_policy"
-  role = "${aws_iam_role.airflow_s3_role.id}"
-
-  policy = <<EOF
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Action": [
-              "s3:ListBucket"
-            ],
-            "Resource": [
-              "arn:aws:s3:::${var.prefix}${var.s3_airflow_bucket_name}"
-            ]
-        },
-        {
-            "Effect": "Allow",
-            "Action": [
-              "s3:PutObject",
-              "s3:GetObject",
-              "s3:DeleteObject"
-            ],
-            "Resource": [
-              "arn:aws:s3:::${var.prefix}${var.s3_airflow_bucket_name}/*"
-            ]
-        }
-
-    ]
-}
-EOF
-}
-
-# IAM Logs Role Policy
-resource "aws_iam_role_policy" "airflow_logs_policy" {
-  depends_on  = ["aws_iam_role.airflow_s3_role"]
-
-  name = "${var.prefix}_logs_policy"
-  role = "${aws_iam_role.airflow_s3_role.id}"
-
-  policy = <<EOF
-{
-    "Version": "2012-10-17",
-    "Statement": [
-      {
-        "Effect": "Allow",
-        "Action": [
-          "logs:CreateLogGroup",
-          "logs:CreateLogStream",
-          "logs:PutLogEvents",
-          "logs:DescribeLogStreams"
-        ],
-        "Resource": [
-          "arn:aws:logs:*:*:*"
-        ]
-      }
-   ]
-}
-EOF
+resource "aws_secretsmanager_secret_version" "airflow_sm_secret_version" {
+  secret_id     = "${aws_secretsmanager_secret.airflow_sm_secret.id}"
+  secret_string = "${random_string.airflow_rds_password.result}"
 }
 
 # Application Load Balancer
@@ -562,6 +502,7 @@ resource "aws_lb_listener" "airflow_lb_listener" {
 }
 
 # RDS Related Items
+
 resource "aws_db_subnet_group" "airflow_rds_subnet_grp" {
   subnet_ids = ["${aws_subnet.airflow_subnet_private_1c.id}", "${aws_subnet.airflow_subnet_private_1d.id}"]
 
@@ -574,26 +515,31 @@ resource "aws_db_subnet_group" "airflow_rds_subnet_grp" {
     environment     = "${var.tag_environment}"
   }
 }
-resource "aws_rds_cluster" "airflow_rds" {
-  depends_on                      = ["aws_db_subnet_group.airflow_rds_subnet_grp", "aws_security_group.airflow_rds"]
 
-  cluster_identifier              = "${var.prefix}-${var.db_identifier}-cluster"
-  engine_mode                     = "serverless"
-  master_username                 = "${var.db_master_username}"
-  master_password                 = "${var.db_master_password}"
-  vpc_security_group_ids          = ["${aws_security_group.airflow_rds.id}"]
-  db_subnet_group_name            = "${aws_db_subnet_group.airflow_rds_subnet_grp.id}"
-  skip_final_snapshot             = true
-  preferred_backup_window         = "06:00-06:30"
-  backup_retention_period         = 5
-  db_cluster_parameter_group_name = "${var.db_cluster_parameter_group_name}"
-  
-  scaling_configuration {
-    auto_pause               = true
-    max_capacity             = "${var.db_max_capacity}"
-    min_capacity             = "${var.db_min_capacity}"
-    seconds_until_auto_pause = "${var.db_seconds_until_auto_pause}"
-  }
+resource "aws_db_instance" "airflow_rds" {
+  depends_on                            = ["aws_db_subnet_group.airflow_rds_subnet_grp", "aws_security_group.airflow_rds"]
+
+  allocated_storage                     = 20
+  auto_minor_version_upgrade            = true
+  availability_zone                     = "${var.availability_zone_1}"
+  backup_retention_period               = 5
+  backup_window                         = "06:00-06:30"
+  copy_tags_to_snapshot                 = true
+  db_subnet_group_name                  = "${aws_db_subnet_group.airflow_rds_subnet_grp.id}"
+  engine                                = "mysql"
+  engine_version                        = "${var.db_engine_version}"
+  iam_database_authentication_enabled   = false
+  identifier                            = "${var.prefix}-${var.db_identifier}-instance"
+  instance_class                        = "${var.db_instance_class}"
+  parameter_group_name                  = "${var.db_parameter_group_name}"
+  password                              = "${var.db_master_password}"
+  port                                  = "${var.db_port}"
+  publicly_accessible                   = false
+  skip_final_snapshot                   = true # make this configurable
+  storage_type                          = "gp2"
+  storage_encrypted                     = true
+  username                              = "${var.db_master_username}"
+  vpc_security_group_ids                = ["${aws_security_group.airflow_rds.id}"]
 
   tags {
     Name            = "${var.prefix}-${var.db_identifier}"
@@ -605,7 +551,6 @@ resource "aws_rds_cluster" "airflow_rds" {
   }
 }
 
-
 # Elasticache Related Items
 resource "aws_elasticache_subnet_group" "airflow_ec_subnet_grp" {
   name       = "${var.prefix}-ec-subnet"
@@ -613,16 +558,19 @@ resource "aws_elasticache_subnet_group" "airflow_ec_subnet_grp" {
 }
 
 resource "aws_elasticache_cluster" "airflow_elasticache" {
-  cluster_id            = "${var.prefix}-cluster"
-  engine                = "redis"
-  node_type             = "${var.ec_node_type}"
-  num_cache_nodes       = "${var.ec_num_cache_nodes}"
-  engine_version        = "${var.ec_engine_version}"
-  parameter_group_name  = "${var.ec_parameter_group_name}"
-  port                  = "${var.ec_port}"
-  security_group_ids    = ["${aws_security_group.airflow_ec.id}"]
-  subnet_group_name     = "${aws_elasticache_subnet_group.airflow_ec_subnet_grp.id}"
-  
+  availability_zone         = "${var.availability_zone_1}"
+  cluster_id                = "${var.prefix}-cluster"
+  engine                    = "redis"
+  node_type                 = "${var.ec_node_type}"
+  num_cache_nodes           = "${var.ec_num_cache_nodes}"
+  engine_version            = "${var.ec_engine_version}"
+  parameter_group_name      = "${var.ec_parameter_group_name}"
+  port                      = "${var.ec_port}"
+  security_group_ids        = ["${aws_security_group.airflow_ec.id}"]
+  subnet_group_name         = "${aws_elasticache_subnet_group.airflow_ec_subnet_grp.id}"
+  # snapshot_retention_limit  = 5
+  # snapshot_window           = "06:00-06:30"
+
   tags {
     Name            = "${var.prefix}_cluster"
     application     = "${var.tag_application}"
@@ -633,22 +581,149 @@ resource "aws_elasticache_cluster" "airflow_elasticache" {
   }
 }
 
+# IAM Role
+resource "aws_iam_role" "airflow_instance" {
 
-# Airflow Weserver / Scheduler Instance Related Items
+  name = "${var.prefix}_instance"
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "ec2.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOF
+}
+
+# IAM S3 Role Policy
+
+resource "aws_iam_role_policy" "airflow_s3" {
+  depends_on  = ["aws_iam_role.airflow_instance"]
+
+  name = "${var.prefix}_s3"
+  role = "${aws_iam_role.airflow_instance.id}"
+
+  policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+              "s3:ListBucket"
+            ],
+            "Resource": [
+              "${aws_s3_bucket.s3_airflow_bucket.arn}",
+              "${aws_s3_bucket.s3_airflow_access_log_bucket.arn}"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+              "s3:PutObject",
+              "s3:GetObject",
+              "s3:DeleteObject"
+            ],
+            "Resource": [
+              "${aws_s3_bucket.s3_airflow_bucket.arn}/*",
+              "${aws_s3_bucket.s3_airflow_access_log_bucket.arn}/*"
+            ]
+        }
+
+    ]
+}
+EOF
+}
+
+# IAM Logs Role Policy
+resource "aws_iam_role_policy" "airflow_logs" {
+  depends_on  = ["aws_iam_role.airflow_instance"]
+
+  name = "${var.prefix}_logs"
+  role = "${aws_iam_role.airflow_instance.id}"
+
+  policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Effect": "Allow",
+        "Action": [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents",
+          "logs:DescribeLogStreams"
+        ],
+        "Resource": [
+          "arn:aws:logs:*:*:*"
+        ]
+      }
+   ]
+}
+EOF
+}
+
+# IAM Secrets Manager Role Policy
+resource "aws_iam_role_policy" "airflow_secrets" {
+  depends_on  = ["aws_iam_role.airflow_instance"]
+
+  name = "${var.prefix}_secrets"
+  role = "${aws_iam_role.airflow_instance.id}"
+
+  policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Effect": "Allow",
+        "Action": [
+          "secretsmanager:GetSecretValue"
+        ],
+        "Resource": [
+          "${aws_secretsmanager_secret.airflow_sm_secret.id}"
+        ]
+      }
+   ]
+}
+EOF
+}
+
+
+# IAM Instance Profile
+resource "aws_iam_instance_profile" "airflow_s3_instance_profile" {
+  depends_on  = ["aws_iam_role.airflow_instance", "aws_iam_role_policy.airflow_s3", "aws_iam_role_policy.airflow_logs"]
+  
+  name = "${var.prefix}_instance_profile"
+  role = "${aws_iam_role.airflow_instance.name}"
+}
+
+# Airflow Webserver / Scheduler Instance Related Items
 # Using an lc / asg to keep webserver and scheduler up and running but only 1 instance should ever be running.
 data "template_file" "airflow-websched-user-data" {
   template = "${file("airflow_websched_install.tpl")}"
   vars {
     ec_url = "${aws_elasticache_cluster.airflow_elasticache.cache_nodes.0.address}"
-    rds_url = "${aws_rds_cluster.airflow_rds.endpoint}"
+    rds_url = "${aws_db_instance.airflow_rds.address}"
+    db_region = "${var.region}"
     db_airflow_username = "${var.db_airflow_username}"
-    db_airflow_password = "${var.db_airflow_password}"
+    db_airflow_password = "${random_string.airflow_rds_password.result}"
     db_master_username = "${var.db_master_username}"
     db_master_password = "${var.db_master_password}"
     db_airflow_dbname = "${var.db_airflow_dbname}"
+    db_resource_id = "${aws_db_instance.airflow_rds.resource_id}"
     db_charset = "${var.db_charset}"
+    db_port = "${var.db_port}"
+    airflow_secret = "${aws_secretsmanager_secret.airflow_sm_secret.id}"
     s3_airflow_bucket_name = "${aws_s3_bucket.s3_airflow_bucket.id}"
-    role_name = "${aws_iam_role.airflow_s3_role.name}"
+    s3_airflow_log_bucket_name = "${aws_s3_bucket.s3_airflow_log_bucket.id}"
+    role_name = "${aws_iam_role.airflow_instance.name}"
     airflow_username = "${var.airflow_username}"
     airflow_emailaddress = "${var.airflow_emailaddress}"
     airflow_password = "${var.airflow_password}"
@@ -660,7 +735,7 @@ data "template_file" "airflow-websched-user-data" {
 }
 
 resource "aws_launch_configuration" "lc_websched_airflow" {
-  depends_on                  = ["aws_elasticache_cluster.airflow_elasticache", "aws_rds_cluster.airflow_rds", "aws_security_group.airflow_instance", "aws_iam_instance_profile.airflow_s3_instance_profile","aws_s3_bucket.s3_airflow_bucket"]
+  depends_on                  = ["aws_elasticache_cluster.airflow_elasticache", "aws_db_instance.airflow_rds", "aws_security_group.airflow_instance", "aws_iam_instance_profile.airflow_s3_instance_profile","aws_s3_bucket.s3_airflow_bucket"]
 
   name                        = "${var.prefix}_lc_websched_airflow"
   image_id                    = "${var.airflow_websched_ami}"
@@ -669,6 +744,12 @@ resource "aws_launch_configuration" "lc_websched_airflow" {
   security_groups             = ["${aws_security_group.airflow_instance.id}"]
   user_data                   = "${data.template_file.airflow-websched-user-data.rendered}"
   iam_instance_profile        = "${aws_iam_instance_profile.airflow_s3_instance_profile.id}"
+  
+  root_block_device {
+    volume_type                 = "gp2"
+    volume_size                 = 80
+    delete_on_termination       = true
+  }
 }
 
 resource "aws_autoscaling_group" "asg_websched_airflow" {
@@ -722,17 +803,61 @@ resource "aws_autoscaling_group" "asg_websched_airflow" {
   }
 }
 
+# WAF
+
+resource "aws_wafregional_ipset" "airflow_waf_ipset" {
+  name = "${var.prefix}_airflow_waf_ipset"
+
+  ip_set_descriptor {
+    type  = "IPV4"
+    value = "${var.ingress_ip}"
+  }
+}
+
+resource "aws_wafregional_rule" "airflow_waf_rule" {
+  name        = "${var.prefix}_waf_rule"
+  metric_name = "${var.prefix}wafrule"
+
+  predicate {
+    data_id = "${aws_wafregional_ipset.airflow_waf_ipset.id}"
+    negated = false
+    type    = "IPMatch"
+  }
+}
+
+resource "aws_wafregional_web_acl" "airflow_waf_web_acl" {
+  name = "${var.prefix}_airflow_waf_web_acl"
+  metric_name = "${var.prefix}airflowwafwebacl"
+  default_action {
+    type = "BLOCK"
+  }
+  rule {
+    action {
+      type = "ALLOW"
+    }
+    priority = 1
+    rule_id = "${aws_wafregional_rule.airflow_waf_rule.id}"
+  }
+}
+
+resource "aws_wafregional_web_acl_association" "airflow_waf_web_acl_assoc" {
+  depends_on    = ["aws_lb.airflow_lb"]
+  
+  resource_arn  = "${aws_lb.airflow_lb.arn}"
+  web_acl_id    = "${aws_wafregional_web_acl.airflow_waf_web_acl.id}"
+}
+
 # Airflow Worker Instance Related Items
 data "template_file" "airflow-worker-user-data" {
   template = "${file("airflow_worker_install.tpl")}"
   vars {
     s3_airflow_bucket_name = "${aws_s3_bucket.s3_airflow_bucket.id}"
-    role_name = "${aws_iam_role.airflow_s3_role.name}"
+    role_name = "${aws_iam_role.airflow_instance.name}"
   }
 }
 
 resource "aws_launch_configuration" "lc_worker_airflow" {
-  depends_on                  = ["aws_autoscaling_group.asg_websched_airflow", "aws_elasticache_cluster.airflow_elasticache", "aws_rds_cluster.airflow_rds", "aws_security_group.airflow_instance", "aws_iam_instance_profile.airflow_s3_instance_profile","aws_s3_bucket.s3_airflow_bucket"]
+  depends_on                  = ["aws_autoscaling_group.asg_websched_airflow", "aws_elasticache_cluster.airflow_elasticache", "aws_db_instance.airflow_rds", "aws_security_group.airflow_instance", "aws_iam_instance_profile.airflow_s3_instance_profile","aws_s3_bucket.s3_airflow_bucket"]
 
   name                        = "${var.prefix}_lc_worker_airflow"
   image_id                    = "${var.airflow_worker_ami}"
@@ -741,6 +866,12 @@ resource "aws_launch_configuration" "lc_worker_airflow" {
   security_groups             = ["${aws_security_group.airflow_instance.id}"]
   user_data                   = "${data.template_file.airflow-worker-user-data.rendered}"
   iam_instance_profile        = "${aws_iam_instance_profile.airflow_s3_instance_profile.id}"
+  
+  root_block_device {
+    volume_type                 = "gp2"
+    volume_size                 = 80
+    delete_on_termination       = true
+  }
 }
 
 resource "aws_autoscaling_group" "asg_worker_airflow" {

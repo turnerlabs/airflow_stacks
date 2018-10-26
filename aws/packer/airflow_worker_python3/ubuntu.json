@@ -32,32 +32,32 @@
     }],
     "provisioners": [{
             "type": "file",
-            "source": "../airflow_websched_python2/config/airflow.conf",
+            "source": "../airflow_websched_python3/config/airflow.conf",
             "destination": "/home/ubuntu/airflow.conf"
         },
         {
             "type": "file",
-            "source": "../airflow_websched_python2/config/airflow.sysconfig",
+            "source": "../airflow_websched_python3/config/airflow.sysconfig",
             "destination": "/home/ubuntu/airflow.sysconfig"
         },
         {
             "type": "file",
-            "source": "../airflow_websched_python2/config/logrotate.conf",
+            "source": "../airflow_websched_python3/config/logrotate.conf",
             "destination": "/home/ubuntu/logrotate.conf"
         },
         {
             "type": "file",
-            "source": "../airflow_websched_python2/config/awslogs.conf",
+            "source": "../airflow_websched_python3/config/awslogs.conf",
             "destination": "/home/ubuntu/awslogs.conf"
         },
         {
             "type": "file",
-            "source": "../airflow_websched_python2/cron/crontab",
+            "source": "../airflow_websched_python3/cron/crontab",
             "destination": "/home/ubuntu/crontab"
         },
         {
             "type": "file",
-            "source": "../airflow_websched_python2/systemd/airflow-worker.service",
+            "source": "../airflow_websched_python3/systemd/airflow-worker.service",
             "destination": "/home/ubuntu/airflow-worker.service"
         },
         {

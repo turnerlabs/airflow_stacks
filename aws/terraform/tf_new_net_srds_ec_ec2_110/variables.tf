@@ -18,18 +18,22 @@ variable "prefix" {
   description = "Name to prefix all the items with"
 }
 
-variable "db_identifier" {
-  description = "Database identifier"
-  default     = "airflow_rds"
+variable "availability_zone_1" {
+  description = "az 1 of 2 azs"
+  default     = "us-east-1c"
 }
 
+variable "availability_zone_2" {
+  description = "az 2 of 2 azs"
+  default     = "us-east-1d"
+}
 variable "airflow_websched_ami" {
   description = "Airflow Webserver / Scheduler AMI created by packer"
 }
 
 variable "airflow_websched_instance_class" {
   description = "Airflow websched instance size"
-  default     = "t3.medium"
+  default     = "t3.small"
 }
 
 variable "airflow_worker_ami" {
@@ -38,11 +42,21 @@ variable "airflow_worker_ami" {
 
 variable "airflow_worker_instance_class" {
   description = "Airflow worker instance size"
-  default     = "c4.large"
+  default     = "t3.medium"
 }
 
 variable "airflow_keypair_name" {
   description = "AWS keypair to use on the airflow ec2 instance"
+}
+
+variable "db_identifier" {
+  description = "Database identifier"
+  default     = "airflow_rds"
+}
+
+variable "db_port" {
+  description = "Database port"
+  default     = "3306"
 }
 
 variable "db_master_username" {
@@ -64,9 +78,19 @@ variable "db_airflow_dbname" {
   default     = "airflow"
 }
 
-variable "db_cluster_parameter_group_name" {
+variable "db_engine_version" {
+  description = "MYSQL airflow engine version"
+  default     = "8.0"
+}
+
+variable "db_instance_class" {
+  description = "MYSQL airflow instance class"
+  default     = "db.t2.small"
+}
+
+variable "db_parameter_group_name" {
   description = "MYSQL airflow parameter group"
-  default     = "default.aurora5.6"
+  default     = "default.mysql8.0"
 }
 
 variable "db_charset" {
@@ -74,24 +98,9 @@ variable "db_charset" {
   default     = "latin1"
 }
 
-variable "db_max_capacity" {
-  description = "Max capacity to allow aurora to have"
-  default = 256
-}
-
-variable "db_min_capacity" {
-  description = "Min capacity to allow aurora to have"
-  default = 2
-}
-
-variable "db_seconds_until_auto_pause" {
-  description = "Time without any activity before pausing.  Default is 15 minutews"
-  default = 900
-}
-
 variable "ec_node_type" {
   description = "Node type to use"
-  default = "cache.m3.medium"
+  default = "cache.t2.small"
 }
 
 variable "ec_engine_version" {
@@ -141,6 +150,10 @@ variable "airflow_role"  {
 
 variable "s3_airflow_bucket_name"  {
   description = "Airflow bucket for airflow shared directory"
+}
+
+variable "s3_airflow_log_bucket_name"  {
+  description = "Airflow bucket for airflow logs"
 }
 
 variable "s3_airflow_access_log_bucket_name"  {
