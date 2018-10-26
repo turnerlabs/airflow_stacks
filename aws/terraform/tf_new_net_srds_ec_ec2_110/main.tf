@@ -17,8 +17,8 @@ provider "aws" {
 }
 
 provider "random" {
+  version = "~> 2.0.0"
 }
-
 
 # VPC 
 
@@ -420,7 +420,7 @@ resource "random_string" "airflow_rds_password" {
 
 resource "aws_secretsmanager_secret" "airflow_sm_secret" {
   name = "airflow_user_pass"
-  recovery_window_in_days = 0
+  recovery_window_in_days = 0 # make this configurable
 }
 
 resource "aws_secretsmanager_secret_version" "airflow_sm_secret_version" {
@@ -535,7 +535,7 @@ resource "aws_db_instance" "airflow_rds" {
   password                              = "${var.db_master_password}"
   port                                  = "${var.db_port}"
   publicly_accessible                   = false
-  skip_final_snapshot                   = true
+  skip_final_snapshot                   = true # make this configurable
   storage_type                          = "gp2"
   storage_encrypted                     = true
   username                              = "${var.db_master_username}"
@@ -801,6 +801,50 @@ resource "aws_autoscaling_group" "asg_websched_airflow" {
     value               = "${var.tag_environment}"
     propagate_at_launch = true
   }
+}
+
+# WAF
+
+resource "aws_wafregional_ipset" "airflow_waf_ipset" {
+  name = "${var.prefix}_airflow_waf_ipset"
+
+  ip_set_descriptor {
+    type  = "IPV4"
+    value = "${var.ingress_ip}"
+  }
+}
+
+resource "aws_wafregional_rule" "airflow_waf_rule" {
+  name        = "${var.prefix}_waf_rule"
+  metric_name = "${var.prefix}wafrule"
+
+  predicate {
+    data_id = "${aws_wafregional_ipset.airflow_waf_ipset.id}"
+    negated = false
+    type    = "IPMatch"
+  }
+}
+
+resource "aws_wafregional_web_acl" "airflow_waf_web_acl" {
+  name = "${var.prefix}_airflow_waf_web_acl"
+  metric_name = "${var.prefix}airflowwafwebacl"
+  default_action {
+    type = "BLOCK"
+  }
+  rule {
+    action {
+      type = "ALLOW"
+    }
+    priority = 1
+    rule_id = "${aws_wafregional_rule.airflow_waf_rule.id}"
+  }
+}
+
+resource "aws_wafregional_web_acl_association" "airflow_waf_web_acl_assoc" {
+  depends_on    = ["aws_lb.airflow_lb"]
+  
+  resource_arn  = "${aws_lb.airflow_lb.arn}"
+  web_acl_id    = "${aws_wafregional_web_acl.airflow_waf_web_acl.id}"
 }
 
 # Airflow Worker Instance Related Items
