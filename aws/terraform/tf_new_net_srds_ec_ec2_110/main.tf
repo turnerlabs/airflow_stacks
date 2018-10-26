@@ -3,7 +3,7 @@ terraform {
   required_version = ">=0.11.8"
   
   backend "s3" {
-    bucket = "" # the terraform state bucket has to be hand entered unfortunately
+    bucket = "tf-state-caprod-airflow110" # the terraform state bucket has to be hand entered unfortunately
     key    = "tf_new_net_srds_ec_ec2_110/terraform.tfstate"
     region = "us-east-1"
   }

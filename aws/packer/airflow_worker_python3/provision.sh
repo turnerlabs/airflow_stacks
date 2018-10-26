@@ -33,6 +33,10 @@ pip install "awscli"
 pip install "apache-airflow[all]"
 echo "------------------- install airflow complete -------------------"
 
+pip uninstall Flask-AppBuilder
+pip install Flask-AppBuilder==1.11.1
+echo "------------------- Bug fix for Flask AppBuilder  -------------------"
+
 curl https://s3.amazonaws.com/aws-cloudwatch/downloads/latest/awslogs-agent-setup.py -O
 echo "------------------- download aws logs -------------------"
 
