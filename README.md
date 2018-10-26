@@ -4,32 +4,20 @@ This repo is an attempt to put all the Airflow operationalized knowledge at Turn
 
 Before trying to run this please take a look at the documentation here:  http://airflow.incubator.apache.org/index.html
 
-Currently there are 2 AMI's(AWS) and 2 Cloud Images(GCP) that need to be created via Packer initially(Airflow(either Python 2.7 or Python 3.6)) before you can create the Airflow stack via Terraform.  
+Currently there are 2 AMI's(AWS) and 2 Cloud Images(GCP) that need to be created via Packer initially(Airflow(Python 3.x) before you can create the Airflow stack via Terraform.  
 
 Here's our current stack:
 
 **AWS(most work has been done here)**
 
-Airflow with Python 3 or Python 2
-
-RDS MySQL
-
-Elasticache
+![AWS](images/Airflow_10_26_18.jpg)
 
 **GCP(work in progress with less work since Composer exists there)**
 
-Airflow with Python 3
-
-**aws** -  directory has an Airflow Terraform / Packer stack based around Airflow, Elasticache, Serverless Aurora.
+DIAGRAM TO COME
 
 **Docker(work in progress)**
 
-- all containers
-
-Airflow with Python 3.
-
-MySQL
-
-RabbitMQ
+DIAGRAM TO COME
 
 Please feel free to add any issues to github.
