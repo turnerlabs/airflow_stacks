@@ -10,18 +10,10 @@ Here's the order of commands to get this up and running:
 
 `docker build --rm -t turnerlabs/docker-airflow .`
 
---- Docker Compose up either the version running just the web server and mysql
+--- Docker Compose up using the web server, scheduler, worker, flower, redis, and mysql
 
-`docker-compose --verbose -f docker-compose-LocalExecutor.yml up -d`
+`docker-compose --verbose -f docker-compose.yml up -d`
 
---- or the one using the web server, scheduler, worker, flower, and mysql
+--- To shut this down, use:
 
-`docker-compose --verbose -f docker-compose-CeleryExecutor.yml up -d`
-
---- To shut this down, try either:
-
-`docker-compose --verbose -f docker-compose-LocalExecutor.yml down`
-
---- Or
-
-`docker-compose --verbose -f docker-compose-CeleryExecutor.yml down`
+`docker-compose --verbose -f docker-compose.yml down`

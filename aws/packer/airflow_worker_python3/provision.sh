@@ -8,13 +8,14 @@ echo "------------------- apt update complete -------------------"
 sudo apt-get -y install unattended-upgrades
 echo "------------------- apt upgrade complete -------------------"
 
-sudo apt-get -y install virtualenv python3-pip libmysqlclient-dev python3-dev python3 libkrb5-dev libsasl2-dev mysql-client-core-5.7 python3-gdbm s3fs redis-tools openjdk-8-jre
+sudo apt-get -y install jq virtualenv python3-pip libmysqlclient-dev python3-dev python3 libkrb5-dev libsasl2-dev mysql-client-core-5.7 python3-gdbm s3fs redis-tools openjdk-8-jre
 echo "------------------- airflow aptitude dependencies complete -------------------"
 
 sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.5 1
 
 echo "export AIRFLOW_HOME=/home/ubuntu/airflow" >> /home/ubuntu/.bash_profile
-echo "------------------- append AIRFLOW_HOME to bash profile complete -------------------"
+
+echo "------------------- append environment variables to bash profile complete -------------------"
 
 export AIRFLOW_HOME=/home/ubuntu/airflow
 export SLUGIFY_USES_TEXT_UNIDECODE=yes
@@ -28,8 +29,13 @@ echo "------------------- virtual environment creation complete ----------------
 source ~/venv/bin/activate
 echo "------------------- activate virtual environment complete -------------------"
 
+pip install "awscli"
 pip install "apache-airflow[all]"
 echo "------------------- install airflow complete -------------------"
+
+pip uninstall -y Flask-AppBuilder
+pip install Flask-AppBuilder==1.11.1
+echo "------------------- Bug fix for Flask AppBuilder  -------------------"
 
 curl https://s3.amazonaws.com/aws-cloudwatch/downloads/latest/awslogs-agent-setup.py -O
 echo "------------------- download aws logs -------------------"
