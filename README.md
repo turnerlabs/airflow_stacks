@@ -10,7 +10,7 @@ Here's our current stacks:
 
 **AWS(most work has been done here)**
 
-![AWS](images/Airflow_10_26_18.jpg)
+![AWS](images/airflow.jpg)
 
 **GCP(work in progress with less work since Composer exists there)**
 
