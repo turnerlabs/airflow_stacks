@@ -8,7 +8,7 @@ echo "------------------- apt update complete -------------------"
 sudo apt-get -y install unattended-upgrades
 echo "------------------- apt upgrade complete -------------------"
 
-sudo apt-get -y install jq virtualenv python3-pip libmysqlclient-dev python3-dev python3 libkrb5-dev libsasl2-dev mysql-client-core-5.7 python3-gdbm s3fs redis-tools openjdk-8-jre
+sudo apt-get -y install chrony jq virtualenv python3-pip libmysqlclient-dev python3-dev python3 libkrb5-dev libsasl2-dev mysql-client-core-5.7 python3-gdbm s3fs redis-tools openjdk-8-jre
 echo "------------------- airflow aptitude dependencies complete -------------------"
 
 sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.5 1
@@ -36,6 +36,12 @@ echo "------------------- install airflow complete -------------------"
 pip uninstall -y Flask-AppBuilder
 pip install Flask-AppBuilder==1.11.1
 echo "------------------- Bug fix for Flask AppBuilder  -------------------"
+
+sudo sed -i '1 i\server 169.254.169.123 prefer iburst'  /etc/chrony/chrony.conf
+echo "------------------- add ip for aws time services -------------------"
+
+sudo /etc/init.d/chrony restart
+echo "------------------- start chrony -------------------"
 
 curl https://s3.amazonaws.com/aws-cloudwatch/downloads/latest/awslogs-agent-setup.py -O
 echo "------------------- download aws logs -------------------"
