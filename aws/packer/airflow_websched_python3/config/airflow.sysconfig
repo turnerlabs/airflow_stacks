@@ -15,4 +15,5 @@
 # configuration of the systemd unit files.
 #
 AIRFLOW_HOME=/home/ubuntu/airflow
+FORWARDED_ALLOW_IPS=*
 PATH=/home/ubuntu/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
