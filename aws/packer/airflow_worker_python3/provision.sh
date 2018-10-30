@@ -55,6 +55,17 @@ echo "------------------- start of awslogs complete -------------------"
 sudo systemctl enable awslogs
 echo "------------------- enable autostart of awslogs complete -------------------"
 
+wget https://s3.amazonaws.com/turner-iso-artifacts/AlertLogicAgents/al-agent_LATEST_amd64.deb -O /home/ubuntu/al-agent_LATEST_amd64.deb
+echo "------------------- download threat manager -------------------"
+
+sudo dpkg -i /home/ubuntu/al-agent_LATEST_amd64.deb
+echo "------------------- install threat manager -------------------"
+
+sudo systemctl enable al-agent.service
+
+rm /home/ubuntu/al-agent_LATEST_amd64.deb
+echo "------------------- enable autostart of threat manager and remove deb-------------------"
+
 crontab -u ubuntu /home/ubuntu/crontab
 echo "------------------- enable logs cleanup complete -------------------"
 
