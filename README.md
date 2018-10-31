@@ -23,3 +23,7 @@ DIAGRAM TO COME
 Please look over the issues and variable defintions before creating these stacks.  I default many of the settings for cost and to expedite creating and tearing down stacks so if you don't want your workers running on t2.micro's you would be advised to take a look at the variables.tf file in each terraform stack directory.
 
 Please feel free to add any issues as well.  I want to make this a first class stack for each environment.
+
+**Future Design Thoughts**
+
+- The future of this compute stack is Kubernetes.  In AWS and GCP, we may iterate through the webserver / scheduler being in fargate or serverless containers and the workers still on instances but my future design thoughts will revolve around this post on the kubernets blog(https://kubernetes.io/blog/2018/06/28/airflow-on-kubernetes-part-1-a-different-kind-of-operator/)
