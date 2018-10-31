@@ -23,11 +23,11 @@ Custom ones:
 
 *** Please note that this airflow AMI is created with the following features in mind although all these subpackages are installed:
 - Celery as the worker task executor
-- RabbitMQ is the queue used for Celery
-- RDS MySQL is the database used for both airflow and celery.
-- Snowflake
-- All airflow specific logs(webserver, scheduler, worker) will go to cloudwatch logs
-- Airflow logs are rotated out every night using logrotate since they get very large quickly.
+- Elasticache is the queue used for Celery
+- RDS MySQL is the database used for both airflow
+- Airflow logs are rotated out every night using logrotate since they get very large quickly
+- Chrony to keep time up to date
+- Airflow services using systemd
 
 Here's the command line needed to build the AMI.
 
