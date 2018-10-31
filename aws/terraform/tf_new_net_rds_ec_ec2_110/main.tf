@@ -4,7 +4,7 @@ terraform {
   
   backend "s3" {
     bucket = "" # the terraform state bucket has to be hand entered unfortunately
-    key    = "tf_new_net_srds_ec_ec2_110/terraform.tfstate"
+    key    = "tf_new_net_rds_ec_ec2_110/terraform.tfstate"
     region = "us-east-1"
   }
 }
@@ -453,7 +453,7 @@ resource "aws_lb_target_group" "airflow_lb_tg" {
 }
 
 resource "aws_lb" "airflow_lb" {
-  # depends_on         = ["aws_security_group.airflow_lb","aws_s3_bucket.s3_airflow_access_log_bucket"]
+  depends_on         = ["aws_security_group.airflow_lb","aws_s3_bucket.s3_airflow_access_log_bucket"]
 
   name               = "${var.prefix}-alb"
   internal           = false
@@ -505,11 +505,15 @@ resource "aws_route53_record" "airflow_r53_cert_record" {
 }
 
 resource "aws_acm_certificate_validation" "cert" {
+  depends_on              = ["aws_acm_certificate.airflow_acm_cert", "aws_route53_record.airflow_r53_cert_record"]
+
   certificate_arn         = "${aws_acm_certificate.airflow_acm_cert.arn}"
   validation_record_fqdns = ["${aws_route53_record.airflow_r53_cert_record.fqdn}"]
 }
 
 resource "aws_lb_listener" "airflow_lb_listener" {
+  depends_on              = ["aws_lb.airflow_lb","aws_acm_certificate_validation.cert","aws_lb_target_group.airflow_lb_tg"]
+
   load_balancer_arn = "${aws_lb.airflow_lb.arn}"
   port              = "443"
   protocol          = "HTTPS"
@@ -556,7 +560,7 @@ resource "aws_db_instance" "airflow_rds" {
   password                              = "${var.db_master_password}"
   port                                  = "${var.db_port}"
   publicly_accessible                   = false
-  skip_final_snapshot                   = true # make this configurable
+  skip_final_snapshot                   = "${var.db_skip_final_snapshot}"
   storage_type                          = "gp2"
   storage_encrypted                     = true
   username                              = "${var.db_master_username}"
@@ -589,8 +593,6 @@ resource "aws_elasticache_cluster" "airflow_elasticache" {
   port                      = "${var.ec_port}"
   security_group_ids        = ["${aws_security_group.airflow_ec.id}"]
   subnet_group_name         = "${aws_elasticache_subnet_group.airflow_ec_subnet_grp.id}"
-  # snapshot_retention_limit  = 5
-  # snapshot_window           = "06:00-06:30"
 
   tags {
     Name            = "${var.prefix}_cluster"

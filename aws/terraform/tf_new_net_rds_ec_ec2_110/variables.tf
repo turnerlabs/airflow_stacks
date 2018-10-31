@@ -71,8 +71,6 @@ variable "db_airflow_username" {
   default     = "airflow"
 }
 
-variable "db_airflow_password" {}
-
 variable "db_airflow_dbname" {
   description = "MYSQL airflow database name"
   default     = "airflow"
@@ -96,6 +94,11 @@ variable "db_parameter_group_name" {
 variable "db_charset" {
   description = "MYSQL airflow database character set"
   default     = "latin1"
+}
+
+variable "db_skip_final_snapshot"{
+  description = "MYSQL airflow database character set"
+  default     = "true"
 }
 
 variable "ec_node_type" {
@@ -183,4 +186,9 @@ variable "subdomain" {
 variable "alb_accesslog_account" {
   description="Look here for more info: https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-access-logs.html#access-logging-bucket-permissions"
   default="127311923021"
+}
+
+variable "secret_recovery_window_in_days" {
+  description="How many days to keep a secret before deleting it.  0 is immediately"
+  default="0"
 }
