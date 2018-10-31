@@ -944,22 +944,25 @@ resource "aws_autoscaling_group" "asg_worker_airflow" {
   }
 }
 
-resource "aws_autoscaling_policy" "airflow_worker_as_policy" {
-  name                      = "${var.prefix}_airflow_worker_as_policy"
-  estimated_instance_warmup = 60
+resource "aws_autoscaling_policy" "airflow_worker_scale_up_policy" {
+  depends_on                = ["aws_autoscaling_group.asg_worker_airflow"]
+
+  name                      = "${var.prefix}_airflow_worker_scale_up_policy"
   scaling_adjustment        = 1
   adjustment_type           = "ChangeInCapacity"
-  cooldown                  = 180
+  cooldown                  = 120
   autoscaling_group_name    = "${aws_autoscaling_group.asg_worker_airflow.name}"
 }
 
-resource "aws_cloudwatch_metric_alarm" "airflow_worker_cw_alarm" {
-  alarm_name          = "${var.prefix}_airflow_worker_cw_alarm"
+resource "aws_cloudwatch_metric_alarm" "airflow_worker_cw_add_alarm" {
+  depends_on          = ["aws_autoscaling_policy.airflow_worker_scale_up_policy"]
+
+  alarm_name          = "${var.prefix}_airflow_worker_cw_add_alarm"
   comparison_operator = "GreaterThanOrEqualToThreshold"
-  evaluation_periods  = "2"
+  evaluation_periods  = "3"
   metric_name         = "CPUUtilization"
   namespace           = "AWS/EC2"
-  period              = "120"
+  period              = "60"
   statistic           = "Average"
   threshold           = "80"
 
@@ -968,5 +971,35 @@ resource "aws_cloudwatch_metric_alarm" "airflow_worker_cw_alarm" {
   }
 
   alarm_description = "This metric monitors ec2 cpu utilization"
-  alarm_actions     = ["${aws_autoscaling_policy.airflow_worker_as_policy.arn}"]
+  alarm_actions     = ["${aws_autoscaling_policy.airflow_worker_scale_up_policy.arn}"]
+}
+
+resource "aws_autoscaling_policy" "airflow_worker_scale_down_policy" {
+  depends_on                = ["aws_autoscaling_group.asg_worker_airflow"]
+
+  name                      = "${var.prefix}_airflow_worker_scale_down_policy"
+  scaling_adjustment        = -1
+  adjustment_type           = "ChangeInCapacity"
+  cooldown                  = 120
+  autoscaling_group_name    = "${aws_autoscaling_group.asg_worker_airflow.name}"
+}
+
+resource "aws_cloudwatch_metric_alarm" "airflow_worker_cw_remove_alarm" {
+  depends_on          = ["aws_autoscaling_policy.airflow_worker_scale_down_policy"]
+
+  alarm_name          = "${var.prefix}_airflow_worker_cw_remove_alarm"
+  comparison_operator = "LessThanThreshold"
+  evaluation_periods  = "3"
+  metric_name         = "CPUUtilization"
+  namespace           = "AWS/EC2"
+  period              = "60"
+  statistic           = "Average"
+  threshold           = "80"
+
+  dimensions {
+    AutoScalingGroupName = "${aws_autoscaling_group.asg_worker_airflow.name}"
+  }
+
+  alarm_description = "This metric monitors ec2 cpu utilization"
+  alarm_actions     = ["${aws_autoscaling_policy.airflow_worker_scale_down_policy.arn}"]
 }
