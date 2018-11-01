@@ -12,7 +12,7 @@ group=`id -g ubuntu`
 
 echo "############# Enabled s3 mount for airflow directory #############"
 
-sleep 5m
+sleep 3m
 
 echo "############# Slept 5 minutes to wait for airflow.cfg to be created correctly #############"
 
