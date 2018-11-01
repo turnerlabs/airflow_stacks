@@ -61,6 +61,11 @@
             "destination": "/home/ubuntu/airflow-worker.service"
         },
         {
+            "type": "file",
+            "source": "../airflow_websched_python3/scripts/pip_mod_install.sh",
+            "destination": "/home/ubuntu/pip_mod_install.sh"
+        },
+        {
             "type": "shell",
             "execute_command": "{{.Vars}} bash '{{.Path}}'",
             "script": "provision.sh"

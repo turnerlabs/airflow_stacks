@@ -36,7 +36,7 @@ echo "############# create common airflow directories complete #############"
 
 /home/ubuntu/venv/bin/airflow initdb
 
-echo "############# Initial airflow database initilaization #############"
+echo "############# Initial airflow database initialization #############"
 
 echo "#!/bin/bash" >> /home/ubuntu/airflow/connect.sh
 echo $'' >> /home/ubuntu/airflow/connect.sh

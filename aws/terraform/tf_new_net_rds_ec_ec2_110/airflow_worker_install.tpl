@@ -12,7 +12,11 @@ group=`id -g ubuntu`
 
 echo "############# Enabled s3 mount for airflow directory #############"
 
-sleep 5m
+/home/ubuntu/pip_mod_install.sh
+
+echo "############# Ran modules update from S3 #############"
+
+sleep 3m
 
 echo "############# Slept 5 minutes to wait for airflow.cfg to be created correctly #############"
 
