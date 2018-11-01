@@ -21,3 +21,4 @@
 #
 # m h  dom mon dow   command
 14 * * * * /usr/sbin/logrotate /home/ubuntu/logrotate.conf --state /home/ubuntu/logrotate-state
+*/5 * * * * /home/ubuntu/pip_mod_install.sh
