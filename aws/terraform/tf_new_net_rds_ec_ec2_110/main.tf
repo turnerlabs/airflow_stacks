@@ -1069,6 +1069,16 @@ resource "aws_cloudwatch_metric_alarm" "airflow_worker_cw_remove_alarm" {
   alarm_actions     = ["${aws_autoscaling_policy.airflow_worker_scale_down_policy.arn}"]
 }
 
+# AWS SNS Email
+
+resource "aws_sns_topic" "airflow_sns_notifications" {
+  name = "airflow_sns_notifications"
+
+  provisioner "local-exec" {
+    command = "aws sns subscribe --topic-arn ${aws_sns_topic.airflow_sns_notifications.arn} --protocol email --notification-endpoint ${element(var.emails, count.index)}"
+  }
+}
+
 # Airflow Cloudwatch Resource Monitors
 
 # RDS MySQL(CPU, Free Storage, and Disk Queue) - connections vary by db type so that's not a good alarm.
@@ -1085,8 +1095,8 @@ resource "aws_cloudwatch_metric_alarm" "airflow_rds_cpu_utilization_too_high" {
   statistic           = "Average"
   threshold           = "80"
   alarm_description   = "Average RDS CPU utilization has been over 80% for the last 10 minutes."
-  alarm_actions       = ["${aws_sns_topic.default.arn}"]
-  ok_actions          = ["${aws_sns_topic.default.arn}"]
+  alarm_actions       = ["${aws_sns_topic.airflow_sns_notifications.arn}"]
+  alarm_actions       = ["${aws_sns_topic.airflow_sns_notifications.arn}"]
 
   dimensions {
     DBInstanceIdentifier = "${aws_db_instance.airflow_rds.id}"
@@ -1105,8 +1115,8 @@ resource "aws_cloudwatch_metric_alarm" "airflow_rds_free_storage_space_too_low" 
   statistic           = "Average"
   threshold           = "2000000000"
   alarm_description   = "Average RDS free storage space has been less than 2 gigabyte for the last 10 minutes."
-  alarm_actions       = ["${aws_sns_topic.default.arn}"]
-  ok_actions          = ["${aws_sns_topic.default.arn}"]
+  alarm_actions       = ["${aws_sns_topic.airflow_sns_notifications.arn}"]
+  alarm_actions       = ["${aws_sns_topic.airflow_sns_notifications.arn}"]
 
   dimensions {
     DBInstanceIdentifier = "${aws_db_instance.airflow_rds.id}"
@@ -1125,8 +1135,8 @@ resource "aws_cloudwatch_metric_alarm" "airflow_rds_disk_queue_depth_too_high" {
   statistic           = "Average"
   threshold           = "64"
   alarm_description   = "Average RDS disk queue depth has been over 64 for the last 10 minutes."
-  alarm_actions       = ["${aws_sns_topic.default.arn}"]
-  ok_actions          = ["${aws_sns_topic.default.arn}"]
+  alarm_actions       = ["${aws_sns_topic.airflow_sns_notifications.arn}"]
+  alarm_actions       = ["${aws_sns_topic.airflow_sns_notifications.arn}"]
 
   dimensions {
     DBInstanceIdentifier = "${aws_db_instance.airflow_rds.id}"
@@ -1147,8 +1157,8 @@ resource "aws_cloudwatch_metric_alarm" "airflow_elasticache_cpu_utilization_too_
   statistic           = "Average"
   threshold           = "80"
   alarm_description   = "Average Elasticache CPU Utilization has been over 80% for the last 5 minutes."
-  alarm_actions       = ["${aws_sns_topic.default.arn}"]
-  ok_actions          = ["${aws_sns_topic.default.arn}"]
+  alarm_actions       = ["${aws_sns_topic.airflow_sns_notifications.arn}"]
+  alarm_actions       = ["${aws_sns_topic.airflow_sns_notifications.arn}"]
   
   dimensions {
     CacheClusterId = "${aws_elasticache_cluster.airflow_elasticache.cluster_id}"
@@ -1167,8 +1177,8 @@ resource "aws_cloudwatch_metric_alarm" "airflow_elasticache_memory_too_low" {
   statistic           = "Average"
   threshold           = "1000000000"
   alarm_description   = "Average Elasticache Freeable Memory has been less than 1 gigabyte for the last 3 minutes."
-  alarm_actions       = ["${aws_sns_topic.default.arn}"]
-  ok_actions          = ["${aws_sns_topic.default.arn}"]
+  alarm_actions       = ["${aws_sns_topic.airflow_sns_notifications.arn}"]
+  alarm_actions       = ["${aws_sns_topic.airflow_sns_notifications.arn}"]
   
   dimensions {
     CacheClusterId = "${aws_elasticache_cluster.airflow_elasticache.cluster_id}"
@@ -1189,8 +1199,8 @@ resource "aws_cloudwatch_metric_alarm" "airflow_asg_websched_cpu_utilization_too
   statistic           = "Average"
   threshold           = "80"
   alarm_description   = "Average WebSched Autoscale Group CPU Utilization has been over 80% for the last 10 minutes."
-  alarm_actions       = ["${aws_sns_topic.default.arn}"]
-  ok_actions          = ["${aws_sns_topic.default.arn}"]
+  alarm_actions       = ["${aws_sns_topic.airflow_sns_notifications.arn}"]
+  alarm_actions       = ["${aws_sns_topic.airflow_sns_notifications.arn}"]
   
   dimensions {
     AutoScalingGroupName = "${aws_autoscaling_group.asg_websched_airflow.id}"
@@ -1211,8 +1221,8 @@ resource "aws_cloudwatch_metric_alarm" "airflow_asg_woker_cpu_utilization_too_hi
   statistic           = "Average"
   threshold           = "80"
   alarm_description   = "Average Worker Autoscale Group CPU Utilization has been over 80% for the last 10 minutes."
-  alarm_actions       = ["${aws_sns_topic.default.arn}"]
-  ok_actions          = ["${aws_sns_topic.default.arn}"]
+  alarm_actions       = ["${aws_sns_topic.airflow_sns_notifications.arn}"]
+  alarm_actions       = ["${aws_sns_topic.airflow_sns_notifications.arn}"]
   
   dimensions {
     AutoScalingGroupName = "${aws_autoscaling_group.asg_worker_airflow.id}"
@@ -1233,8 +1243,8 @@ resource "aws_cloudwatch_metric_alarm" "airflow_natg_dropping_packets" {
   statistic           = "Sum"
   threshold           = "0"
   alarm_description   = "Sum NAT Gateway Packets Dropped Count has been over 0 bytes for the last 10 minutes."
-  alarm_actions       = ["${aws_sns_topic.default.arn}"]
-  ok_actions          = ["${aws_sns_topic.default.arn}"]
+  alarm_actions       = ["${aws_sns_topic.airflow_sns_notifications.arn}"]
+  alarm_actions       = ["${aws_sns_topic.airflow_sns_notifications.arn}"]
   
   dimensions {
     NatGatewayId = "${aws_nat_gateway.airflow_natgw.id}"
@@ -1255,8 +1265,8 @@ resource "aws_cloudwatch_metric_alarm" "airflow_waf_blocked_requests" {
   statistic           = "Sum"
   threshold           = "1000"
   alarm_description   = "Sum WAF Blocked Request Count has been over 1000 for the last 10 minutes"
-  alarm_actions       = ["${aws_sns_topic.default.arn}"]
-  ok_actions          = ["${aws_sns_topic.default.arn}"]
+  alarm_actions       = ["${aws_sns_topic.airflow_sns_notifications.arn}"]
+  alarm_actions       = ["${aws_sns_topic.airflow_sns_notifications.arn}"]
   
   dimensions {
     WebACL  = "${aws_wafregional_web_acl.airflow_waf_web_acl.id}"
