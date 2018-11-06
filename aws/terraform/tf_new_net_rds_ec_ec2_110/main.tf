@@ -1075,7 +1075,7 @@ resource "aws_sns_topic" "airflow_sns_notifications" {
   name = "airflow_sns_notifications"
 
   provisioner "local-exec" {
-    command = "aws sns subscribe --topic-arn ${aws_sns_topic.airflow_sns_notifications.arn} --protocol email --notification-endpoint ${element(var.emails, count.index)}"
+    command = "aws sns subscribe --topic-arn ${aws_sns_topic.airflow_sns_notifications.arn} --protocol email --notification-endpoint ${var.notification_email}"
   }
 }
 
