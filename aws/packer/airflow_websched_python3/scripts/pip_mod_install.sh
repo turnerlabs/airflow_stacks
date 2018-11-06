@@ -1,7 +1,7 @@
 #!/bin/bash
 source /home/ubuntu/.bash_profile
 HOSTNAME=`wget -q -O - http://169.254.169.254/latest/meta-data/instance-id`
-PIP_MODULES_FILE=$AIRFLOW_HOME/pipmodules.txt
+PIP_MODULES_FILE=$AIRFLOW_HOME/requirements.txt
 PIP_LOG_FILE=$AIRFLOW_HOME/logs/${HOSTNAME}_module_install.log
 DATESTART=`date`
 
