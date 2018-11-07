@@ -192,3 +192,7 @@ variable "secret_recovery_window_in_days" {
   description="How many days to keep a secret before deleting it.  0 is immediately"
   default="0"
 }
+
+variable "notification_email" {
+  description="Email to send SNS notifications to "
+}

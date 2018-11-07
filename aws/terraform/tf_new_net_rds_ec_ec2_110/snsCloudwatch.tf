@@ -199,7 +199,7 @@ resource "aws_cloudwatch_metric_alarm" "airflow_waf_blocked_requests" {
   
   dimensions {
     WebACL  = "${aws_wafregional_web_acl.airflow_waf_web_acl.id}"
-    Region  = "${aws_wafregional_web_acl.airflow_waf_web_acl.region.id}"
+    Region  = "${var.region}"
     Rule    = "${aws_wafregional_rule.airflow_waf_rule.id}"
   }
 }
