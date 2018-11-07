@@ -26,7 +26,7 @@ resource "aws_iam_role_policy" "airflow_s3" {
   depends_on  = ["aws_iam_role.airflow_instance"]
 
   name = "${var.prefix}_s3"
-  role = "${aws_iam_role.airflow_instance.id}"
+  role = "${aws_iam_role.airflow_instance.name}"
 
   policy = <<EOF
 {
@@ -66,7 +66,7 @@ resource "aws_iam_role_policy" "airflow_logs" {
   depends_on  = ["aws_iam_role.airflow_instance"]
 
   name = "${var.prefix}_logs"
-  role = "${aws_iam_role.airflow_instance.id}"
+  role = "${aws_iam_role.airflow_instance.name}"
 
   policy = <<EOF
 {
@@ -95,7 +95,7 @@ resource "aws_iam_role_policy" "airflow_secrets" {
   depends_on  = ["aws_iam_role.airflow_instance"]
 
   name = "${var.prefix}_secrets"
-  role = "${aws_iam_role.airflow_instance.id}"
+  role = "${aws_iam_role.airflow_instance.name}"
 
   policy = <<EOF
 {
