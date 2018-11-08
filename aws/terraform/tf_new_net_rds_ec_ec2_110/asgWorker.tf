@@ -95,7 +95,7 @@ resource "aws_cloudwatch_metric_alarm" "airflow_worker_cw_add_alarm" {
   namespace           = "AWS/EC2"
   period              = "60"
   statistic           = "Average"
-  threshold           = "80"
+  threshold           = "60"
 
   dimensions {
     AutoScalingGroupName = "${aws_autoscaling_group.asg_worker_airflow.name}"
@@ -125,7 +125,7 @@ resource "aws_cloudwatch_metric_alarm" "airflow_worker_cw_remove_alarm" {
   namespace           = "AWS/EC2"
   period              = "60"
   statistic           = "Average"
-  threshold           = "80"
+  threshold           = "60"
 
   dimensions {
     AutoScalingGroupName = "${aws_autoscaling_group.asg_worker_airflow.name}"
