@@ -194,5 +194,5 @@ variable "secret_recovery_window_in_days" {
 }
 
 variable "notification_email" {
-  description="Email to send SNS notifications to "
+  description="This email will receive sns notification from any resources that alarm.  It is required"
 }
