@@ -1,6 +1,6 @@
 # S3 Airflow log Bucket
 resource "aws_s3_bucket" "s3_airflow_log_bucket" {
-  bucket        = "${var.prefix}${var.s3_airflow_log_bucket_name}"
+  bucket        = "${var.prefix}-${var.s3_airflow_log_bucket_name}"
   force_destroy = "true"
 
   lifecycle_rule {
@@ -33,7 +33,7 @@ resource "aws_s3_bucket" "s3_airflow_log_bucket" {
 
 # S3 Airflow Bucket
 resource "aws_s3_bucket" "s3_airflow_bucket" {
-  bucket        = "${var.prefix}${var.s3_airflow_bucket_name}"
+  bucket        = "${var.prefix}-${var.s3_airflow_bucket_name}"
   force_destroy = "true"
   
   lifecycle_rule {
@@ -67,7 +67,7 @@ resource "aws_s3_bucket" "s3_airflow_bucket" {
 
 # S3 ALB access log Bucket
 resource "aws_s3_bucket" "s3_airflow_access_log_bucket" {
-  bucket        = "${var.s3_airflow_access_log_bucket_name}"
+  bucket        = "${var.prefix}-${var.s3_airflow_access_log_bucket_name}"
   force_destroy = "true"
   tags {
     application     = "${var.tag_application}"
@@ -104,7 +104,7 @@ policy = <<EOF
         "s3:PutObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.s3_airflow_access_log_bucket_name}/*",
+      "Resource": "arn:aws:s3:::${var.prefix}-${var.s3_airflow_access_log_bucket_name}/*",
       "Principal": {
         "AWS": [
           "${var.alb_accesslog_account}"

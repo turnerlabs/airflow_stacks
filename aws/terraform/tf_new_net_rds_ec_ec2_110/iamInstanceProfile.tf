@@ -39,7 +39,7 @@ resource "aws_iam_role_policy" "airflow_s3" {
             ],
             "Resource": [
               "${aws_s3_bucket.s3_airflow_bucket.arn}",
-              "${aws_s3_bucket.s3_airflow_access_log_bucket.arn}"
+              "${aws_s3_bucket.s3_airflow_log_bucket.arn}"
             ]
         },
         {
@@ -51,7 +51,7 @@ resource "aws_iam_role_policy" "airflow_s3" {
             ],
             "Resource": [
               "${aws_s3_bucket.s3_airflow_bucket.arn}/*",
-              "${aws_s3_bucket.s3_airflow_access_log_bucket.arn}/*"
+              "${aws_s3_bucket.s3_airflow_log_bucket.arn}/*"
             ]
         }
 
