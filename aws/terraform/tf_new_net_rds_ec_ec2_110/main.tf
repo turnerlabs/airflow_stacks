@@ -14,3 +14,4 @@ provider "aws" {
   version = "~> 1.40"
   region  = "${var.region}"
   profile = "${var.profile}"
+}
