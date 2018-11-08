@@ -90,7 +90,7 @@ resource "aws_cloudwatch_metric_alarm" "airflow_worker_cw_add_alarm" {
 
   alarm_name          = "${var.prefix}_airflow_worker_cw_add_alarm"
   comparison_operator = "GreaterThanOrEqualToThreshold"
-  evaluation_periods  = "3"
+  evaluation_periods  = "2"
   metric_name         = "CPUUtilization"
   namespace           = "AWS/EC2"
   period              = "60"
@@ -111,7 +111,7 @@ resource "aws_autoscaling_policy" "airflow_worker_scale_down_policy" {
   name                      = "${var.prefix}_airflow_worker_scale_down_policy"
   scaling_adjustment        = -1
   adjustment_type           = "ChangeInCapacity"
-  cooldown                  = 120
+  cooldown                  = 240
   autoscaling_group_name    = "${aws_autoscaling_group.asg_worker_airflow.name}"
 }
 
@@ -120,7 +120,7 @@ resource "aws_cloudwatch_metric_alarm" "airflow_worker_cw_remove_alarm" {
 
   alarm_name          = "${var.prefix}_airflow_worker_cw_remove_alarm"
   comparison_operator = "LessThanThreshold"
-  evaluation_periods  = "3"
+  evaluation_periods  = "5"
   metric_name         = "CPUUtilization"
   namespace           = "AWS/EC2"
   period              = "60"
