@@ -34,16 +34,7 @@ services:
             interval: 30s
             timeout: 30s
             retries: 3
-    flower:
-        image: turnerlabs/docker-airflow:latest
-        restart: always
-        links:
-            - redis
-        environment:
-            - EXECUTOR=Celery
-        ports:
-            - "5555:5555"
-        command: flower
+        entrypoint: /entrypoint.sh
     scheduler:
         image: turnerlabs/docker-airflow:latest
         restart: always
@@ -60,6 +51,7 @@ services:
             - MYSQL_PASSWORD=airflow
             - MYSQL_DATABASE=airflow
         command: scheduler
+        entrypoint: /entrypoint.sh
     worker:
         image: turnerlabs/docker-airflow:latest
         restart: always
@@ -71,3 +63,4 @@ services:
             - FERNET_KEY=46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqDDho=
             - EXECUTOR=Celery
         command: worker
+        entrypoint: /entrypoint.sh

@@ -80,13 +80,14 @@ generate_user(){
 
 case "$1" in
   webserver)
-    if [ ! -d "$AIRFLOW_HOME" ]; then
+    if [ ! -e "/usr/local/airflow/airflow/airflow.cfg" ]; then
       generate_config # generate using the default 1.10 version config
       sleep 5
       update_config  # update the config with the settings I want to change
       sleep 5
       generate_rbac # generate the webserver_config.py
       sleep 5
+      mkdir /usr/local/airflow/airflow/dags
     fi
 
     wait_for_dbs # make sure metadata database is running before attempting to initialize
@@ -100,16 +101,13 @@ case "$1" in
     ;;
   worker|scheduler)
     # need to give the webserver time to run initdb.
-    if [ ! -d "$AIRFLOW_HOME" ]; then
+    if [ ! -e "/usr/local/airflow/airflow/airflow.cfg" ]; then
       sleep 35
     else
       sleep 5
     fi
-    mkdir /usr/local/airflow/airflow/dags
+
     /etc/init.d/chrony restart
-    exec airflow "$@"
-    ;;
-  flower)
     exec airflow "$@"
     ;;
   version)
