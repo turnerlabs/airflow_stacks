@@ -93,11 +93,13 @@ case "$1" in
     sleep 5
     generate_user # create an rbac user after everything is up and running
     sleep 5
+    /etc/init.d/chrony restart
     exec airflow webserver
     ;;
   worker|scheduler)
     # need to give the webserver time to run initdb.
     sleep 35
+    /etc/init.d/chrony restart
     exec airflow "$@"
     ;;
   flower)

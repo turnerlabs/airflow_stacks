@@ -2,6 +2,7 @@ version: '2.1'
 services:
     redis:
         image: 'redis:4.0.11'
+        command: ["redis-server", "--appendonly", "yes"]
     mysql:
         image: mysql:5.7
         command: --explicit_defaults_for_timestamp=1
