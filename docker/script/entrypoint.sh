@@ -39,8 +39,6 @@ update_config() {
   sed -i -e "s/secure_mode = False/secure_mode = True/g" /usr/local/airflow/airflow/airflow.cfg
   sed -i -e "s/donot_pickle = True/donot_pickle = False/g" /usr/local/airflow/airflow/airflow.cfg
   sed -i -e "s/enable_xcom_pickling = True/enable_xcom_pickling = False/g" /usr/local/airflow/airflow/airflow.cfg
-  #sed -i -e "s/base_url = http:\/\/localhost:8080/base_url = http:\/\/$instance_ip:8080/g" /usr/local/airflow/airflow/airflow.cfg
-  #sed -i -e "s/endpoint_url = http:\/\/localhost:8080/endpoint_url = http:\/\/$instance_ip:8080/g" /usr/local/airflow/airflow/airflow.cfg
   sed -i -e "s/sql_alchemy_conn = sqlite:\/\/\/\/usr\/local\/airflow\/airflow\/airflow.db/sql_alchemy_conn = mysql:\/\/$MYSQL_USER:$MYSQL_PASSWORD@$MYSQL_HOST:$MYSQL_PORT\/$MYSQL_DB/g" /usr/local/airflow/airflow/airflow.cfg
   sed -i -e "s/result_backend = db+mysql:\/\/airflow:airflow@localhost:3306\/airflow/result_backend = redis:\/\/$REDIS_PREFIX$REDIS_HOST:$REDIS_PORT\/0/g" /usr/local/airflow/airflow/airflow.cfg
   sed -i -e "s/broker_url = sqla+mysql:\/\/airflow:airflow@localhost:3306\/airflow/broker_url = redis:\/\/$REDIS_PREFIX$REDIS_HOST:$REDIS_PORT\/1/g" /usr/local/airflow/airflow/airflow.cfg
@@ -48,6 +46,7 @@ update_config() {
   sed -i -e "/\[webserver\]/a\\
 auth_backend = airflow.contrib.auth.backends.password_auth" /usr/local/airflow/airflow/airflow.cfg
   sed -i -e "s/rbac = False/rbac = True/g" /usr/local/airflow/airflow/airflow.cfg
+  sed -i -e "s/dag_dir_list_interval = 300/dag_dir_list_interval = 60/g" /usr/local/airflow/airflow/airflow.cfg
 }
 
 generate_rbac(){
@@ -81,24 +80,31 @@ generate_user(){
 
 case "$1" in
   webserver)
-    generate_config # generate using the default 1.10 version config
-    sleep 5
-    update_config  # update the config with the settings I want to change
-    sleep 5
-    generate_rbac # generate the webserver_config.py
-    sleep 5
-    wait_for_dbs # make sure metadata database is running before attempting to initialize
-    sleep 5
-    airflow initdb # reinitilize the config with my settings applied
-    sleep 5
-    generate_user # create an rbac user after everything is up and running
-    sleep 5
+    if [ ! -d "$AIRFLOW_HOME" ]; then
+      generate_config # generate using the default 1.10 version config
+      sleep 5
+      update_config  # update the config with the settings I want to change
+      sleep 5
+      generate_rbac # generate the webserver_config.py
+      sleep 5
+      wait_for_dbs # make sure metadata database is running before attempting to initialize
+      sleep 5
+      airflow initdb # reinitilize the config with my settings applied
+      sleep 5
+      generate_user # create an rbac user after everything is up and running
+      sleep 5
+    fi
     /etc/init.d/chrony restart
     exec airflow webserver
     ;;
   worker|scheduler)
     # need to give the webserver time to run initdb.
-    sleep 35
+    if [ ! -d "$AIRFLOW_HOME" ]; then
+      sleep 35
+    else
+      sleep 5
+    fi
+    mkdir /usr/local/airflow/dags
     /etc/init.d/chrony restart
     exec airflow "$@"
     ;;
