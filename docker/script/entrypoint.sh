@@ -87,13 +87,14 @@ case "$1" in
       sleep 5
       generate_rbac # generate the webserver_config.py
       sleep 5
-      wait_for_dbs # make sure metadata database is running before attempting to initialize
-      sleep 5
-      airflow initdb # reinitilize the config with my settings applied
-      sleep 5
-      generate_user # create an rbac user after everything is up and running
-      sleep 5
     fi
+
+    wait_for_dbs # make sure metadata database is running before attempting to initialize
+    sleep 5
+    airflow initdb # reinitilize the config with my settings applied
+    sleep 5
+    generate_user # create an rbac user after everything is up and running
+    sleep 5
     /etc/init.d/chrony restart
     exec airflow webserver
     ;;
@@ -104,7 +105,7 @@ case "$1" in
     else
       sleep 5
     fi
-    mkdir /usr/local/airflow/dags
+    mkdir /usr/local/airflow/airflow/dags
     /etc/init.d/chrony restart
     exec airflow "$@"
     ;;
