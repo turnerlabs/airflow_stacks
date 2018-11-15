@@ -67,6 +67,7 @@ rm /home/ubuntu/al-agent_LATEST_amd64.deb
 echo "------------------- enable autostart of threat manager and remove deb-------------------"
 
 chmod 700 /home/ubuntu/pip_mod_install.sh
+chmod 700 /home/ubuntu/airflow_vars_install.sh
 
 crontab -u ubuntu /home/ubuntu/crontab
 echo "------------------- enable logs cleanup complete -------------------"

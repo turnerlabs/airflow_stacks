@@ -71,6 +71,11 @@
             "destination": "/home/ubuntu/pip_mod_install.sh"
         },
         {
+            "type": "file",
+            "source": "../airflow_websched_python3/scripts/airflow_vars_install.sh",
+            "destination": "/home/ubuntu/airflow_vars_install.sh"
+        },
+        {
             "type": "shell",
             "execute_command": "{{.Vars}} bash '{{.Path}}'",
             "script": "provision.sh"
