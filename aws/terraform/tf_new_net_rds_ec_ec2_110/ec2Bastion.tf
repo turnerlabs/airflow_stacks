@@ -6,7 +6,6 @@ data "aws_ami" "ubuntu" {
 resource "aws_instance" "instance_bastion" {
   ami                       = "${data.aws_ami.ubuntu.id}"
   instance_type             = "t2.micro"
-  name                      = "${var.prefix}_airflow_bastion"
   key_name                  = "${var.airflow_keypair_name}"
   vpc_security_group_ids    = ["${aws_security_group.bastion_instance.id}"]
 
