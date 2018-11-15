@@ -52,7 +52,7 @@
         },
         {
             "type": "file",
-            "source": "../airflow_websched_python3/cron/crontab",
+            "source": "./cron/crontab",
             "destination": "/home/ubuntu/crontab"
         },
         {
