@@ -44,6 +44,13 @@ resource "aws_security_group" "airflow_instance" {
     security_groups = ["${aws_security_group.airflow_lb.id}"]
   }
 
+  ingress {
+    from_port       = 22
+    to_port         = 22
+    protocol        = "tcp"
+    security_groups = ["${aws_security_group.bastion_instance.id}"]
+  }
+
   egress {
     from_port       = 0
     to_port         = 0
@@ -117,6 +124,37 @@ resource "aws_security_group" "airflow_ec" {
 
   tags {
     Name            = "${var.prefix}_ec"
+    application     = "${var.tag_application}"
+    contact-email   = "${var.tag_contact_email}"
+    customer        = "${var.tag_customer}"
+    team            = "${var.tag_team}"
+    environment     = "${var.tag_environment}"
+  }
+}
+
+# Bastion Security Group
+resource "aws_security_group" "bastion_instance" {
+  name        = "${var.prefix}_bastion"
+  description = "Security group for bastion access to airflow server"
+  vpc_id      = "${aws_vpc.airflow_vpc.id}"
+
+  ingress {
+    from_port       = 22
+    to_port         = 22
+    protocol        = "tcp"
+    cidr_blocks     = ["${var.ingress_ip}"]
+    description     = "${var.ingress_ip_description}"
+  }
+
+  egress {
+    from_port       = 0
+    to_port         = 0
+    protocol        = "-1"
+    cidr_blocks     = ["0.0.0.0/0"]
+  }
+
+  tags {
+    Name            = "${var.prefix}_bastion"
     application     = "${var.tag_application}"
     contact-email   = "${var.tag_contact_email}"
     customer        = "${var.tag_customer}"
