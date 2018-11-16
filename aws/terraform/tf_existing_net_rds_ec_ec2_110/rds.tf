@@ -1,7 +1,7 @@
 # RDS Related Items
 
 resource "aws_db_subnet_group" "airflow_rds_subnet_grp" {
-  subnet_ids = ["${aws_subnet.airflow_subnet_private_1c.id}", "${aws_subnet.airflow_subnet_private_1d.id}"]
+  subnet_ids = ["${var.private_subnet1_id}", "${var.private_subnet2_id}"]
 
   tags {
     Name            = "${var.prefix}_rds"
