@@ -11,7 +11,19 @@ Here's how to get up and running with this on a Mac.
 2. Modify Docker for Mac settings to work more optimally with airflow.
     * Open up the preferences menu item on Docker for the Mac and modify each tab to look similar to this.
 
-![](../images/docker1.png?raw=true)
+![General](../images/docker1.png?raw=true)
+
+![File Sharing](../images/docker2.png?raw=true)
+
+![Disk](../images/docker3.png?raw=true)
+
+![Advanced](../images/docker4.png?raw=true)
+
+![Proxies](../images/docker5.png?raw=true)
+
+![Daemon](../images/docker6.png?raw=true)
+
+![Kubernetes](../images/docker7.png?raw=true)
 
 Here's the order of commands to get this up and running:
 
