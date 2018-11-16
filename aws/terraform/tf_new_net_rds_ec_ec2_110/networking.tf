@@ -1,7 +1,7 @@
 # VPC 
 
 resource "aws_vpc" "airflow_vpc" {
-  cidr_block            = "10.0.0.0/16"
+  cidr_block            = "172.16.0.0/16"
   instance_tenancy      = "default"
   enable_dns_support    = true
   enable_dns_hostnames  = true
@@ -22,7 +22,7 @@ resource "aws_vpc" "airflow_vpc" {
 resource "aws_subnet" "airflow_subnet_private_1c" {
   depends_on                      = ["aws_vpc.airflow_vpc"]
   vpc_id                          = "${aws_vpc.airflow_vpc.id}"
-  cidr_block                      = "10.0.1.0/24"
+  cidr_block                      = "172.16.1.0/24"
   availability_zone               = "${var.availability_zone_1}"
   map_public_ip_on_launch         = false
   assign_ipv6_address_on_creation = false
@@ -40,7 +40,7 @@ resource "aws_subnet" "airflow_subnet_private_1c" {
 resource "aws_subnet" "airflow_subnet_private_1d" {
   depends_on                      = ["aws_vpc.airflow_vpc"]
   vpc_id                          = "${aws_vpc.airflow_vpc.id}"
-  cidr_block                      = "10.0.2.0/24"
+  cidr_block                      = "172.16.2.0/24"
   availability_zone               = "${var.availability_zone_2}"
   map_public_ip_on_launch         = false
   assign_ipv6_address_on_creation = false
@@ -60,7 +60,7 @@ resource "aws_subnet" "airflow_subnet_private_1d" {
 resource "aws_subnet" "airflow_subnet_public_1c" {
   depends_on                      = ["aws_vpc.airflow_vpc"]
   vpc_id                          = "${aws_vpc.airflow_vpc.id}"
-  cidr_block                      = "10.0.3.0/24"
+  cidr_block                      = "172.16.3.0/24"
   availability_zone               = "${var.availability_zone_1}"
   map_public_ip_on_launch         = true
   assign_ipv6_address_on_creation = false
@@ -78,7 +78,7 @@ tags {
 resource "aws_subnet" "airflow_subnet_public_1d" {
   depends_on                      = ["aws_vpc.airflow_vpc"]
   vpc_id                          = "${aws_vpc.airflow_vpc.id}"
-  cidr_block                      = "10.0.4.0/24"
+  cidr_block                      = "172.16.4.0/24"
   availability_zone               = "${var.availability_zone_2}"
   map_public_ip_on_launch         = true
   assign_ipv6_address_on_creation = false
