@@ -11,7 +11,7 @@ Here's how to get up and running with this on a Mac.
 2. Modify Docker for Mac settings to work more optimally with airflow.
     * Open up the preferences menu item on Docker for the Mac and modify each tab to look similar to this.
 
-![](images/docker1.png?raw=true)
+![](../images/docker1.png?raw=true)
 
 Here's the order of commands to get this up and running:
 
