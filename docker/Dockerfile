@@ -1,9 +1,3 @@
-# VERSION 1.9.0-2
-# AUTHOR: Matthieu "Puckel_" Roisil
-# DESCRIPTION: Basic Airflow container
-# BUILD: docker build --rm -t puckel/docker-airflow .
-# SOURCE: https://github.com/puckel/docker-airflow
-
 FROM ubuntu:16.04
 
 # Never prompts the user for choices on installation/configuration of packages
@@ -11,7 +5,7 @@ ENV DEBIAN_FRONTEND noninteractive
 ENV TERM linux
 
 # Airflow
-ARG AIRFLOW_VERSION=1.10
+ARG AIRFLOW_VERSION=1.10.1rc2
 ARG AIRFLOW_HOME=/usr/local/airflow
 ARG AIRFLOW_PACKAGES=all
 
@@ -57,8 +51,6 @@ RUN set -ex \
     && echo 'export AIRFLOW_HOME=/usr/local/airflow' >> /usr/local/.bash_profile \
     && pip3 install -U pip setuptools wheel \
     && pip install apache-airflow[${AIRFLOW_PACKAGES}]==$AIRFLOW_VERSION \
-    && pip uninstall -y Flask-Appbuilder \    
-    && pip install 'Flask-Appbuilder==1.11.1' \ 
     && sed -i '1 i\server time.google.com prefer iburst'  /etc/chrony/chrony.conf \
     && apt-get autoremove -yqq --purge \
     && apt-get autoclean \
