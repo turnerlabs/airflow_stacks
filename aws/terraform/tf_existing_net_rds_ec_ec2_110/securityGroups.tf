@@ -3,7 +3,7 @@
 resource "aws_security_group" "airflow_lb" {
   name        = "${var.prefix}_lb"
   description = "Security group for access to airflow load balancer"
-  vpc_id      = "${aws_vpc.airflow_vpc.id}"
+  vpc_id      = "${var.vpc_id}"
   
   # This needs to be expanded to all the ip ranges.
   ingress {
@@ -35,7 +35,7 @@ resource "aws_security_group" "airflow_lb" {
 resource "aws_security_group" "airflow_instance" {
   name        = "${var.prefix}_instance"
   description = "Security group for access to airflow server"
-  vpc_id      = "${aws_vpc.airflow_vpc.id}"
+  vpc_id      = "${var.vpc_id}"
 
   ingress {
     from_port       = 8080
@@ -74,7 +74,7 @@ resource "aws_security_group" "airflow_rds" {
 
   name        = "${var.prefix}_rds"
   description = "Security group for access to rds server for airflow"
-  vpc_id      = "${aws_vpc.airflow_vpc.id}"
+  vpc_id      = "${var.vpc_id}"
 
   ingress {
     from_port       = 0
@@ -106,7 +106,7 @@ resource "aws_security_group" "airflow_ec" {
 
   name        = "${var.prefix}_ec"
   description = "Security group for access to ec server for airflow"
-  vpc_id      = "${aws_vpc.airflow_vpc.id}"
+  vpc_id      = "${var.vpc_id}"
 
   ingress {
     from_port       = 0
@@ -136,7 +136,7 @@ resource "aws_security_group" "airflow_ec" {
 resource "aws_security_group" "bastion_instance" {
   name        = "${var.prefix}_bastion"
   description = "Security group for bastion access to airflow server"
-  vpc_id      = "${aws_vpc.airflow_vpc.id}"
+  vpc_id      = "${var.vpc_id}"
 
   ingress {
     from_port       = 22

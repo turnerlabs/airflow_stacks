@@ -50,7 +50,7 @@ resource "aws_autoscaling_group" "asg_websched_airflow" {
   depends_on                = ["aws_launch_configuration.lc_websched_airflow", "aws_lb_target_group.airflow_lb_tg"]
 
   name                      = "${var.prefix}_asg_websched_airflow"
-  vpc_zone_identifier       =  ["${aws_subnet.airflow_subnet_private_1c.id}", "${aws_subnet.airflow_subnet_private_1d.id}"]
+  vpc_zone_identifier       = ["${var.private_subnet1_id}", "${var.private_subnet2_id}"]  
   launch_configuration      = "${aws_launch_configuration.lc_websched_airflow.id}"
   max_size                  = "1"
   min_size                  = "1"

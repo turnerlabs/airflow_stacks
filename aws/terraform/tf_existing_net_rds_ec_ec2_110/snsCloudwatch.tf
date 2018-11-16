@@ -158,28 +158,6 @@ resource "aws_cloudwatch_metric_alarm" "airflow_asg_woker_cpu_utilization_too_hi
   }
 }
 
-# NAT Gateway(Traffic)
-
-resource "aws_cloudwatch_metric_alarm" "airflow_natg_dropping_packets" {
-  depends_on          = ["aws_nat_gateway.airflow_natgw"]
-
-  alarm_name          = "${var.prefix}_airflow_natg_dropping_packets"
-  comparison_operator = "GreaterThanThreshold"
-  evaluation_periods  = "1"
-  metric_name         = "PacketsDropCount"
-  namespace           = "AWS/NATGateway"
-  period              = "600"
-  statistic           = "Sum"
-  threshold           = "0"
-  alarm_description   = "Sum NAT Gateway Packets Dropped Count has been over 0 bytes for the last 10 minutes."
-  alarm_actions       = ["${aws_sns_topic.airflow_sns_notifications.arn}"]
-  alarm_actions       = ["${aws_sns_topic.airflow_sns_notifications.arn}"]
-  
-  dimensions {
-    NatGatewayId = "${aws_nat_gateway.airflow_natgw.id}"
-  }
-}
-
 # WAF(Blocked Requests)
 
 resource "aws_cloudwatch_metric_alarm" "airflow_waf_blocked_requests" {

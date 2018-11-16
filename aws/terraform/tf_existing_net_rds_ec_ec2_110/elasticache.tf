@@ -1,7 +1,7 @@
 # Elasticache Related Items
 resource "aws_elasticache_subnet_group" "airflow_ec_subnet_grp" {
   name       = "${var.prefix}-ec-subnet"
-  subnet_ids = ["${aws_subnet.airflow_subnet_private_1c.id}", "${aws_subnet.airflow_subnet_private_1d.id}"]
+  subnet_ids = ["${var.private_subnet1_id}", "${var.private_subnet2_id}"]
 }
 
 resource "aws_elasticache_cluster" "airflow_elasticache" {

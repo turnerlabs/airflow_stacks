@@ -4,7 +4,7 @@ resource "aws_lb_target_group" "airflow_lb_tg" {
   name     = "${var.prefix}-lb-tg"
   port     = 8080
   protocol = "HTTP"
-  vpc_id   = "${aws_vpc.airflow_vpc.id}"
+  vpc_id   = "${var.vpc_id}"
   
   health_check {
     port      = 8080
@@ -25,12 +25,12 @@ resource "aws_lb_target_group" "airflow_lb_tg" {
 resource "aws_lb" "airflow_lb" {
   depends_on         = ["aws_security_group.airflow_lb","aws_s3_bucket.s3_airflow_access_log_bucket"]
 
-  name               = "${var.prefix}-alb"
-  internal           = false
-  load_balancer_type = "application"
-  security_groups    = ["${aws_security_group.airflow_lb.id}"]
-  subnets            = ["${aws_subnet.airflow_subnet_public_1c.id}", "${aws_subnet.airflow_subnet_public_1d.id}"]
-
+  name                = "${var.prefix}-alb"
+  internal            = false
+  load_balancer_type  = "application"
+  security_groups     = ["${aws_security_group.airflow_lb.id}"]
+  subnets             = ["${var.public_subnet1_id}", "${var.public_subnet2_id}"]
+  
   access_logs {
     bucket  = "${aws_s3_bucket.s3_airflow_access_log_bucket.id}"
     prefix  = "airflow-lb"
