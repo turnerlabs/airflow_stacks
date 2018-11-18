@@ -39,7 +39,6 @@ pip uninstall -y redis
 pip install redis==2.10.6
 echo "------------------- Bug fixes for Flask AppBuilder and Redis -------------------"
 
-
 sudo sed -i '1 i\server 169.254.169.123 prefer iburst'  /etc/chrony/chrony.conf
 echo "------------------- add ip for aws time services -------------------"
 
