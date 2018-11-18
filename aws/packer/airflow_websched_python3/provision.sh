@@ -2,7 +2,7 @@
 
 set -e
 
-sudo apt-get -y update
+sudo apt-get update -yq --fix-missing
 echo "------------------- apt update complete -------------------"
 
 sudo apt-get -y install unattended-upgrades
