@@ -37,7 +37,7 @@ Once Docker for Mac is up and running you need to do the following 2 items to st
 
 --- Run Docker Compose up to start up the airflow stack(webserver, scheduler, worker, redis, mysql)
 
-`- Adddocker-compose --verbose -f docker-compose.yml up -d`
+`- ocker-compose --verbose -f docker-compose.yml up -d`
 
 --- To take everythjing down, use:
 
