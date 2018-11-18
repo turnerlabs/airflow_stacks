@@ -25,6 +25,9 @@ This code was taken from <https://github.com/puckel/docker-airflow> and modified
 
 ![Kubernetes](../images/docker7.png?raw=true)
 
+
+## Building, Starting and Stopping Docker.
+
 Once Docker for Mac is up and running you need to do the following 2 items to start using it:
 ** assuming you have cloned this repo and are cd'd to this directory
 
@@ -34,13 +37,13 @@ Once Docker for Mac is up and running you need to do the following 2 items to st
 
 --- Run Docker Compose up to start up the airflow stack(webserver, scheduler, worker, redis, mysql)
 
-`docker-compose --verbose -f docker-compose.yml up -d`
+`- Adddocker-compose --verbose -f docker-compose.yml up -d`
 
 --- To take everythjing down, use:
 
 `docker-compose --verbose -f docker-compose.yml down`
 
-## Here's a typical "I'm creating a hello world dag" work flow
+## Here's a typical "I'm creating a helloworld dag" work flow
 
 1. Start out by verifying that everything is running.  Type `docker ps` and your screen should look similar to this:
 ![dockerps](../images/docker8.png?raw=true)
@@ -102,3 +105,17 @@ t3.set_upstream(t1)
 
 4. Navigate to http://localhost:8080 to the airflow website.
       * The scheduler polls the dag directory every 60 seconds so it may take a minute for changes to show up in the ui.
+
+5. Turn on the helloworld dag once you see the on / off toggle button.
+
+6. Once the DAG starts you can monitor airflow's services logs and the tasks logs in the following way:
+      * WebServer - `docker logs -f docker_webserver_1`
+      * Scheduler - `docker logs -f docker_scheduler_1`
+      * Worker - `docker logs -f docker_worker_1`
+      * Task output - `cd airflow/logs/helloworld` - although I suggest using the UI for this.
+
+7. You should be able to iterate here and see any code changes you make get applied within a minute or less.
+
+### TODO's
+- Add the ability to load requirements, variables and connections.
+    - I plan on this being a quick `docker stop docker_webserver_1 docker_scheduler_1 docker_worker_1`, `docker start docker_webserver_1 docker_scheduler_1 docker_worker_1` to load these files but need to test it out first.
