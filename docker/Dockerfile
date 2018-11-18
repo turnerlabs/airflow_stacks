@@ -51,6 +51,8 @@ RUN set -ex \
     && echo 'export AIRFLOW_HOME=/usr/local/airflow' >> /usr/local/.bash_profile \
     && pip3 install -U pip setuptools wheel \
     && pip install apache-airflow[${AIRFLOW_PACKAGES}]==$AIRFLOW_VERSION \
+    && pip uninstall -y redis \
+    && pip install redis==2.10.6 \
     && sed -i '1 i\server time.google.com prefer iburst'  /etc/chrony/chrony.conf \
     && apt-get autoremove -yqq --purge \
     && apt-get autoclean \
