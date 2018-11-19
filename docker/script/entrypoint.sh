@@ -19,12 +19,28 @@ generate_config() {
   airflow initdb
 }
 
-update_config() {
+update_requirements() {
   # Install custom python package if requirements.txt is present
-  if [ -e "/requirements.txt" ]; then
-      $(which pip) install --user -r /requirements.txt
+  if [ -e "/usr/local/airflow/airflow/requirements/requirements.txt" ]; then
+      $(which pip) install --user -r /usr/local/airflow/airflow/requirements/requirements.txt
   fi
+}
 
+update_variables() {
+  # Install custom variables if is present
+  if [ -e "/usr/local/airflow/airflow/variables/variables.json" ]; then
+      /usr/local/airflow/bin/airflow variables --import /usr/local/airflow/airflow/variables/variables.json
+  fi
+}
+
+update_connections() {
+  # Install custom connections if is present
+  if [ -e "/usr/local/airflow/airflow/connections/connections.json" ]; then
+      /usr/local/airflow/bin/airflow connections --import /usr/local/airflow/airflow/variables/connections.json
+  fi
+}
+
+update_config() {
   if [ -n "$REDIS_PASSWORD" ]; then
       REDIS_PREFIX=:${REDIS_PASSWORD}@
   else
@@ -88,14 +104,17 @@ case "$1" in
       generate_rbac # generate the webserver_config.py
       sleep 5
       mkdir /usr/local/airflow/airflow/dags
+      wait_for_dbs # make sure metadata database is running before attempting to initialize
+      sleep 5
+      airflow initdb # reinitilize the config with my settings applied
+      sleep 5
+      generate_user # create an rbac user after everything is up and running
+      sleep 5
     fi
 
-    wait_for_dbs # make sure metadata database is running before attempting to initialize
-    sleep 5
-    airflow initdb # reinitilize the config with my settings applied
-    sleep 5
-    generate_user # create an rbac user after everything is up and running
-    sleep 5
+    update_requirements
+    update_variables
+    update_connections
     /etc/init.d/chrony restart
     exec airflow webserver
     ;;
