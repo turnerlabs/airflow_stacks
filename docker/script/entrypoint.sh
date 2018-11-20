@@ -29,14 +29,14 @@ update_requirements() {
 update_variables() {
   # Install custom variables if is present
   if [ -e "/usr/local/airflow/airflow/variables/variables.json" ]; then
-      /usr/local/airflow/bin/airflow variables --import /usr/local/airflow/airflow/variables/variables.json
+      airflow variables --import /usr/local/airflow/airflow/variables/variables.json
   fi
 }
 
 update_connections() {
   # Install custom connections if is present
   if [ -e "/usr/local/airflow/airflow/connections/connections.json" ]; then
-      /usr/local/airflow/bin/airflow connections --import /usr/local/airflow/airflow/variables/connections.json
+      airflow connections --import /usr/local/airflow/airflow/variables/connections.json
   fi
 }
 
