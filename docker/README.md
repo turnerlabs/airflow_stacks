@@ -29,6 +29,7 @@ This code was taken from <https://github.com/puckel/docker-airflow> and modified
 ## Building, Starting and Stopping Docker.
 
 Once Docker for Mac is up and running you need to do the following 2 items to start using it:
+
 ** assuming you have cloned this repo and are cd'd to this directory
 
 --- Build the airflow docker image
@@ -39,7 +40,7 @@ Once Docker for Mac is up and running you need to do the following 2 items to st
 
 `docker-compose --verbose -f docker-compose.yml up -d`
 
---- To take everythjing down, use:
+--- To take everything down, use:
 
 `docker-compose --verbose -f docker-compose.yml down`
 
