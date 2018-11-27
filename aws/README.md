@@ -20,25 +20,25 @@ Step 2. Run the Terraform scripts
 
 ## How do I get my DAGs into Airflow
 
-*** DAG's will eventually be put in github and ci cd will be used to move files to the DAG s3 bucket ***
+1. Make changes to your dag in the dags folder and commit the change to the appropriate github repo.
 
-1. Check the dags folder in the airflow S3 bucket to see if a file with your name exists already.
+2. Push your changes to github.
 
-- If a file does exist, please rename your file and upload the file to the dags folder in the airflow S3 bucket.
+3. Circle Ci will deploy the dags to airflow.
 
-- If a file does NOT exist, upload the file to the dags folder in the airflow S3 bucket.
+4. Scheduler will check for changes every 5 minutes so keep an eye on the UI on the website for updates.
 
 ## What if I have a specific python module I need in my code
 
-*** requirements.txt file will eventually be put in github and ci cd will be used to move the requirements.txt file to the s3 bucket ***
+1. Make changes to the requirements.txt file in the requirements directory and commit the chnage to the appropriate github repo.
 
-1. Check the root of the airflow S3 bucket to see if a requirements.txt file exists already.
+- If the requirements.txt file does NOT exist in the repo, create a requirements directory and then create a new text file named requirements.txt locally and add your module in the format "FooProject >= 1.2" to the top of the file.
 
-- If the requirements.txt file does exist, please download the file and add your module in the format "FooProject >= 1.2" to the bottom of the requirements.txt file.  Once complete, upload the updated requirments.txt file to the root of the airflow S3 bucket.
+2. Push your changes to github.
 
-- If the requirements.txt file does NOT exist in the airflow S3 bucket, create a new text file named requirements.txt locally and add your module in the format "FooProject >= 1.2" to the top of the file.  Once complete, upload the new requirements.txt file to the root of the airflow S3 bucket.
+3. Circle Ci will deploy the requirements.txt file to airflow once itspushed to master.
 
-2. Cron job on worker nodes will pick up requirements.txt file and install modules in file.
+4. A Cron job on all nodes will pick up requirements.txt file and install the modules.
 
 ## How long do my task logs stay out in S3?
 
