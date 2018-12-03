@@ -29,12 +29,10 @@ echo "------------------- virtual environment creation complete ----------------
 source ~/venv/bin/activate
 echo "------------------- activate virtual environment complete -------------------"
 
-pip install "awscli" 
-pip install "apache-airflow[all]"
+pip install awscli
+pip install apache-airflow[all]==1.10.1
 echo "------------------- install airflow complete -------------------"
 
-pip uninstall -y Flask-AppBuilder
-pip install Flask-AppBuilder==1.11.1
 pip uninstall -y redis
 pip install redis==2.10.6
 echo "------------------- Bug fixes for Flask AppBuilder and Redis -------------------"
