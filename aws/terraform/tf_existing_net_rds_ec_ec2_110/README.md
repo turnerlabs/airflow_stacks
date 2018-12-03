@@ -61,7 +61,7 @@ terraform apply
 -var 's3_airflow_bucket_name=<>'
 -var 's3_airflow_access_log_bucket_name=<>'
 -var 's3_airflow_log_bucket_name=<>'
--var 'ingress_ip=<>'
+-var 'ingress_ips=<>'
 -var 'ingress_ip_description=<>'
 -var 'aws_account_number=<>'
 -var 'airflow_worker_ami=<>'
@@ -226,8 +226,8 @@ variable "s3_airflow_access_log_bucket_name"  {
   description = "S3bucket for alb access logs"
 }
 
-variable "ingress_ip"  {
-  description = "Instance ingress ip to allow. Used by ALB Security Group and WAF"
+variable "ingress_ips"  {
+  description = "Instance ingress ips to allow. Used by ALB Security Group and WAF"
 }
 
 variable "ingress_ip_description"  {
