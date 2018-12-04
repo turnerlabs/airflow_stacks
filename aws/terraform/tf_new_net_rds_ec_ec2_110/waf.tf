@@ -5,7 +5,7 @@ resource "aws_wafregional_ipset" "airflow_waf_ipset" {
 
   ip_set_descriptor {
     type  = "IPV4"
-    value = "${var.ingress_ip}"
+    value = "${var.waf_ip}"
   }
 }
 

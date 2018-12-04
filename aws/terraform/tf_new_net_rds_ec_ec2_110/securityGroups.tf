@@ -10,7 +10,7 @@ resource "aws_security_group" "airflow_lb" {
     from_port       = 443
     to_port         = 443
     protocol        = "tcp"
-    cidr_blocks     = ["${var.ingress_ips}"]
+    cidr_blocks     = ["${split(",", var.ingress_ips)}"]
     description     = "${var.ingress_ip_description}"
   }
 
@@ -142,7 +142,7 @@ resource "aws_security_group" "bastion_instance" {
     from_port       = 22
     to_port         = 22
     protocol        = "tcp"
-    cidr_blocks     = ["${var.ingress_ips}"]
+    cidr_blocks     = ["${split(",", var.ingress_ips)}"]
     description     = "${var.ingress_ip_description}"
   }
 

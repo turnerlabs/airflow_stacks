@@ -10,7 +10,7 @@ resource "random_string" "airflow_rds_password" {
 }
 
 resource "aws_secretsmanager_secret" "airflow_sm_secret" {
-  name = "airflow_user_pass"
+  name = "${var.prefix}_airflow_user_pass"
   recovery_window_in_days = 0 # make this configurable
 }
 

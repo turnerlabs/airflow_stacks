@@ -51,7 +51,7 @@ variable "airflow_keypair_name" {
 
 variable "db_identifier" {
   description = "Database identifier"
-  default     = "airflow_rds"
+  default     = "airflow-rds"
 }
 
 variable "db_port" {
@@ -163,8 +163,12 @@ variable "s3_airflow_access_log_bucket_name"  {
   description = "Airflow bucket for alb access logs"
 }
 
+variable "waf_ip"  {
+  description = "instance ingress ip to allow"
+}
+
 variable "ingress_ips"  {
-  description = "instance ingress ips to allow"
+  description = "instance ingress ip to allow"
 }
 
 variable "ingress_ip_description"  {
