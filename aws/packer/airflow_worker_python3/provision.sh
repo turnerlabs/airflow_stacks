@@ -29,8 +29,9 @@ echo "------------------- virtual environment creation complete ----------------
 source ~/venv/bin/activate
 echo "------------------- activate virtual environment complete -------------------"
 
-pip install awscli
 pip install apache-airflow[all]==1.10.1
+pip install botocore==1.12.58
+pip install awscli==1.16.68
 echo "------------------- install airflow complete -------------------"
 
 pip uninstall -y redis
