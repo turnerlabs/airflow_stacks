@@ -183,7 +183,7 @@ variable "s3_airflow_access_log_bucket_name"  {
   description = "Airflow bucket for alb access logs"
 }
 
-variable "ingress_ip"  {
+variable "ingress_ips"  {
   description = "instance ingress ip to allow"
 }
 

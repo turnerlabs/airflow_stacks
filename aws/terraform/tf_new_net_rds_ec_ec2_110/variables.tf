@@ -166,6 +166,7 @@ variable "s3_airflow_access_log_bucket_name"  {
 variable "waf_ip"  {
   description = "instance ingress ip to allow"
 }
+
 variable "ingress_ips"  {
   description = "instance ingress ip to allow"
 }
