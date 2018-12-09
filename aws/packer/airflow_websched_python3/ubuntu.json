@@ -76,6 +76,11 @@
             "destination": "/home/ubuntu/airflow_vars_install.sh"
         },
         {
+            "type": "file",
+            "source": "../airflow_websched_python3/scripts/dags_install.sh",
+            "destination": "/home/ubuntu/dags_install.sh"
+        },
+        {
             "type": "shell",
             "execute_command": "{{.Vars}} bash '{{.Path}}'",
             "script": "provision.sh"

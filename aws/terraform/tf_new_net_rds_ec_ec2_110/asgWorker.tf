@@ -5,6 +5,8 @@ data "template_file" "airflow-worker-user-data" {
   vars {
     s3_airflow_bucket_name = "${aws_s3_bucket.s3_airflow_bucket.id}"
     role_name = "${aws_iam_role.airflow_instance.name}"
+    db_region = "${var.region}"
+    airflow_secret = "${aws_secretsmanager_secret.airflow_sm_secret.id}"    
   }
 }
 

@@ -8,7 +8,7 @@ echo "------------------- apt update complete -------------------"
 sudo apt-get -y install unattended-upgrades
 echo "------------------- apt upgrade complete -------------------"
 
-sudo apt-get -y install chrony jq virtualenv python3-pip libmysqlclient-dev python3-dev python3 libkrb5-dev libsasl2-dev mysql-client-core-5.7 python3-gdbm s3fs redis-tools openjdk-8-jre
+sudo apt-get -y install chrony jq virtualenv python3-pip libmysqlclient-dev python3-dev python3 libkrb5-dev libsasl2-dev mysql-client-core-5.7 python3-gdbm redis-tools openjdk-8-jre
 echo "------------------- airflow aptitude dependencies complete -------------------"
 
 sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.5 1
@@ -67,6 +67,7 @@ sudo systemctl enable al-agent.service
 rm /home/ubuntu/al-agent_LATEST_amd64.deb
 echo "------------------- enable autostart of threat manager and remove deb-------------------"
 
+chmod 700 /home/ubuntu/dags_install.sh
 chmod 700 /home/ubuntu/pip_mod_install.sh
 chmod 700 /home/ubuntu/airflow_vars_install.sh
 

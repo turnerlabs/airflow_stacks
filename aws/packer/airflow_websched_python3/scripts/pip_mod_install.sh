@@ -5,7 +5,13 @@ PIP_MODULES_FILE=$AIRFLOW_HOME/requirements/requirements.txt
 PIP_LOG_FILE=$AIRFLOW_HOME/logs/${HOSTNAME}_module_install.log
 DATESTART=`date`
 
-echo "---------- STARTED at $DATESTART ----------" >> $PIP_LOG_FILE
+echo "---------- STARTED AT $DATESTART ----------" >> $PIP_LOG_FILE
+
+echo "---------- STARTING COPY FROM S3 ----------" >> $PIP_LOG_FILE
+
+/home/ubuntu/venv/bin/aws s3 cp s3://$S3_AIRFLOW_BUCKET/requirements/ /home/ubuntu/airflow/requirements/ --recursive --quiet
+
+echo "---------- STARTING PIP INSTALL ----------" >> $PIP_LOG_FILE
 
 # verify file exists
 if [ -e $PIP_MODULES_FILE ]
@@ -16,4 +22,4 @@ else
 fi
 
 DATEEND=`date`
-echo "---------- FINISHED at $DATEEND ----------" >> $PIP_LOG_FILE
+echo "---------- FINISHED AT $DATEEND ----------" >> $PIP_LOG_FILE
