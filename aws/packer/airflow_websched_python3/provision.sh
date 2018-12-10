@@ -91,6 +91,26 @@ sudo mkdir /run/airflow
 sudo chown ubuntu:ubuntu /run/airflow
 echo "------------------- modified pid directory complete -------------------"
 
+mkdir /home/ubuntu/airflow
+chown ubuntu:ubuntu /home/ubuntu/airflow
+
+echo "------------------- created airflow directory -------------------"
+
+mkdir /home/ubuntu/airflow/dags
+chown ubuntu:ubuntu /home/ubuntu/airflow/dags
+mkdir /home/ubuntu/airflow/data
+chown ubuntu:ubuntu /home/ubuntu/airflow/data
+mkdir /home/ubuntu/airflow/logs
+chown ubuntu:ubuntu /home/ubuntu/airflow/logs
+mkdir /home/ubuntu/airflow/plugins
+chown ubuntu:ubuntu /home/ubuntu/airflow/plugins
+mkdir /home/ubuntu/airflow/requirements
+chown ubuntu:ubuntu /home/ubuntu/airflow/requirements
+mkdir /home/ubuntu/airflow/variables
+chown ubuntu:ubuntu /home/ubuntu/airflow/variables
+
+echo "------------------- created common airflow directories complete -------------------"
+
 pip install --upgrade jsonpatch
 
 cd /home/ubuntu
