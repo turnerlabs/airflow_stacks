@@ -23,5 +23,5 @@
 14 * * * * /usr/sbin/logrotate /home/ubuntu/logrotate.conf --state /home/ubuntu/logrotate-state
 */5 * * * * /home/ubuntu/pip_mod_install.sh
 */5 * * * * /home/ubuntu/airflow_vars_install.sh
-*/5 * * * * /home/ubuntu/dags_install.sh
+*/2 * * * * /home/ubuntu/dags_install.sh
 */5 * * * * /home/ubuntu/airflow/sm_update.sh
