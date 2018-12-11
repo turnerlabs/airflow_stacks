@@ -80,6 +80,7 @@ if [ ! -e "/home/ubuntu/airflow/airflow.cfg" ]; then
 
     echo "############# Initial airflow database initialization #############"
 
+    sed -i -e "s/dag_dir_list_interval = 300/dag_dir_list_interval = 120/g" /home/ubuntu/airflow/airflow.cfg
     sed -i -e "s/expose_config = False/expose_config = True/g" /home/ubuntu/airflow/airflow.cfg
     sed -i -e "s/executor = SequentialExecutor/executor = CeleryExecutor/g" /home/ubuntu/airflow/airflow.cfg
     sed -i -e "s/remote_logging = False/remote_logging = True/g" /home/ubuntu/airflow/airflow.cfg
