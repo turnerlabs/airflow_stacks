@@ -23,13 +23,13 @@ resource "aws_lb_target_group" "airflow_lb_tg" {
 }
 
 resource "aws_lb" "airflow_lb" {
-  depends_on         = ["aws_security_group.airflow_lb","aws_s3_bucket.s3_airflow_access_log_bucket"]
+  depends_on          = ["aws_security_group.airflow_lb","aws_s3_bucket.s3_airflow_access_log_bucket"]
 
-  name               = "${var.prefix}-alb"
-  internal           = false
-  load_balancer_type = "application"
-  security_groups    = ["${aws_security_group.airflow_lb.id}"]
-  subnets            = ["${aws_subnet.airflow_subnet_public_1c.id}", "${aws_subnet.airflow_subnet_public_1d.id}"]
+  name                = "${var.prefix}-alb"
+  internal            = false
+  load_balancer_type  = "application"
+  security_groups     = ["${aws_security_group.airflow_lb.id}"]
+  subnets             = ["${aws_subnet.airflow_subnet_public_1c.id}", "${aws_subnet.airflow_subnet_public_1d.id}"]
 
   access_logs {
     bucket  = "${aws_s3_bucket.s3_airflow_access_log_bucket.id}"

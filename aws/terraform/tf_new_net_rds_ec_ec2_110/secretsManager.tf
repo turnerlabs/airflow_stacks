@@ -5,12 +5,12 @@ provider "random" {
 # Random password and Secrets Manager
 
 resource "random_string" "airflow_rds_password" {
-  length = 30
+  length  = 30
   special = false
 }
 
 resource "aws_secretsmanager_secret" "airflow_sm_secret" {
-  name = "${var.prefix}_airflow_user_pass"
+  name                    = "${var.prefix}_airflow_user_pass"
   recovery_window_in_days = 0 # make this configurable
 }
 
