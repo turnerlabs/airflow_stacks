@@ -5,7 +5,13 @@ VARIABLES_INSTALL_FILE=$AIRFLOW_HOME/variables/variables.json
 VARIABLES_LOG_FILE=$AIRFLOW_HOME/logs/${HOSTNAME}_variables_install.log
 DATESTART=`date`
 
-echo "---------- STARTED at $DATESTART ----------" >> $VARIABLES_LOG_FILE
+echo "---------- STARTED AT $DATESTART ----------" >> $VARIABLES_LOG_FILE
+
+echo "---------- STARTING COPY FROM S3 ----------" >> $VARIABLES_LOG_FILE
+
+/home/ubuntu/venv/bin/aws s3 cp s3://$S3_AIRFLOW_BUCKET/variables/ /home/ubuntu/airflow/variables/ --recursive --quiet
+
+echo "---------- STARTING VARIABLES IMPORT ----------" >> $VARIABLES_LOG_FILE
 
 # verify file exists
 if [ -e $VARIABLES_INSTALL_FILE ]
@@ -16,4 +22,4 @@ else
 fi
 
 DATEEND=`date`
-echo "---------- FINISHED at $DATEEND ----------" >> $VARIABLES_LOG_FILE
+echo "---------- FINISHED AT $DATEEND ----------" >> $VARIABLES_LOG_FILE

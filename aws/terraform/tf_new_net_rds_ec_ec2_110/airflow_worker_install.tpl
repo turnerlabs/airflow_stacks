@@ -1,24 +1,45 @@
 #!/bin/bash -xe
 
-mkdir /home/ubuntu/airflow
-chown ubuntu:ubuntu /home/ubuntu/airflow
+export AIRFLOW_HOME=/home/ubuntu/airflow
 
-echo "############# Created airflow directory #############"
+echo "S3_AIRFLOW_BUCKET=${s3_airflow_bucket_name}" >> /etc/environment
+echo "S3_AIRFLOW_BUCKET=${s3_airflow_bucket_name}" >> /etc/profile.d/airflow.sh
 
-id=`id -u ubuntu`
-group=`id -g ubuntu`
+export S3_AIRFLOW_BUCKET=${s3_airflow_bucket_name}
 
-/usr/bin/s3fs ${s3_airflow_bucket_name} -o use_cache=/tmp,rw,noatime,iam_role="${role_name}",uid=$id,gid=$group,allow_other /home/ubuntu/airflow
+secret=`/home/ubuntu/venv/bin/aws secretsmanager get-secret-value --region ${db_region} --secret-id ${airflow_secret}`
+token=$(echo $secret | jq -r .SecretString)
 
-echo "############# Enabled s3 mount for airflow directory #############"
+echo "RDS_KEY=$token" >> /etc/environment
+echo "RDS_KEY=$token" >> /etc/profile.d/airflow.sh
 
-/home/ubuntu/pip_mod_install.sh
+export RDS_KEY=$token
 
-echo "############# Ran modules update from S3 #############"
+echo "############# Set initial environment variables for cron and systemd #############"
 
-sleep 3m
+/home/ubuntu/venv/bin/aws s3 cp s3://${s3_airflow_bucket_name}/ /home/ubuntu/airflow/ --recursive --quiet
 
-echo "############# Slept 5 minutes to wait for airflow.cfg to be created correctly #############"
+if [ ! -e "/home/ubuntu/airflow/airflow.cfg" ]; then
+    sleep 5m
+    
+    /home/ubuntu/venv/bin/aws s3 cp s3://${s3_airflow_bucket_name}/ /home/ubuntu/airflow/ --recursive --quiet
+fi
+
+echo "############# Copy important files from s3 locally #############"
+
+chmod 600 /home/ubuntu/airflow/airflow.cfg
+chmod 600 /home/ubuntu/airflow/unittests.cfg
+chmod 600 /home/ubuntu/airflow/webserver_config.py
+chmod 700 /home/ubuntu/airflow/connect.sh
+chmod 700 /home/ubuntu/airflow/sm_update.sh
+
+chown ubuntu:ubuntu /home/ubuntu/airflow/connect.sh
+chown ubuntu:ubuntu /home/ubuntu/airflow/sm_update.sh
+chown ubuntu:ubuntu /home/ubuntu/airflow/airflow.cfg
+chown ubuntu:ubuntu /home/ubuntu/airflow/unittests.cfg
+chown ubuntu:ubuntu /home/ubuntu/airflow/webserver_config.py
+
+echo "############# Set correct permissions on files #############"
 
 systemctl enable airflow-worker
 
