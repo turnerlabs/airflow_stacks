@@ -2,6 +2,9 @@
 
 export AIRFLOW_HOME=/home/ubuntu/airflow
 
+echo $'' >> /etc/environment
+echo $'' >> /etc/profile.d/airflow.sh
+
 echo "S3_AIRFLOW_BUCKET=${s3_airflow_bucket_name}" >> /etc/environment
 echo "S3_AIRFLOW_BUCKET=${s3_airflow_bucket_name}" >> /etc/profile.d/airflow.sh
 
@@ -27,19 +30,15 @@ fi
 
 echo "############# Copy important files from s3 locally #############"
 
+chown -R ubuntu:ubuntu /home/ubuntu/airflow
+
 chmod 600 /home/ubuntu/airflow/airflow.cfg
 chmod 600 /home/ubuntu/airflow/unittests.cfg
 chmod 600 /home/ubuntu/airflow/webserver_config.py
 chmod 700 /home/ubuntu/airflow/connect.sh
 chmod 700 /home/ubuntu/airflow/sm_update.sh
 
-chown ubuntu:ubuntu /home/ubuntu/airflow/connect.sh
-chown ubuntu:ubuntu /home/ubuntu/airflow/sm_update.sh
-chown ubuntu:ubuntu /home/ubuntu/airflow/airflow.cfg
-chown ubuntu:ubuntu /home/ubuntu/airflow/unittests.cfg
-chown ubuntu:ubuntu /home/ubuntu/airflow/webserver_config.py
-
-echo "############# Set correct permissions on files #############"
+echo "############# Apply owndership and execution priviliges #############"
 
 systemctl enable airflow-worker
 

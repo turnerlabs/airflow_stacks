@@ -2,6 +2,9 @@
 
 export AIRFLOW_HOME=/home/ubuntu/airflow
 
+echo $'' >> /etc/environment
+echo $'' >> /etc/profile.d/airflow.sh
+
 echo "S3_AIRFLOW_BUCKET=${s3_airflow_bucket_name}" >> /etc/environment
 echo "S3_AIRFLOW_BUCKET=${s3_airflow_bucket_name}" >> /etc/profile.d/airflow.sh
 
@@ -44,9 +47,6 @@ if [ ! -e "/home/ubuntu/airflow/connect.sh" ]; then
     echo $'' >> /home/ubuntu/airflow/connect.sh
     echo "echo \"\$url"\" >> /home/ubuntu/airflow/connect.sh
     
-    chown ubuntu:ubuntu /home/ubuntu/airflow/connect.sh    
-    chmod 700 /home/ubuntu/airflow/connect.sh
-
     /home/ubuntu/venv/bin/aws s3 cp /home/ubuntu/airflow/connect.sh s3://${s3_airflow_bucket_name}/connect.sh --quiet
 
     echo "############# Generate connect.sh #############"
@@ -65,9 +65,6 @@ if [ ! -e "/home/ubuntu/airflow/sm_update.sh" ]; then
 
     echo "sudo sed -i -e \"$ a RDS_KEY=\$token\" /etc/environment" >> /home/ubuntu/airflow/sm_update.sh
     echo "sudo sed -i -e \"$ a RDS_KEY=\$token\" /etc/profile.d/airflow.sh" >> /home/ubuntu/airflow/sm_update.sh
-
-    chown ubuntu:ubuntu /home/ubuntu/airflow/sm_update.sh
-    chmod 700 /home/ubuntu/airflow/sm_update.sh
 
     /home/ubuntu/venv/bin/aws s3 cp /home/ubuntu/airflow/sm_update.sh s3://${s3_airflow_bucket_name}/sm_update.sh --quiet
 
@@ -116,20 +113,22 @@ auth_backend = airflow.contrib.auth.backends.password_auth" /home/ubuntu/airflow
 
     echo "############# Added airflow user #############"
 
-    chmod 600 /home/ubuntu/airflow/airflow.cfg
-    chmod 600 /home/ubuntu/airflow/unittests.cfg
-    chmod 600 /home/ubuntu/airflow/webserver_config.py
-
-    chown ubuntu:ubuntu /home/ubuntu/airflow/airflow.cfg
-    chown ubuntu:ubuntu /home/ubuntu/airflow/unittests.cfg
-    chown ubuntu:ubuntu /home/ubuntu/airflow/webserver_config.py
-
     /home/ubuntu/venv/bin/aws s3 cp /home/ubuntu/airflow/airflow.cfg s3://${s3_airflow_bucket_name}/airflow.cfg --quiet
     /home/ubuntu/venv/bin/aws s3 cp /home/ubuntu/airflow/unittests.cfg s3://${s3_airflow_bucket_name}/unittests.cfg --quiet
     /home/ubuntu/venv/bin/aws s3 cp /home/ubuntu/airflow/webserver_config.py s3://${s3_airflow_bucket_name}/webserver_config.py --quiet
 
     echo "############# Copy config files to s3 #############"
 fi
+
+chown -R ubuntu:ubuntu /home/ubuntu/airflow
+
+chmod 700 /home/ubuntu/airflow/connect.sh
+chmod 700 /home/ubuntu/airflow/sm_update.sh
+chmod 600 /home/ubuntu/airflow/airflow.cfg
+chmod 600 /home/ubuntu/airflow/unittests.cfg
+chmod 600 /home/ubuntu/airflow/webserver_config.py
+
+echo "############# Apply owndership and execution priviliges #############"
 
 systemctl enable airflow-webserver
 systemctl enable airflow-scheduler
