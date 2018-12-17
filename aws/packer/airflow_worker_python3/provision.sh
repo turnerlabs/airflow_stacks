@@ -8,6 +8,20 @@ echo "------------------- apt update complete -------------------"
 sudo apt-get -y install unattended-upgrades
 echo "------------------- apt upgrade complete -------------------"
 
+curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
+
+curl https://packages.microsoft.com/config/ubuntu/16.04/prod.list >> /home/ubuntu/prod.list
+sudo cp /home/ubuntu/prod.list /etc/apt/sources.list.d/mssql-release.list
+rm /home/ubuntu/prod.list
+
+sudo apt-get update
+sudo ACCEPT_EULA=Y apt-get -y install msodbcsql17 mssql-tools
+
+echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> /home/ubuntu/.bash_profile
+echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> /home/ubuntu/.bashrc
+source /home/ubuntu/.bashrc
+echo "------------------- microsoft unixodbc dependencies complete -------------------"
+
 sudo apt-get -y install unixodbc unixodbc-dev chrony jq virtualenv python3-pip libmysqlclient-dev python3-dev python3 libkrb5-dev libsasl2-dev mysql-client-core-5.7 python3-gdbm redis-tools openjdk-8-jre
 echo "------------------- airflow aptitude dependencies complete -------------------"
 
