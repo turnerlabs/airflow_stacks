@@ -9,7 +9,7 @@ echo "---------- STARTED AT $DATESTART ----------" >> $VARIABLES_LOG_FILE
 
 echo "---------- STARTING COPY FROM S3 ----------" >> $VARIABLES_LOG_FILE
 
-/home/ubuntu/venv/bin/aws s3 sync s3://$S3_AIRFLOW_BUCKET/variables/ /home/ubuntu/airflow/variables/ --delete --quiet
+/home/ubuntu/venv/bin/aws s3 sync s3://$S3_AIRFLOW_BUCKET/variables/ /home/ubuntu/airflow/variables/ --exact-timestamps --delete --quiet
 
 echo "---------- STARTING VARIABLES IMPORT ----------" >> $VARIABLES_LOG_FILE
 

@@ -9,7 +9,7 @@ echo "---------- STARTED AT $DATESTART ----------" >> $PIP_LOG_FILE
 
 echo "---------- STARTING COPY FROM S3 ----------" >> $PIP_LOG_FILE
 
-/home/ubuntu/venv/bin/aws s3 sync s3://$S3_AIRFLOW_BUCKET/requirements/ /home/ubuntu/airflow/requirements/ --delete --quiet
+/home/ubuntu/venv/bin/aws s3 sync s3://$S3_AIRFLOW_BUCKET/requirements/ /home/ubuntu/airflow/requirements/ --exact-timestamps --delete --quiet
 
 echo "---------- STARTING PIP INSTALL ----------" >> $PIP_LOG_FILE
 
