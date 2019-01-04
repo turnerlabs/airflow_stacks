@@ -24,9 +24,11 @@ Step 2. Run the Terraform scripts
 
 2. Push your changes to github.
 
-3. Circle Ci will deploy the dags to airflow.
+3. Circle Ci will deploy the dags to S3 once its pushed to master.
 
-4. Scheduler will check for changes every 5 minutes so keep an eye on the UI on the website for updates.
+4. A cron job will run every 3 minutes on all nodes and copy any changed dags over to the $AIRFLOW_HOME/dags directory.
+
+5. The Scheduler will check for changes every 3 minutes so keep an eye on the UI on the website for updates.
 
 ## What if I have a specific python module I need in my code
 
@@ -36,9 +38,11 @@ Step 2. Run the Terraform scripts
 
 2. Push your changes to github.
 
-3. Circle Ci will deploy the requirements.txt file to airflow once itspushed to master.
+3. Circle Ci will deploy the requirements.txt file to S3 once its pushed to master.
 
-4. A Cron job on all nodes will pick up requirements.txt file and install the modules.
+4. A cron job will run every 3 minutes on all nodes and copy any changed requirements.txt over to the $AIRFLOW_HOME/requirements directory.
+
+5. A cron job on all nodes will pip install the requirements.txt file every 5 minutes.
 
 ## How long do my task logs stay out in S3?
 
