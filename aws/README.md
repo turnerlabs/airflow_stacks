@@ -4,15 +4,15 @@
 
 Step 1. Build the Packer AMI's
 
-[Build Webserver Scheduler AMI](/packer/airflow_websched_python3/README.md)
+[Build Webserver Scheduler AMI](https://github.com/turnerlabs/airflow_stacks/tree/master/aws/packer/airflow_websched_python3)
 
-[Build Worker AMI](/packer/airflow_worker_python3/README.md)
+[Build Worker AMI](https://github.com/turnerlabs/airflow_stacks/tree/master/aws/packer/airflow_worker_python3)
 
 Step 2. Run the Terraform scripts
 
-[Create the state bucket to contain the Airflow stacks state](/terraform/tf_s3_state/README.md)
+[Create the state bucket to contain the Airflow stacks state](https://github.com/turnerlabs/airflow_stacks/tree/master/aws/terraform/tf_s3_state/README.md)
 
-[Create the Airflow stack](/terraform/tf_new_net_rds_ec_ec2_110/README.md)
+[Create the Airflow stack](https://github.com/turnerlabs/airflow_stacks/tree/master/aws/terraform/tf_new_net_rds_ec_ec2_110/README.md)
 
 ## How to use Airflow once it's stood up
 
