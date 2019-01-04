@@ -16,6 +16,7 @@ It creates the following resources in AWS:
 - 1 SSL cert is created using ACM
 - 1 Secret Manager key is created for access from Webserver / Scheduler instance to RDS instance.
 - 1 MySQL RDS database
+- 1 Elasticache cluster
 - 3 Security groups
   - 1 for RDS access
   - 1 for Elasticache access
@@ -24,12 +25,13 @@ It creates the following resources in AWS:
 - 1 Auto Scale Group for Airflow Webserver / Scheduler
 - 1 Launch Config using Airflow Worker AMI
 - 1 Auto Scale Group for Airflow Worker
+- 1 Bastion server
 
-The Airflow instances will be able to communicate with Elasticache as well as Serverless Aurora.
+The Airflow instances will be able to communicate with Elasticache as well as RDS.
 
 Assumptions:
 
-A Key Pair has already been created.
+A SSH Key Pair has already been created.
 A domain has been registered in Route53 with a hosted zone.
 
 Please check the variables.tf for a clear description of what each variable is that is passed to this terraform.
