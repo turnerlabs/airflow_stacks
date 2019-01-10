@@ -5,7 +5,7 @@ workflow "Build Airflow Container" {
 
 action "Build Docker image" {
   uses = "actions/docker/cli@master"
-  args = ["build --rm -t turnerlabs/docker-airflow ./docker"]
+  args = "build --rm -t turnerlabs/docker-airflow ./docker"
 }
 
 action "GitHub Action for Docker" {
