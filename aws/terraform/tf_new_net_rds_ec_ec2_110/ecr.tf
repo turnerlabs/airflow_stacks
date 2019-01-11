@@ -1,6 +1,7 @@
 resource "aws_ecr_repository" "airflow_ecr_repo" {
   name = "${var.prefix}_websched"
 }
+
 resource "aws_ecr_lifecycle_policy" "airflow_ecr_lc_policy" {
   repository = "${aws_ecr_repository.airflow_ecr_repo.name}"
 
