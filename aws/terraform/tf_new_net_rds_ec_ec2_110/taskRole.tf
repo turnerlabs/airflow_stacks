@@ -114,13 +114,3 @@ resource "aws_iam_role_policy" "airflow_secrets" {
 }
 EOF
 }
-
-
-# IAM Instance Profile
-
-resource "aws_iam_instance_profile" "airflow_s3_task_profile" {
-  depends_on  = ["aws_iam_role.airflow_task", "aws_iam_role_policy.airflow_s3", "aws_iam_role_policy.airflow_logs"]
-  
-  name = "${var.prefix}_task_profile"
-  role = "${aws_iam_role.airflow_task.name}"
-}

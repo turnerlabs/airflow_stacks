@@ -1,0 +1,37 @@
+version: '2.1'
+services:
+    webserver:
+        image: turnerlabs/docker-airflow:latest
+        restart: always
+        environment:
+            - LOAD_EX=n
+            - FERNET_KEY=46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqDDho=
+            - EXECUTOR=Celery
+            - MYSQL_USER=airflow
+            - MYSQL_PASSWORD=airflow
+            - MYSQL_DATABASE=airflow
+        volumes:
+            - ./airflow:/usr/local/airflow/airflow
+        ports:
+            - "8080:8080"
+        command: webserver
+        healthcheck:
+            test: ["CMD-SHELL", "[ -f /usr/local/airflow/airflow-webserver.pid ]"]
+            interval: 30s
+            timeout: 30s
+            retries: 3
+        entrypoint: /entrypoint.sh
+    scheduler:
+        image: turnerlabs/docker-airflow:latest
+        restart: always
+        volumes:
+            - ./airflow:/usr/local/airflow/airflow
+        environment:
+            - LOAD_EX=n
+            - FERNET_KEY=46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqDDho=
+            - EXECUTOR=Celery
+            - MYSQL_USER=airflow
+            - MYSQL_PASSWORD=airflow
+            - MYSQL_DATABASE=airflow
+        command: scheduler
+        entrypoint: /entrypoint.sh
