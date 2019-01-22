@@ -225,7 +225,7 @@ case "$1" in
     update_variables
     update_connections
     /etc/init.d/chrony restart
-    exec airflow scheduler
+    exec airflow webserver
     ;;
   version)
     exec airflow "$@"
