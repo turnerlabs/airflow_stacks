@@ -47,6 +47,9 @@ if [ ! -e "/home/ubuntu/airflow/connect.sh" ]; then
     echo $'' >> /home/ubuntu/airflow/connect.sh
     echo "echo \"\$url"\" >> /home/ubuntu/airflow/connect.sh
     
+    chown -R ubuntu:ubuntu /home/ubuntu/airflow
+    chmod 700 /home/ubuntu/airflow/connect.sh
+
     /home/ubuntu/venv/bin/aws s3 cp /home/ubuntu/airflow/connect.sh s3://${s3_airflow_bucket_name}/connect.sh --quiet
 
     echo "############# Generate connect.sh #############"
@@ -66,6 +69,9 @@ if [ ! -e "/home/ubuntu/airflow/sm_update.sh" ]; then
     echo "sudo sed -i -e \"$ a RDS_KEY=\$token\" /etc/environment" >> /home/ubuntu/airflow/sm_update.sh
     echo "sudo sed -i -e \"$ a RDS_KEY=\$token\" /etc/profile.d/airflow.sh" >> /home/ubuntu/airflow/sm_update.sh
 
+    chown -R ubuntu:ubuntu /home/ubuntu/airflow
+    chmod 700 /home/ubuntu/airflow/sm_update.sh
+
     /home/ubuntu/venv/bin/aws s3 cp /home/ubuntu/airflow/sm_update.sh s3://${s3_airflow_bucket_name}/sm_update.sh --quiet
 
     echo "############# Generate sm_update.sh #############"
@@ -74,6 +80,10 @@ fi
 if [ ! -e "/home/ubuntu/airflow/airflow.cfg" ]; then
     
     /home/ubuntu/venv/bin/airflow initdb
+
+    chown -R ubuntu:ubuntu /home/ubuntu/airflow
+    chmod 600 /home/ubuntu/airflow/airflow.cfg
+    chmod 600 /home/ubuntu/airflow/unittests.cfg
 
     echo "############# Initial airflow database initialization #############"
 
@@ -102,6 +112,9 @@ auth_backend = airflow.contrib.auth.backends.password_auth" /home/ubuntu/airflow
     sed -i -e "s/rbac = False/rbac = True/g" /home/ubuntu/airflow/airflow.cfg
 
     /home/ubuntu/venv/bin/airflow -h
+
+    chown -R ubuntu:ubuntu /home/ubuntu/airflow
+    chmod 600 /home/ubuntu/airflow/webserver_config.py
 
     echo "############# Generate webserver_config.py before initdb  #############"
 
