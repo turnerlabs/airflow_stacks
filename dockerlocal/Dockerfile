@@ -1,4 +1,4 @@
-FROM python:3.5.6-alpine3.8
+FROM ubuntu:16.04
 
 # Never prompts the user for choices on installation/configuration of packages
 ENV DEBIAN_FRONTEND noninteractive
@@ -10,59 +10,59 @@ ARG AIRFLOW_HOME=/usr/local/airflow
 ARG AIRFLOW_PACKAGES=all
 
 # Define en_US.
-ENV SLUGIFY_USES_TEXT_UNIDECODE yes
-ENV CFLAGS -I/usr/include/libffi/include
-
-RUN set -ex \
-    && apk update \
-    && apk upgrade \
-    && apk add \
-        mariadb-dev \
-        freetds-dev \
-        krb5-dev \
-        cyrus-sasl-dev \
-        py3-cffi \
-        libffi-dev \
-        libxslt \
-        libxslt-dev \
-        libxml2 \
-        libxml2-dev  \
-        linux-headers \
-        postgresql-libs \
-        build-base \
-        python3-dev \
-        subversion \
-        bash \
-        libsasl \
-        krb5 \
-        chrony \
-        jq \
-        git \
-        curl \
-        rsync \
-    && apk add --virtual .build-deps gcc musl-dev postgresql-dev \
-    && apk --no-cache add ca-certificates wget \
-    && wget -q -O /etc/apk/keys/sgerrand.rsa.pub https://alpine-pkgs.sgerrand.com/sgerrand.rsa.pub \
-    && wget https://github.com/sgerrand/alpine-pkg-glibc/releases/download/2.28-r0/glibc-2.28-r0.apk \
-    && wget https://github.com/sgerrand/alpine-pkg-glibc/releases/download/2.28-r0/glibc-bin-2.28-r0.apk \
-    && wget https://github.com/sgerrand/alpine-pkg-glibc/releases/download/2.28-r0/glibc-i18n-2.28-r0.apk \
-    && apk add glibc-bin-2.28-r0.apk glibc-i18n-2.28-r0.apk glibc-2.28-r0.apk \
-    && addgroup -S airflow \
-    && adduser -s /bin/bash -h ${AIRFLOW_HOME} -S airflow -G airflow \
-    && echo 'export AIRFLOW_HOME=/usr/local/airflow' >> /usr/local/.bash_profile \
-    && pip3 install -U pip setuptools wheel cython \
-    && pip install apache-airflow[${AIRFLOW_PACKAGES}]==$AIRFLOW_VERSION \
-    && pip uninstall -y redis \
-    && pip install redis==2.10.6 \
-    && sed -i '1 i\server time.google.com prefer iburst'  /etc/chrony/chrony.conf \
-    && /usr/glibc-compat/bin/localedef -i en_US -f UTF-8 en_US.UTF-8 \
-    && /usr/glibc-compat/bin/locale -a
-
 ENV LANGUAGE en_US.UTF-8
 ENV LANG en_US.UTF-8
 ENV LC_ALL en_US.UTF-8
 ENV LC_CTYPE en_US.UTF-8
 ENV LC_MESSAGES en_US.UTF-8
+ENV SLUGIFY_USES_TEXT_UNIDECODE yes
+
+RUN set -ex \
+    && apt-get update -yqq \
+    && apt-get upgrade -yqq \
+    && apt-get install -yqq \
+        unattended-upgrades \
+        chrony \
+        jq \
+        python3-pip \
+        libmysqlclient-dev \
+        python3-dev \
+        python3 \
+        libkrb5-dev \
+        libsasl2-dev \
+        mysql-client-core-5.7 \
+        python3-gdbm \
+        redis-tools \
+        openjdk-8-jre \
+        git \
+        build-essential \
+        apt-utils \
+        curl \
+        rsync \
+        netcat \
+        locales \
+        locales-all \
+    && locale-gen \
+    && sed -i 's/^# en_US.UTF-8 UTF-8$/en_US.UTF-8 UTF-8/g' /etc/locale.gen \
+    && locale-gen \
+    && update-locale LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 \
+    && useradd -ms /bin/bash -d ${AIRFLOW_HOME} airflow \
+    && update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.5 1 \
+    && echo 'export AIRFLOW_HOME=/usr/local/airflow' >> /usr/local/.bash_profile \
+    && pip3 install -U pip setuptools wheel \
+    && pip install apache-airflow[${AIRFLOW_PACKAGES}]==$AIRFLOW_VERSION \
+    && pip uninstall -y redis \
+    && pip install redis==2.10.6 \
+    && sed -i '1 i\server time.google.com prefer iburst'  /etc/chrony/chrony.conf \
+    && apt-get autoremove -yqq --purge \
+    && apt-get autoclean \
+    && rm -rf \
+        /var/lib/apt/lists/* \
+        /tmp/* \
+        /var/tmp/* \
+        /usr/share/man \
+        /usr/share/doc \
+        /usr/share/doc-base
 
 COPY script/entrypoint.sh /entrypoint.sh
 
