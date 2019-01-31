@@ -2,9 +2,6 @@
 
 TRY_LOOP="20"
 
-export AIRFLOW_HOME=/usr/local/airflow
-export AIRFLOW_CONFIG=${AIRFLOW_HOME}/airflow.cfg
-
 # Defaults and back-compat
 : "${AIRFLOW__CORE__FERNET_KEY:=${FERNET_KEY:=$(/usr/bin/python3 -c "from cryptography.fernet import Fernet; FERNET_KEY = Fernet.generate_key().decode(); print(FERNET_KEY)")}}"
 

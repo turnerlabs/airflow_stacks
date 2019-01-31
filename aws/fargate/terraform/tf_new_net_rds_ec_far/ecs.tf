@@ -52,6 +52,18 @@ resource "aws_ecs_task_definition" "airflow_webserver_ecs_task_def" {
     },
     "environment": [
        {
+        "name": "AIRFLOW_HOME",
+        "value" : "/usr/local/airflow"
+       },
+       {
+        "name": "AIRFLOW_CONFIG",
+        "value" : "/usr/local/airflow/airflow.cfg"
+       },
+       {
+        "name": "FORWARDED_ALLOW_IPS",
+        "value" : "*"
+       },
+       {
         "name": "EC_URL",
         "value" : "${aws_elasticache_cluster.airflow_elasticache.cache_nodes.0.address}"
        },
