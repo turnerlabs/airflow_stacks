@@ -1,0 +1,32 @@
+version: '2.1'
+services:
+    scheduler:
+        image: turnerlabs/airflow-sched:latest
+        restart: always
+        command: scheduler
+        environment:
+            - AIRFLOW_EMAILADDRESS=
+            - AIRFLOW_FIRST=
+            - AIRFLOW_LAST=
+            - AIRFLOW_PASSWORD=
+            - AIRFLOW_ROLE=
+            - AIRFLOW_SECRET=
+            - AIRFLOW_USERNAME=
+            - DB_AIRFLOW_DBNAME=
+            - DB_AIRFLOW_PASSWORD=
+            - DB_AIRFLOW_USERNAME=
+            - DB_CHARSET=latin1
+            - DB_MASTER_PASSWORD=
+            - DB_MASTER_USERNAME=
+            - DB_PORT=3306
+            - DB_REGION=
+            - EC_URL=
+            - RDS_URL=
+            - S3_AIRFLOW_BUCKET_NAME=
+            - S3_AIRFLOW_LOG_BUCKET_NAME=
+            - SUBDOMAIN=
+            - AWS_ACCESS_KEY_ID=
+            - AWS_SECRET_ACCESS_KEY=
+            - AWS_SESSION_TOKEN=
+            - AWS_DEFAULT_REGION=
+        entrypoint: /entrypoint.sh
