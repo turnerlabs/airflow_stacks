@@ -13,7 +13,7 @@ services:
             - MYSQL_DATABASE=airflow
     webserver:
         image: turnerlabs/docker-airflow:latest
-        restart: always
+        restart: "no"
         links:
             - mysql
             - redis
@@ -25,24 +25,24 @@ services:
             - MYSQL_PASSWORD=airflow
             - MYSQL_DATABASE=airflow
         volumes:
-            - ./airflow:/usr/local/airflow/airflow
+            - ./airflow:/usr/local/airflow
         ports:
             - "8080:8080"
         command: webserver
         healthcheck:
-            test: ["CMD-SHELL", "[ -f /usr/local/airflow/airflow-webserver.pid ]"]
+            test: ["CMD-SHELL", "curl -f http://localhost:8080/ || exit 1"]
             interval: 30s
             timeout: 30s
             retries: 3
         entrypoint: /entrypoint.sh
     scheduler:
         image: turnerlabs/docker-airflow:latest
-        restart: always
+        restart: "no"
         links:
             - mysql            
             - redis
         volumes:
-            - ./airflow:/usr/local/airflow/airflow
+            - ./airflow:/usr/local/airflow
         environment:
             - LOAD_EX=n
             - FERNET_KEY=46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqDDho=
@@ -54,11 +54,11 @@ services:
         entrypoint: /entrypoint.sh
     worker:
         image: turnerlabs/docker-airflow:latest
-        restart: always
+        restart: "no"
         links:
             - redis
         volumes:
-            - ./airflow:/usr/local/airflow/airflow
+            - ./airflow:/usr/local/airflow
         environment:
             - FERNET_KEY=46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqDDho=
             - EXECUTOR=Celery
