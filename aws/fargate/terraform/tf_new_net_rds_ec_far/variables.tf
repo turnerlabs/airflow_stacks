@@ -188,6 +188,7 @@ variable "airflow_webserver_image" {
   default="turnerlabs/airflow-web"
 }
 
-# variable "airflow_scheduler_image" {
-#   description="Docker webserver image"  
-# }
+variable "airflow_scheduler_image" {
+  description="Docker scheduler image"  
+  default="turnerlabs/airflow-sched"  
+}
