@@ -2,9 +2,6 @@
 
 TRY_LOOP="50"
 
-# Defaults and back-compat
-: "${AIRFLOW__CORE__FERNET_KEY:=${FERNET_KEY:=$(/usr/bin/python3 -c "from cryptography.fernet import Fernet; FERNET_KEY = Fernet.generate_key().decode(); print(FERNET_KEY)")}}"
-
 set_environment_values(){
   echo "############# Start set_environment_values  #############"
   echo $'' >> /etc/environment

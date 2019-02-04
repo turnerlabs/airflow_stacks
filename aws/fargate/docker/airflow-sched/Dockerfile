@@ -25,7 +25,6 @@ COPY ./script/entrypoint.sh /entrypoint.sh
 COPY ./config/logrotate.conf /usr/local/airflow/logrotate.conf
 COPY ./cron/crontab /usr/local/airflow/crontab
 COPY ./scripts/pip_mod_install.sh /usr/local/airflow/pip_mod_install.sh
-COPY ./scripts/airflow_vars_install.sh /usr/local/airflow/airflow_vars_install.sh
 COPY ./scripts/dags_install.sh /usr/local/airflow/dags_install.sh
 
 RUN mkdir /run/airflow \
@@ -40,20 +39,16 @@ RUN mkdir /run/airflow \
     && chown airflow:airflow /usr/local/airflow/plugins \
     && mkdir /usr/local/airflow/requirements \
     && chown airflow:airflow /usr/local/airflow/requirements \
-    && mkdir /usr/local/airflow/variables \
-    && chown airflow:airflow /usr/local/airflow/variables \
     && chown -R airflow:airflow ${AIRFLOW_HOME} \
     && chown -R airflow:airflow /entrypoint.sh \
     && chown -R airflow:airflow /usr/local/airflow/logrotate.conf \
     && chown -R airflow:airflow /usr/local/airflow/crontab \
     && chown -R airflow:airflow /usr/local/airflow/pip_mod_install.sh \
-    && chown -R airflow:airflow /usr/local/airflow/airflow_vars_install.sh \
     && chown -R airflow:airflow /usr/local/airflow/dags_install.sh \
     && chmod 770 /entrypoint.sh \
     && chmod 600 /usr/local/airflow/logrotate.conf \
     && chmod 700 /usr/local/airflow/crontab \
     && chmod 700 /usr/local/airflow/pip_mod_install.sh \
-    && chmod 700 /usr/local/airflow/airflow_vars_install.sh \
     && chmod 700 /usr/local/airflow/dags_install.sh
 
 RUN set -ex \

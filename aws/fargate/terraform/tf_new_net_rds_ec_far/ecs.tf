@@ -44,7 +44,7 @@ resource "aws_ecs_task_definition" "airflow_webserver_ecs_task_def" {
         "retries": 3,
         "command": [
           "\"CMD-SHELL\"",
-          "\"[ -f /usr/local/airflow/airflow-webserver.pid ]\""
+          "\"curl -f http://localhost:8080/login || exit 1\""
         ],
         "timeout": 30,
         "interval": 30,
@@ -221,7 +221,7 @@ resource "aws_ecs_task_definition" "airflow_scheduler_ecs_task_def" {
     "logConfiguration": {
       "logDriver": "awslogs",
       "options": {
-        "awslogs-group": "/fargate/service/${var.prefix}_webserver_ecs_service",
+        "awslogs-group": "/fargate/service/${var.prefix}_scheduler_ecs_service",
         "awslogs-region": "us-east-1",
         "awslogs-stream-prefix": "ecs"
       }
@@ -266,5 +266,31 @@ resource "aws_ecs_service" "airflow_scheduler_ecs_svc" {
   network_configuration {
     security_groups = ["${aws_security_group.airflow_instance.id}"]
     subnets         = ["${aws_subnet.airflow_subnet_private_1c.id}", "${aws_subnet.airflow_subnet_private_1d.id}"]
+  }
+}
+
+resource "aws_cloudwatch_log_group" "webserver_logs" {
+  name              = "/fargate/service/${var.prefix}_webserver_ecs_service"
+  retention_in_days = "14"
+  tags {
+    Name            = "${var.prefix}_webserver"
+    application     = "${var.tag_application}"
+    contact-email   = "${var.tag_contact_email}"
+    customer        = "${var.tag_customer}"
+    team            = "${var.tag_team}"
+    environment     = "${var.tag_environment}"
+  }
+}
+
+resource "aws_cloudwatch_log_group" "scheduler_logs" {
+  name              = "/fargate/service/${var.prefix}_scheduler_ecs_service"
+  retention_in_days = "14"
+  tags {
+    Name            = "${var.prefix}_scheduler"
+    application     = "${var.tag_application}"
+    contact-email   = "${var.tag_contact_email}"
+    customer        = "${var.tag_customer}"
+    team            = "${var.tag_team}"
+    environment     = "${var.tag_environment}"
   }
 }
