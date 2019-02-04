@@ -192,3 +192,8 @@ variable "airflow_scheduler_image" {
   description="Docker scheduler image"  
   default="turnerlabs/airflow-sched"  
 }
+
+variable "airflow_worker_image" {
+  description="Docker worker image"  
+  default="turnerlabs/airflow-wrkr"  
+}
