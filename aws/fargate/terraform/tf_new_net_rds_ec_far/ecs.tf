@@ -40,16 +40,6 @@ resource "aws_ecs_task_definition" "airflow_webserver_ecs_task_def" {
         "/entrypoint.sh"
     ],
     "workingDirectory": "/usr/local/airflow",
-    "healthCheck": {
-        "retries": 3,
-        "command": [
-          "\"CMD-SHELL\"",
-          "\"curl -f http://localhost:8080/login || exit 1\""
-        ],
-        "timeout": 30,
-        "interval": 30,
-        "startPeriod": 60
-    },
     "environment": [
        {
         "name": "AIRFLOW_HOME",
