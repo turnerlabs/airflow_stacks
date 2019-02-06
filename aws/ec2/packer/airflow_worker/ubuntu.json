@@ -1,0 +1,79 @@
+{
+    "variables": {
+        "access_key": "",
+        "secret_key": "",
+        "vpcid_to_build_in": "",
+        "subnetid_to_build_in": "",
+        "tag_application": "",
+        "tag_contact_email": "",
+        "tag_customer": "",
+        "tag_team": "",
+        "tag_environment": ""
+    },
+    "builders": [{
+        "type": "amazon-ebs",
+        "access_key": "{{user `access_key`}}",
+        "secret_key": "{{user `secret_key`}}",
+        "region": "us-east-1",
+        "source_ami": "ami-04169656fea786776",
+        "instance_type": "t2.medium",
+        "ssh_username": "ubuntu",
+        "ami_name": "airflow_worker_python3 {{timestamp}}",
+        "vpc_id": "{{user `vpcid_to_build_in`}}",
+        "subnet_id": "{{user `subnetid_to_build_in`}}",
+        "run_tags": {
+            "Name": "airflow packer ami builder for airflow_worker_python3",
+            "application": "{{user `tag_application`}}",
+            "contact-email": "{{user `tag_contact_email`}}",
+            "customer": "{{user `tag_customer`}}",
+            "team": "{{user `tag_team`}}",
+            "environment": "{{user `tag_environment`}}"
+        }
+    }],
+    "provisioners": [{
+            "type": "file",
+            "source": "../airflow_websched/config/airflow.conf",
+            "destination": "/home/ubuntu/airflow.conf"
+        },
+        {
+            "type": "file",
+            "source": "../airflow_websched/config/airflow.sysconfig",
+            "destination": "/home/ubuntu/airflow.sysconfig"
+        },
+        {
+            "type": "file",
+            "source": "../airflow_websched/config/logrotate.conf",
+            "destination": "/home/ubuntu/logrotate.conf"
+        },
+        {
+            "type": "file",
+            "source": "../airflow_websched/config/awslogs.conf",
+            "destination": "/home/ubuntu/awslogs.conf"
+        },
+        {
+            "type": "file",
+            "source": "./cron/crontab",
+            "destination": "/home/ubuntu/crontab"
+        },
+        {
+            "type": "file",
+            "source": "../airflow_websched/systemd/airflow-worker.service",
+            "destination": "/home/ubuntu/airflow-worker.service"
+        },
+        {
+            "type": "file",
+            "source": "../airflow_websched/scripts/pip_mod_install.sh",
+            "destination": "/home/ubuntu/pip_mod_install.sh"
+        },
+        {
+            "type": "file",
+            "source": "../airflow_websched/scripts/dags_install.sh",
+            "destination": "/home/ubuntu/dags_install.sh"
+        },
+        {
+            "type": "shell",
+            "execute_command": "{{.Vars}} bash '{{.Path}}'",
+            "script": "provision.sh"
+        }
+    ]
+}
