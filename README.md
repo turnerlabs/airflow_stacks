@@ -8,29 +8,31 @@ Before trying to run this please take a look at the documentation here:  http://
 
 Here's our current stacks:
 
-**AWS**
+## AWS
 
-EC2
+### EC2
 
 Terraform - https://github.com/turnerlabs/airflow_stack_aws_ec2_tf
 
 Image - https://github.com/turnerlabs/airflow_stack_aws_ec2_ami
+***
 
-Fargate
+### Fargate
 
 Terraform - https://github.com/turnerlabs/airflow_stack_aws_fg_tf
 
 Docker Images - https://github.com/turnerlabs/airflow_stack_aws_fg_image
+***
 
-
-**GCP(work in progress with less work since Composer exists there)**
+### GCP(work in progress with less work since Composer exists there)
 
 Compute Enigne
 
 Terraform - https://github.com/turnerlabs/airflow_stack_gcp_ce_tf
 
 Image - https://github.com/turnerlabs/airflow_stack_gcp_ce_images
+**
 
-**Docker**
+### Docker
 
 Local Dockerized version for testing - https://github.com/turnerlabs/airflow_stack_docker
