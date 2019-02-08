@@ -25,7 +25,7 @@ Docker Images - https://github.com/turnerlabs/airflow_stack_aws_fg_image
 
 ### GCP(work in progress with less work since Composer exists there)
 
-Compute Enigne
+### Compute Enigne
 
 Terraform - https://github.com/turnerlabs/airflow_stack_gcp_ce_tf
 
