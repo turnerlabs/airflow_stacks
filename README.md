@@ -15,7 +15,6 @@ Here's our current stacks:
 Terraform - https://github.com/turnerlabs/airflow_stack_aws_ec2_tf
 
 Image - https://github.com/turnerlabs/airflow_stack_aws_ec2_ami
-***
 
 ### Fargate
 
@@ -31,7 +30,7 @@ Compute Enigne
 Terraform - https://github.com/turnerlabs/airflow_stack_gcp_ce_tf
 
 Image - https://github.com/turnerlabs/airflow_stack_gcp_ce_images
-**
+***
 
 ### Docker
 
