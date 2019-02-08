@@ -1,6 +1,6 @@
 # What is this
 
-This repo is an attempt to put all the Airflow operationalized knowledge at Turner into one place.  
+This was a repo is to put all the Airflow operationalized knowledge at Turner into one place but it got too big and I broke it out into the following pieces.
 
 I've had to make a few decisions in my design(Python 3 and Airflow 1.10) as well as some of the resources I've used(MySQL and Redis) for each platform.  It's mainly to keep my sanity and make this managable.  Please feel free to fork this and use Postgres, Maria, RabbitMQ, etc.  It won't hurt my feelings.  :)
 
@@ -8,22 +8,26 @@ Before trying to run this please take a look at the documentation here:  http://
 
 Here's our current stacks:
 
-**AWS(most work has been done here)**
+**AWS**
 
-![AWS](images/airflow.jpg)
+EC2
+
+Terraform - https://github.com/turnerlabs/airflow_stack_aws_ec2_tf
+Image - https://github.com/turnerlabs/airflow_stack_aws_ec2_ami
+
+Fargate
+
+Terraform - https://github.com/turnerlabs/airflow_stack_aws_fg_tf
+Docker Images - https://github.com/turnerlabs/airflow_stack_aws_fg_image
+
 
 **GCP(work in progress with less work since Composer exists there)**
 
-DIAGRAM TO COME
+Compute Enigne
 
-**Docker(work in progress)**
+Terraform - https://github.com/turnerlabs/airflow_stack_gcp_ce_tf
+Image - https://github.com/turnerlabs/airflow_stack_gcp_ce_images
 
-DIAGRAM TO COME
+**Docker**
 
-Please look over the issues and variable defintions before creating these stacks.  I default many of the settings for cost and to expedite creating and tearing down stacks so if you don't want your workers running on t2.micro's you would be advised to take a look at the variables.tf file in each terraform stack directory.
-
-Please feel free to add any issues as well.  I want to make this a first class stack for each environment.
-
-**Future Design Thoughts**
-
-- The future of this compute stack is Kubernetes.  In AWS and GCP, we may iterate through the webserver / scheduler being in fargate or serverless containers and the workers still on instances but my future design thoughts will revolve around this post on the kubernets blog(https://kubernetes.io/blog/2018/06/28/airflow-on-kubernetes-part-1-a-different-kind-of-operator/)
+Local Dockerized version for testing - https://github.com/turnerlabs/airflow_stack_docker
