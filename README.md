@@ -16,7 +16,7 @@ Terraform - https://github.com/turnerlabs/airflow_stack_aws_ec2_tf
 
 Image - https://github.com/turnerlabs/airflow_stack_aws_ec2_ami
 
-### Fargate
+### Fargate(This is just to dockerize airflow.  We have another initiative to run tasks on Fargate)
 
 Terraform - https://github.com/turnerlabs/airflow_stack_aws_fg_tf
 
